@@ -1,0 +1,316 @@
+<Story>
+  <Locations>
+	<Location Id ="0" Name="All" Visible="false" Sessions="17,19,18,22,21,20,23,24,26,25,28,27,29,31,30,32,34,35,37,38,41,40,39,43,42,44,46,45,47,49,50,51,52,54,53,56,55,57,58,63,65,64,66,67,115,114,116">
+    <Location Id ="1" Name="ARIADNE DREAM" Color="#E8EFE4" Visible="true" Sessions="48" />
+    <Location Id ="2" Name="COBB DREAM" Color="#E8E4F9" Visible="true" Sessions="11,13,14,15,16,33,36,59,61,60,62">
+      <Location Id ="3" Name="SAITO DREAM" Color="#FCF0F0" Visible="true" Sessions="0,3,2,1,5,4,7,6,8,9,10,12" />
+		</Location>
+    <Location Id ="4" Name="FISCHER DREAM" Color="#E9EDEB" Visible="true" Sessions="69,68,71,70,72,74,73,76,75,77,81,107,110,109,113,112">
+      <Location Id ="5" Name="FISCHER DREAM LAYER 2" Color="#FDEDED" Visible="true" Sessions="80,78,79,83,82,84,85,87,106">
+        <Location Id ="6" Name="FISCHER DREAM LAYER 3" Color="#EDFBFF" Visible="true" Sessions="86,89,88,91,90,92,93,94,101,103,105">
+          <Location Id ="7" Name="DUMMY" Color="White" Visible="false" Sessions="95" />
+          <Location Id ="8" Name="LIMBO" Color="#FAF8D9" Visible="true" Sessions="97,96,98,99,100,102,104,108,111" />
+				</Location>
+			</Location>
+		</Location>
+	</Location>
+  </Locations>
+  <Characters>
+    <Character Name="SAITO" Color="#9EA677">
+      <Span Start="0" End="7" Session="0" />
+      <Span Start="7" End="21" Session="1" />
+      <Span Start="21" End="28" Session="6" />
+      <Span Start="28" End="34" Session="8" />
+      <Span Start="34" End="41" Session="9" />
+      <Span Start="41" End="48" Session="10" />
+      <Span Start="48" End="55" Session="12" />
+      <Span Start="55" End="62" Session="14" />
+      <Span Start="62" End="68" Session="15" />
+      <Span Start="68" End="75" Session="16" />
+      <Span Start="75" End="82" Session="18" />
+      <Span Start="82" End="96" Session="20" />
+      <Span Start="96" End="102" Session="24" />
+      <Span Start="102" End="109" Session="25" />
+      <Span Start="109" End="191" Session="27" />
+      <Span Start="191" End="204" Session="47" />
+      <Span Start="204" End="218" Session="49" />
+      <Span Start="218" End="231" Session="51" />
+      <Span Start="231" End="238" Session="53" />
+      <Span Start="238" End="245" Session="55" />
+      <Span Start="245" End="252" Session="57" />
+      <Span Start="252" End="279" Session="58" />
+      <Span Start="279" End="286" Session="64" />
+      <Span Start="286" End="293" Session="66" />
+      <Span Start="293" End="299" Session="67" />
+      <Span Start="299" End="306" Session="68" />
+      <Span Start="306" End="313" Session="70" />
+      <Span Start="313" End="320" Session="72" />
+      <Span Start="320" End="326" Session="73" />
+      <Span Start="326" End="333" Session="75" />
+      <Span Start="333" End="340" Session="77" />
+      <Span Start="340" End="347" Session="78" />
+      <Span Start="347" End="360" Session="82" />
+      <Span Start="360" End="367" Session="85" />
+      <Span Start="367" End="374" Session="86" />
+      <Span Start="374" End="381" Session="88" />
+      <Span Start="381" End="394" Session="90" />
+      <Span Start="394" End="401" Session="92" />
+      <Span Start="401" End="408" Session="93" />
+      <Span Start="408" End="415" Session="94" />
+      <Span Start="415" End="435" Session="95" />
+      <Span Start="435" End="476" Session="100" />
+      <Span Start="476" End="483" Session="111" />
+      <Span Start="483" End="490" Session="116" />
+    </Character>
+    <Character Name="COBB" Color="#846C84">
+      <Span Start="0" End="7" Session="0" />
+      <Span Start="7" End="14" Session="2" />
+      <Span Start="14" End="21" Session="4" />
+      <Span Start="21" End="34" Session="7" />
+      <Span Start="34" End="41" Session="9" />
+      <Span Start="41" End="48" Session="10" />
+      <Span Start="48" End="62" Session="13" />
+      <Span Start="62" End="68" Session="15" />
+      <Span Start="68" End="75" Session="16" />
+      <Span Start="75" End="82" Session="19" />
+      <Span Start="82" End="89" Session="21" />
+      <Span Start="89" End="96" Session="23" />
+      <Span Start="96" End="102" Session="24" />
+      <Span Start="102" End="109" Session="25" />
+      <Span Start="109" End="123" Session="28" />
+      <Span Start="123" End="130" Session="30" />
+      <Span Start="130" End="136" Session="32" />
+      <Span Start="136" End="143" Session="33" />
+      <Span Start="143" End="150" Session="35" />
+      <Span Start="150" End="157" Session="36" />
+      <Span Start="157" End="163" Session="38" />
+      <Span Start="163" End="170" Session="39" />
+      <Span Start="170" End="177" Session="42" />
+      <Span Start="177" End="184" Session="44" />
+      <Span Start="184" End="191" Session="45" />
+      <Span Start="191" End="204" Session="47" />
+      <Span Start="204" End="218" Session="49" />
+      <Span Start="218" End="231" Session="51" />
+      <Span Start="231" End="238" Session="53" />
+      <Span Start="238" End="245" Session="56" />
+      <Span Start="245" End="252" Session="57" />
+      <Span Start="252" End="259" Session="59" />
+      <Span Start="259" End="265" Session="60" />
+      <Span Start="265" End="272" Session="62" />
+      <Span Start="272" End="279" Session="63" />
+      <Span Start="279" End="286" Session="64" />
+      <Span Start="286" End="293" Session="66" />
+      <Span Start="293" End="299" Session="67" />
+      <Span Start="299" End="306" Session="68" />
+      <Span Start="306" End="313" Session="70" />
+      <Span Start="313" End="320" Session="72" />
+      <Span Start="320" End="326" Session="73" />
+      <Span Start="326" End="333" Session="75" />
+      <Span Start="333" End="340" Session="77" />
+      <Span Start="340" End="347" Session="79" />
+      <Span Start="347" End="354" Session="83" />
+      <Span Start="354" End="360" Session="84" />
+      <Span Start="360" End="367" Session="85" />
+      <Span Start="367" End="374" Session="86" />
+      <Span Start="374" End="401" Session="89" />
+      <Span Start="401" End="408" Session="93" />
+      <Span Start="408" End="415" Session="94" />
+      <Span Start="415" End="422" Session="96" />
+      <Span Start="422" End="428" Session="98" />
+      <Span Start="428" End="442" Session="99" />
+      <Span Start="442" End="449" Session="102" />
+      <Span Start="449" End="469" Session="104" />
+      <Span Start="469" End="476" Session="108" />
+      <Span Start="476" End="483" Session="111" />
+      <Span Start="483" End="490" Session="116" />
+    </Character>
+    <Character Name="ARTHUR" Color="#938473">
+      <Span Start="0" End="7" Session="0" />
+      <Span Start="7" End="14" Session="2" />
+      <Span Start="14" End="28" Session="5" />
+      <Span Start="28" End="34" Session="8" />
+      <Span Start="34" End="41" Session="9" />
+      <Span Start="41" End="62" Session="11" />
+      <Span Start="62" End="68" Session="15" />
+      <Span Start="68" End="75" Session="17" />
+      <Span Start="75" End="82" Session="19" />
+      <Span Start="82" End="89" Session="22" />
+      <Span Start="89" End="96" Session="23" />
+      <Span Start="96" End="102" Session="24" />
+      <Span Start="102" End="109" Session="25" />
+      <Span Start="109" End="123" Session="28" />
+      <Span Start="123" End="130" Session="31" />
+      <Span Start="130" End="136" Session="32" />
+      <Span Start="136" End="143" Session="34" />
+      <Span Start="143" End="150" Session="35" />
+      <Span Start="150" End="157" Session="37" />
+      <Span Start="157" End="163" Session="38" />
+      <Span Start="163" End="170" Session="39" />
+      <Span Start="170" End="197" Session="43" />
+      <Span Start="197" End="231" Session="48" />
+      <Span Start="231" End="238" Session="53" />
+      <Span Start="238" End="245" Session="55" />
+      <Span Start="245" End="252" Session="57" />
+      <Span Start="252" End="279" Session="58" />
+      <Span Start="279" End="286" Session="64" />
+      <Span Start="286" End="293" Session="66" />
+      <Span Start="293" End="299" Session="67" />
+      <Span Start="299" End="306" Session="68" />
+      <Span Start="306" End="313" Session="70" />
+      <Span Start="313" End="320" Session="72" />
+      <Span Start="320" End="326" Session="73" />
+      <Span Start="326" End="333" Session="75" />
+      <Span Start="333" End="340" Session="77" />
+      <Span Start="340" End="354" Session="80" />
+      <Span Start="354" End="360" Session="84" />
+      <Span Start="360" End="367" Session="85" />
+      <Span Start="367" End="456" Session="87" />
+      <Span Start="456" End="462" Session="106" />
+      <Span Start="462" End="469" Session="107" />
+      <Span Start="469" End="476" Session="109" />
+      <Span Start="476" End="483" Session="112" />
+      <Span Start="483" End="490" Session="114" />
+    </Character>
+    <Character Name="MAL" Color="#C36FA9">
+      <Span Start="7" End="14" Session="3" />
+      <Span Start="14" End="21" Session="4" />
+      <Span Start="21" End="28" Session="6" />
+      <Span Start="28" End="34" Session="8" />
+      <Span Start="34" End="41" Session="9" />
+      <Span Start="41" End="48" Session="10" />
+      <Span Start="48" End="55" Session="12" />
+      <Span Start="259" End="265" Session="61" />
+      <Span Start="265" End="272" Session="62" />
+      <Span Start="394" End="401" Session="92" />
+      <Span Start="422" End="428" Session="98" />
+      <Span Start="428" End="442" Session="99" />
+      <Span Start="442" End="449" Session="102" />
+      <Span Start="449" End="469" Session="104" />
+    </Character>
+
+    <Character Name="ARIADNE" Color="#9D64A9">
+      <Span Start="116" End="123" Session="29" />
+      <Span Start="123" End="130" Session="30" />
+      <Span Start="130" End="136" Session="32" />
+      <Span Start="136" End="143" Session="33" />
+      <Span Start="143" End="150" Session="35" />
+      <Span Start="150" End="157" Session="36" />
+      <Span Start="157" End="163" Session="38" />
+      <Span Start="163" End="197" Session="40" />
+      <Span Start="197" End="231" Session="48" />
+      <Span Start="231" End="238" Session="54" />
+      <Span Start="238" End="245" Session="56" />
+      <Span Start="245" End="252" Session="57" />
+      <Span Start="252" End="259" Session="59" />
+      <Span Start="259" End="265" Session="61" />
+      <Span Start="265" End="272" Session="62" />
+      <Span Start="272" End="279" Session="63" />
+      <Span Start="279" End="286" Session="64" />
+      <Span Start="286" End="293" Session="66" />
+      <Span Start="293" End="299" Session="67" />
+      <Span Start="299" End="306" Session="68" />
+      <Span Start="306" End="313" Session="70" />
+      <Span Start="313" End="320" Session="72" />
+      <Span Start="320" End="326" Session="73" />
+      <Span Start="326" End="333" Session="75" />
+      <Span Start="333" End="340" Session="77" />
+      <Span Start="340" End="354" Session="80" />
+      <Span Start="354" End="360" Session="84" />
+      <Span Start="360" End="367" Session="85" />
+      <Span Start="367" End="374" Session="86" />
+      <Span Start="374" End="401" Session="89" />
+      <Span Start="401" End="408" Session="93" />
+      <Span Start="408" End="415" Session="94" />
+      <Span Start="415" End="422" Session="96" />
+      <Span Start="422" End="428" Session="98" />
+      <Span Start="428" End="442" Session="99" />
+      <Span Start="442" End="449" Session="102" />
+      <Span Start="449" End="456" Session="105" />
+      <Span Start="456" End="462" Session="106" />
+      <Span Start="462" End="469" Session="107" />
+      <Span Start="469" End="476" Session="109" />
+      <Span Start="476" End="483" Session="112" />
+      <Span Start="483" End="490" Session="114" />
+    </Character>
+    <Character Name="EAMES" Color="#646A93">
+      <Span Start="163" End="177" Session="41" />
+      <Span Start="177" End="184" Session="44" />
+      <Span Start="184" End="204" Session="46" />
+      <Span Start="204" End="218" Session="49" />
+      <Span Start="218" End="231" Session="51" />
+      <Span Start="231" End="238" Session="53" />
+      <Span Start="238" End="245" Session="55" />
+      <Span Start="245" End="252" Session="57" />
+      <Span Start="252" End="279" Session="58" />
+      <Span Start="279" End="286" Session="65" />
+      <Span Start="286" End="293" Session="66" />
+      <Span Start="293" End="299" Session="67" />
+      <Span Start="299" End="306" Session="68" />
+      <Span Start="306" End="313" Session="70" />
+      <Span Start="313" End="320" Session="72" />
+      <Span Start="320" End="333" Session="74" />
+      <Span Start="333" End="340" Session="77" />
+      <Span Start="340" End="347" Session="79" />
+      <Span Start="347" End="360" Session="82" />
+      <Span Start="360" End="367" Session="85" />
+      <Span Start="367" End="374" Session="86" />
+      <Span Start="374" End="381" Session="88" />
+      <Span Start="381" End="408" Session="91" />
+      <Span Start="408" End="415" Session="94" />
+      <Span Start="415" End="435" Session="95" />
+      <Span Start="435" End="442" Session="101" />
+      <Span Start="442" End="449" Session="103" />
+      <Span Start="449" End="456" Session="105" />
+      <Span Start="456" End="462" Session="106" />
+      <Span Start="462" End="469" Session="107" />
+      <Span Start="469" End="483" Session="110" />
+      <Span Start="483" End="490" Session="114" />
+    </Character>
+    <Character Name="YUSUF" Color="#65DB85">
+      <Span Start="211" End="218" Session="50" />
+      <Span Start="218" End="231" Session="51" />
+      <Span Start="231" End="238" Session="53" />
+      <Span Start="238" End="245" Session="55" />
+      <Span Start="245" End="252" Session="57" />
+      <Span Start="252" End="279" Session="58" />
+      <Span Start="279" End="286" Session="65" />
+      <Span Start="286" End="293" Session="66" />
+      <Span Start="293" End="299" Session="67" />
+      <Span Start="299" End="306" Session="68" />
+      <Span Start="306" End="313" Session="70" />
+      <Span Start="313" End="320" Session="72" />
+      <Span Start="320" End="326" Session="73" />
+      <Span Start="326" End="333" Session="75" />
+      <Span Start="333" End="476" Session="77" />
+      <Span Start="476" End="483" Session="113" />
+      <Span Start="483" End="490" Session="114" />
+    </Character>
+    <Character Name="FISCHER" Color="#748BDB">
+      <Span Start="225" End="293" Session="52" />
+      <Span Start="293" End="299" Session="67" />
+      <Span Start="299" End="306" Session="69" />
+      <Span Start="306" End="313" Session="70" />
+      <Span Start="313" End="320" Session="72" />
+      <Span Start="320" End="333" Session="74" />
+      <Span Start="333" End="340" Session="77" />
+      <Span Start="340" End="347" Session="79" />
+      <Span Start="347" End="354" Session="83" />
+      <Span Start="354" End="360" Session="84" />
+      <Span Start="360" End="367" Session="85" />
+      <Span Start="367" End="374" Session="86" />
+      <Span Start="374" End="381" Session="88" />
+      <Span Start="381" End="394" Session="90" />
+      <Span Start="394" End="401" Session="92" />
+      <Span Start="401" End="408" Session="93" />
+      <Span Start="408" End="415" Session="94" />
+      <Span Start="415" End="428" Session="97" />
+      <Span Start="428" End="442" Session="99" />
+      <Span Start="442" End="449" Session="103" />
+      <Span Start="449" End="456" Session="105" />
+      <Span Start="456" End="462" Session="106" />
+      <Span Start="462" End="469" Session="107" />
+      <Span Start="469" End="483" Session="110" />
+      <Span Start="483" End="490" Session="115" />
+    </Character>
+  </Characters>
+</Story>

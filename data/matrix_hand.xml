@@ -1,0 +1,15 @@
+<Story>
+  <Locations>
+    <Location Name="ALL" Color="#e7f7de" Visible="true" Sessions="" />
+  </Locations>
+  <Characters>
+    <Character Id="0" Name="SMITH" Color="#ff5d70">
+      <Span Start="0" End="1" Session="0" />
+      <Span Start="1" End="2" Session="1" />
+      <Span Start="2" End="6" Session="2" />
+      <Span Start="6" End="7" Session="3" />
+      <Span Start="7" End="8" Session="4" />
+      <Span Start="8" End="9" Session="0" />
+    </Character>
+  </Characters>
+</Story>

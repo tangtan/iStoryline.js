@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Story>
+ <Locations>
+	<Location Name="All" Color="#000000" Visible="false" Sessions="1">
+		<Location Name="DAGOBAH" Color="#E8EFE4" Visible="true" Sessions="" />
+	</Location>
+  </Locations>
+  <Characters>
+    <Character Name="default" Color="Red">
+      <Span Start="1" End="5" Session="1"></Span>
+    </Character>
+  </Characters>
+</Story>

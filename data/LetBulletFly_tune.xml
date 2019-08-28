@@ -1,0 +1,306 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Story>
+  <Locations>
+    <Location Name="火车" Color="#E9F0E5" Visible="true" Sessions="23" />
+    <Location Name="鹅城" Color="#EAE7F1" Visible="true" Sessions="25,29,30,74,75,7,  55,56,57,39,28,79,81,69,78" />
+    <Location Name="碉楼" Color="#E2DFE9" Visible="true" Sessions="61, 62, 63, 12 ,13, 42,43,44,73" />
+    <Location Name="城外" Color="#FFF0E8" Visible="true" Sessions="9" />
+    <Location Name="上海" Color="#EDEDED" Visible="true" Sessions="48, 49, 50" />
+    <Location Name="All" Color="#FFFFFF" Visible="false" Sessions="0, 1, 2, 3, 4, 5,6, 8, 10, 11, 15, 14, 16, 17, 18, 19, 22, 21, 20, 24, 26, 27, 32, 34, 33, 35, 36, 37, 38, 40, 41, 46, 45, 47, 51, 52, 53, 54, 58, 59, 60, 64, 65, 66, 67, 68, 70, 71, 72, 76, 77, 80, 82, 83, 84" />
+  </Locations>
+  <Characters>
+    <Character Name="黄四郎" Color="#1acad5" Weight="4">
+      <Span Start="0" End="32" Session="0"/>
+      <Span Start="32" End="43" Session="1"/>
+      <Span Start="43" End="50" Session="2"/>
+      <Span Start="50" End="75" Session="3"/>
+      <Span Start="75" End="82" Session="4"/>
+      <Span Start="82" End="90" Session="5"/>
+      <Span Start="90" End="96" Session="6"/>
+      <Span Start="96" End="102" Session="7"/>
+      <Span Start="102" End="107" Session="8"/>
+      <Span Start="107" End="115" Session="9"/>
+      <Span Start="115" End="140" Session="10"/>
+      <Span Start="140" End="163" Session="11"/>
+      <Span Start="163" End="212" Session="12"/>
+      <Span Start="212" End="221" Session="13"/>
+      <Span Start="221" End="239" Session="14"/>
+      <Span Start="239" End="246" Session="15"/>
+    </Character>
+    <Character Name="胡千" Color="#1e588e">
+      <Span Start="32" End="43" Session="1"/>
+      <Span Start="43" End="50" Session="2"/>
+      <Span Start="50" End="75" Session="3"/>
+      <Span Start="75" End="82" Session="4"/>
+      <Span Start="82" End="90" Session="5"/>
+      <Span Start="90" End="96" Session="6"/>
+      <Span Start="96" End="102" Session="7"/>
+      <Span Start="102" End="107" Session="8"/>
+      <Span Start="107" End="115" Session="9"/>
+      <Span Start="115" End="140" Session="10"/>
+      <Span Start="140" End="147" Session="64"/>
+      <Span Start="147" End="155" Session="39"/>
+      <Span Start="155" End="163" Session="64"/>
+      <Span Start="163" End="212" Session="12"/>
+      <Span Start="212" End="221" Session="13"/>
+      <Span Start="221" End="233" Session="17"/>
+    </Character>
+    <Character Name="胡万" Color="#233673">
+      <Span Start="28" End="37" Session="18"/>
+      <Span Start="37" End="43" Session="26"/>
+      <Span Start="43" End="50" Session="2"/>
+      <Span Start="50" End="54" Session="19"/>
+      <Span Start="54" End="63" Session="20"/>
+      <Span Start="63" End="82" Session="21"/>
+      <Span Start="82" End="90" Session="5"/>
+      <Span Start="90" End="96" Session="6"/>
+      <Span Start="96" End="102" Session="7"/>
+    </Character>
+    <Character Name="花姐" Color="#d5683f">
+      <Span Start="28" End="37" Session="18"/>
+      <Span Start="37" End="43" Session="26"/>
+      <Span Start="43" End="50" Session="2"/>
+      <Span Start="50" End="75" Session="3"/>
+      <Span Start="75" End="122" Session="27"/>
+      <Span Start="122" End="128" Session="28"/>
+      <Span Start="128" End="137" Session="37"/>
+      <Span Start="137" End="147" Session="38"/>
+      <Span Start="147" End="155" Session="39"/>
+      <Span Start="155" End="172" Session="40"/>
+      <Span Start="172" End="181" Session="41"/>
+      <Span Start="181" End="186" Session="42"/>
+      <Span Start="186" End="194" Session="43"/>
+      <Span Start="194" End="212" Session="44"/>
+      <Span Start="212" End="221" Session="13"/>
+      <Span Start="221" End="227" Session="45"/>
+      <Span Start="227" End="233" Session="46"/>
+      <Span Start="233" End="239" Session="47"/>
+      <Span Start="239" End="246" Session="48"/>
+      <Span Start="246" End="254" Session="49"/>
+      <Span Start="254" End="260" Session="50"/>
+    </Character>
+    <Character Name="张牧之" Color="#f3c115" Weight="100">
+      <Span Start="0" End="15" Session="54"/>
+      <Span Start="15" End="20" Session="23"/>
+      <Span Start="20" End="28" Session="24"/>
+      <Span Start="28" End="37" Session="25"/>
+      <Span Start="37" End="42" Session="35"/>
+      <Span Start="42" End="50" Session="32"/>
+      <Span Start="50" End="55" Session="36"/>
+      <Span Start="55" End="63" Session="34"/>
+      <Span Start="63" End="82" Session="21"/>
+      <Span Start="82" End="90" Session="5"/>
+      <Span Start="90" End="96" Session="6"/>
+      <Span Start="96" End="102" Session="7"/>
+      <Span Start="102" End="107" Session="8"/>
+      <Span Start="107" End="115" Session="9"/>
+      <Span Start="115" End="122" Session="55"/>
+      <Span Start="122" End="137" Session="56"/>
+      <Span Start="137" End="147" Session="57"/>
+      <Span Start="147" End="155" Session="39"/>
+      <Span Start="155" End="172" Session="59"/>
+      <Span Start="172" End="181" Session="60"/>
+      <Span Start="181" End="186" Session="61"/>
+      <Span Start="186" End="194" Session="62"/>
+      <Span Start="194" End="212" Session="63"/>
+      <Span Start="212" End="221" Session="13"/>
+      <Span Start="221" End="227" Session="51"/>
+      <Span Start="227" End="233" Session="52"/>
+      <Span Start="233" End="239" Session="53"/>
+      <Span Start="239" End="246" Session="15"/>
+      <Span Start="246" End="260" Session="16"/>
+    </Character>
+    <Character Name="武举人" Color="#79A25E">
+      <Span Start="28" End="37" Session="25"/>
+      <Span Start="37" End="42" Session="35"/>
+      <Span Start="42" End="50" Session="32"/>
+      <Span Start="50" End="55" Session="36"/>
+      <Span Start="55" End="63" Session="34"/>
+      <Span Start="63" End="82" Session="21"/>
+      <Span Start="82" End="90" Session="5"/>
+    </Character>
+    <Character Name="孙守义" Color="#a5b48b">
+      <Span Start="42" End="50" Session="32"/>
+      <Span Start="50" End="55" Session="33"/>
+      <Span Start="55" End="63" Session="34"/>
+      <Span Start="63" End="82" Session="21"/>
+      <Span Start="82" End="90" Session="5"/>
+    </Character>
+    <Character Name="马邦德" Color="#100b0f" Weight="4">
+      <Span Start="0" End="15" Session="22"/>
+      <Span Start="15" End="20" Session="23"/>
+      <Span Start="20" End="28" Session="24"/>
+      <Span Start="28" End="37" Session="25"/>
+      <Span Start="37" End="42" Session="65"/>
+      <Span Start="42" End="50" Session="32"/>
+      <Span Start="50" End="55" Session="33"/>
+      <Span Start="55" End="63" Session="34"/>
+      <Span Start="63" End="82" Session="21"/>
+      <Span Start="82" End="90" Session="5"/>
+      <Span Start="90" End="96" Session="66"/>
+      <Span Start="96" End="102" Session="7"/>
+      <Span Start="102" End="107" Session="67"/>
+      <Span Start="107" End="115" Session="9"/>
+      <Span Start="115" End="122" Session="68"/>
+      <Span Start="122" End="137" Session="69"/>
+      <Span Start="137" End="150" Session="70"/>
+      <Span Start="150" End="165" Session="71"/>
+      <Span Start="165" End="172" Session="72"/>
+      <Span Start="172" End="181" Session="60"/>      
+    </Character>
+    <Character Name="县长夫人" Color="#f4534b"> 
+      <Span Start="0" End="15" Session="22"/>
+      <Span Start="15" End="20" Session="23"/>
+      <Span Start="20" End="28" Session="24"/>
+      <Span Start="28" End="37" Session="25"/>
+      <Span Start="37" End="49" Session="29"/>
+      <Span Start="49" End="96" Session="30"/>
+      <Span Start="96" End="102" Session="7"/>
+    </Character>
+    <Character Name="师爷" Color="#8C7551">
+      <Span Start="0" End="15" Session="22"/>
+      <Span Start="15" End="20" Session="23"/>
+    </Character>
+    <Character Name="老二" Color="#332f67">
+      <Span Start="0" End="15" Session="54"/>
+      <Span Start="15" End="20" Session="23"/>
+      <Span Start="20" End="28" Session="24"/>
+      <Span Start="28" End="37" Session="25"/>
+      <Span Start="37" End="49" Session="74"/>
+      <Span Start="49" End="96" Session="75"/>
+      <Span Start="96" End="102" Session="7"/>
+      <Span Start="102" End="115" Session="76"/>
+      <Span Start="115" End="122" Session="77"/>
+      <Span Start="122" End="128" Session="28"/>
+      <Span Start="128" End="137" Session="78"/>
+      <Span Start="137" End="147" Session="79"/>
+      <Span Start="147" End="155" Session="39"/>
+      <Span Start="155" End="172" Session="80"/>
+      <Span Start="172" End="181" Session="60"/>
+    </Character>
+    <Character Name="老三" Color="#451a60">
+      <Span Start="0" End="15" Session="54"/>
+      <Span Start="15" End="20" Session="23"/>
+      <Span Start="20" End="28" Session="24"/>
+      <Span Start="28" End="37" Session="25"/>
+      <Span Start="37" End="49" Session="74"/>
+      <Span Start="49" End="96" Session="75"/>
+      <Span Start="96" End="102" Session="7"/>
+      <Span Start="102" End="115" Session="76"/>
+      <Span Start="115" End="122" Session="77"/>
+      <Span Start="122" End="128" Session="28"/>
+      <Span Start="128" End="137" Session="81"/>
+      <Span Start="137" End="147" Session="79"/>
+      <Span Start="147" End="155" Session="39"/>
+      <Span Start="155" End="165" Session="82"/>
+      <Span Start="165" End="172" Session="72"/>
+      <Span Start="172" End="181" Session="60"/>
+      <Span Start="181" End="186" Session="61"/>
+      <Span Start="186" End="194" Session="62"/>
+      <Span Start="194" End="212" Session="73"/>
+      <Span Start="212" End="221" Session="13"/>
+      <Span Start="221" End="227" Session="51"/>
+      <Span Start="227" End="233" Session="52"/>
+      <Span Start="233" End="239" Session="47"/>
+      <Span Start="239" End="246" Session="48"/>
+      <Span Start="246" End="254" Session="49"/>
+      <Span Start="254" End="260" Session="50"/>
+    </Character>
+    <Character Name="老四" Color="#485b1e">
+      <Span Start="0" End="15" Session="54"/>
+      <Span Start="15" End="20" Session="23"/>
+      <Span Start="20" End="28" Session="24"/>
+      <Span Start="28" End="37" Session="25"/>
+      <Span Start="37" End="49" Session="74"/>
+      <Span Start="49" End="96" Session="75"/>
+      <Span Start="96" End="102" Session="7"/>
+      <Span Start="102" End="115" Session="76"/>
+      <Span Start="115" End="122" Session="83"/>
+      <Span Start="122" End="137" Session="69"/>
+      <Span Start="137" End="147" Session="79"/>
+      <Span Start="147" End="155" Session="39"/>
+      <Span Start="155" End="165" Session="82"/>
+      <Span Start="165" End="172" Session="72"/>
+      <Span Start="172" End="181" Session="60"/>
+      <Span Start="181" End="186" Session="61"/>
+      <Span Start="186" End="194" Session="62"/>
+      <Span Start="194" End="212" Session="73"/>
+      <Span Start="212" End="221" Session="13"/>
+      <Span Start="221" End="227" Session="51"/>
+      <Span Start="227" End="233" Session="52"/>
+      <Span Start="233" End="239" Session="47"/>
+      <Span Start="239" End="246" Session="48"/>
+      <Span Start="246" End="254" Session="49"/>
+      <Span Start="254" End="260" Session="50"/>
+    </Character>
+    <Character Name="老五" Color="#635057">
+      <Span Start="0" End="15" Session="54"/>
+      <Span Start="15" End="20" Session="23"/>
+      <Span Start="20" End="28" Session="24"/>
+      <Span Start="28" End="37" Session="25"/>
+      <Span Start="37" End="49" Session="74"/>
+      <Span Start="49" End="96" Session="75"/>
+      <Span Start="96" End="102" Session="7"/>
+      <Span Start="102" End="115" Session="76"/>
+      <Span Start="115" End="122" Session="83"/>
+      <Span Start="122" End="137" Session="69"/>
+      <Span Start="137" End="147" Session="79"/>
+      <Span Start="147" End="155" Session="39"/>
+      <Span Start="155" End="165" Session="82"/>
+      <Span Start="165" End="172" Session="72"/>
+      <Span Start="172" End="181" Session="60"/>
+      <Span Start="181" End="186" Session="61"/>
+      <Span Start="186" End="194" Session="62"/>
+      <Span Start="194" End="212" Session="73"/>
+      <Span Start="212" End="221" Session="13"/>
+      <Span Start="221" End="227" Session="51"/>
+      <Span Start="227" End="233" Session="52"/>
+      <Span Start="233" End="239" Session="47"/>
+      <Span Start="239" End="246" Session="48"/>
+      <Span Start="246" End="254" Session="49"/>
+      <Span Start="254" End="260" Session="50"/>
+    </Character>
+    <Character Name="老六" Color="#505746">
+      <Span Start="0" End="15" Session="54"/>
+      <Span Start="15" End="20" Session="23"/>
+      <Span Start="20" End="28" Session="24"/>
+      <Span Start="28" End="37" Session="25"/>
+      <Span Start="37" End="49" Session="74"/>
+      <Span Start="49" End="55" Session="84"/>
+      <Span Start="55" End="63" Session="34"/>
+    </Character>
+    <Character Name="老七" Color="#6e5e1f">
+      <Span Start="0" End="15" Session="54"/>
+      <Span Start="15" End="20" Session="23"/>
+      <Span Start="20" End="28" Session="24"/>
+      <Span Start="28" End="37" Session="25"/>
+      <Span Start="37" End="49" Session="74"/>
+      <Span Start="49" End="96" Session="75"/>
+      <Span Start="96" End="102" Session="7"/>
+      <Span Start="102" End="115" Session="76"/>
+      <Span Start="115" End="122" Session="83"/>
+      <Span Start="122" End="137" Session="69"/>
+      <Span Start="137" End="147" Session="79"/>
+      <Span Start="147" End="155" Session="39"/>
+      <Span Start="155" End="165" Session="82"/>
+      <Span Start="165" End="172" Session="72"/>
+      <Span Start="172" End="181" Session="60"/>
+      <Span Start="181" End="186" Session="61"/>
+      <Span Start="186" End="194" Session="62"/>
+      <Span Start="194" End="212" Session="73"/>
+      <Span Start="212" End="221" Session="13"/>
+      <Span Start="221" End="227" Session="51"/>
+      <Span Start="227" End="233" Session="52"/>
+      <Span Start="233" End="239" Session="47"/>
+      <Span Start="239" End="246" Session="48"/>
+      <Span Start="246" End="254" Session="49"/>
+      <Span Start="254" End="260" Session="50"/>
+    </Character>
+    <Character Name="佚名" Color="#849f55">
+      <Span Start="212" End="221" Session="13"/>
+      <Span Start="221" End="239" Session="14"/>
+      <Span Start="239" End="246" Session="15"/>
+    </Character>
+  </Characters>
+</Story>
+

@@ -1,0 +1,306 @@
+<Story>
+  <Locations>
+	<Location Name="All" Color="Black" Visible="false" Sessions="1,2,8,7,25,29,37,41,39,46,56,55,64,67,71,76,78,80,86">
+		<Location Name="DAGOBAH" Color="#E8EFE4" Visible="true" Sessions="45,49,57,77" />
+		<Location Name="DEATH STAR" Color="#EDEDED" Visible="true" Sessions="0,9,18,19,16,17,20,23,26,27,28,61,81,87,84,88,89,90,91" />
+		<Location Name="HOTH" Color="#D9F2FC" Visible="true" Sessions="32,34,35,36,38" />
+		<Location Name="YAVIN 4" Color="#E1EFEF" Visible="true" Sessions="22,21,24,30,31,33" />
+		<Location Name="CLOUD CITY" Color="#DFE4F1" Visible="true" Sessions="40,42,43,44,47,48,50,51,53,54,59,58,62,63" />
+		<Location Name="ENDOR" Color="#E2DFE9" Visible="true" Sessions="82,85,92" />
+		<Location Name="TATOOINE" Color="#FFF0E8" Visible="true" Sessions="4,5,6,3,10,12,11,13,14,15,52,60,65,66,68,69,70,72,73,74,75,79,83" />
+	</Location>
+  </Locations>
+  <Characters>
+    <Character Id="0" Name="VADER" Color="#000000" Weight="4">
+      <Span Start="0" End="7" Session="0" />
+      <Span Start="7" End="22" Session="9" />
+      <Span Start="22" End="33" Session="16" />
+      <Span Start="33" End="35" Session="20" />
+      <Span Start="35" End="40" Session="23" />
+      <Span Start="40" End="46" Session="26" />
+      <Span Start="46" End="51" Session="27" />
+      <Span Start="51" End="75" Session="28" />
+      <Span Start="75" End="78" Session="38" />
+      <Span Start="78" End="81" Session="39" />
+      <Span Start="81" End="85" Session="42" />
+      <Span Start="85" End="90" Session="43" />
+      <Span Start="90" End="95" Session="48" />
+      <Span Start="95" End="102" Session="50" />
+      <Span Start="102" End="105" Session="51" />
+      <Span Start="105" End="109" Session="53" />
+      <Span Start="109" End="119" Session="58" />
+      <Span Start="119" End="170" Session="61" />
+      <Span Start="170" End="174" Session="81" />
+      <Span Start="174" End="178" Session="84" />
+      <Span Start="178" End="185" Session="88" />
+      <Span Start="185" End="190" Session="89" />
+      <Span Start="190" End="193" Session="90" />
+    </Character>
+    <Character Id="1" Name="LEIA" Color="#A3A3A3">
+      <Span Start="0" End="2" Session="1" />
+      <Span Start="2" End="7" Session="7" />
+      <Span Start="7" End="22" Session="9" />
+      <Span Start="22" End="33" Session="17" />
+      <Span Start="33" End="38" Session="21" />
+      <Span Start="38" End="52" Session="24" />
+      <Span Start="52" End="58" Session="30" />
+      <Span Start="58" End="65" Session="31" />
+      <Span Start="65" End="72" Session="33" />
+      <Span Start="72" End="75" Session="36" />
+      <Span Start="75" End="78" Session="38" />
+      <Span Start="78" End="87" Session="40" />
+      <Span Start="87" End="95" Session="47" />
+      <Span Start="95" End="102" Session="50" />
+      <Span Start="102" End="105" Session="51" />
+      <Span Start="105" End="109" Session="54" />
+      <Span Start="109" End="124" Session="59" />
+      <Span Start="124" End="128" Session="63" />
+      <Span Start="128" End="134" Session="64" />
+      <Span Start="134" End="143" Session="67" />
+      <Span Start="143" End="146" Session="70" />
+      <Span Start="146" End="151" Session="72" />
+      <Span Start="151" End="153" Session="73" />
+      <Span Start="153" End="154" Session="74" />
+      <Span Start="154" End="163" Session="75" />
+      <Span Start="163" End="170" Session="79" />
+      <Span Start="170" End="174" Session="82" />
+      <Span Start="174" End="197" Session="85" />
+      <Span Start="197" End="200" Session="92" />
+    </Character>
+    <Character Id="2" Name="R2-D2" Color="#277FE1">
+      <Span Start="0" End="2" Session="1" />
+      <Span Start="2" End="7" Session="8" />
+      <Span Start="7" End="12" Session="10" />
+      <Span Start="12" End="19" Session="11" />
+      <Span Start="19" End="22" Session="15" />
+      <Span Start="22" End="33" Session="18" />
+      <Span Start="33" End="40" Session="22" />
+      <Span Start="40" End="46" Session="26" />
+      <Span Start="46" End="51" Session="27" />
+      <Span Start="51" End="52" Session="24" />
+      <Span Start="52" End="58" Session="30" />
+      <Span Start="58" End="65" Session="31" />
+      <Span Start="65" End="72" Session="33" />
+      <Span Start="72" End="75" Session="36" />
+      <Span Start="75" End="78" Session="38" />
+      <Span Start="78" End="90" Session="41" />
+      <Span Start="90" End="105" Session="49" />
+      <Span Start="105" End="109" Session="55" />
+      <Span Start="109" End="124" Session="59" />
+      <Span Start="124" End="128" Session="63" />
+      <Span Start="128" End="134" Session="64" />
+      <Span Start="134" End="138" Session="68" />
+      <Span Start="138" End="146" Session="69" />
+      <Span Start="146" End="151" Session="72" />
+      <Span Start="151" End="153" Session="73" />
+      <Span Start="153" End="154" Session="74" />
+      <Span Start="154" End="163" Session="75" />
+      <Span Start="163" End="170" Session="79" />
+      <Span Start="170" End="174" Session="82" />
+      <Span Start="174" End="197" Session="85" />
+      <Span Start="197" End="200" Session="92" />
+    </Character>
+    <Character Id="3" Name="C-3PO" Color="#D1C441">
+      <Span Start="0" End="7" Session="2" />
+      <Span Start="7" End="12" Session="10" />
+      <Span Start="12" End="19" Session="11" />
+      <Span Start="19" End="22" Session="15" />
+      <Span Start="22" End="33" Session="18" />
+      <Span Start="33" End="38" Session="21" />
+      <Span Start="38" End="52" Session="24" />
+      <Span Start="52" End="58" Session="30" />
+      <Span Start="58" End="65" Session="31" />
+      <Span Start="65" End="72" Session="33" />
+      <Span Start="72" End="75" Session="36" />
+      <Span Start="75" End="78" Session="38" />
+      <Span Start="78" End="87" Session="40" />
+      <Span Start="87" End="95" Session="47" />
+      <Span Start="95" End="102" Session="50" />
+      <Span Start="102" End="105" Session="51" />
+      <Span Start="105" End="109" Session="54" />
+      <Span Start="109" End="124" Session="59" />
+      <Span Start="124" End="128" Session="63" />
+      <Span Start="128" End="134" Session="64" />
+      <Span Start="134" End="138" Session="68" />
+      <Span Start="138" End="146" Session="69" />
+      <Span Start="146" End="151" Session="72" />
+      <Span Start="151" End="153" Session="73" />
+      <Span Start="153" End="154" Session="74" />
+      <Span Start="154" End="163" Session="75" />
+      <Span Start="163" End="170" Session="79" />
+      <Span Start="170" End="174" Session="82" />
+      <Span Start="174" End="197" Session="85" />
+      <Span Start="197" End="200" Session="92" />
+    </Character>
+    <Character Id="4" Name="OBI-WAN" Color="#A3A3A3">
+      <Span Start="0" End="12" Session="3" />
+      <Span Start="12" End="19" Session="11" />
+      <Span Start="19" End="22" Session="15" />
+      <Span Start="22" End="33" Session="19" />
+      <Span Start="33" End="35" Session="20" />
+    </Character>
+    <Character Id="5" Name="LUKE" Color="#A3A3A3">
+      <Span Start="0" End="7" Session="4" />
+      <Span Start="7" End="12" Session="10" />
+      <Span Start="12" End="19" Session="11" />
+      <Span Start="19" End="22" Session="15" />
+      <Span Start="22" End="33" Session="17" />
+      <Span Start="33" End="40" Session="22" />
+      <Span Start="40" End="46" Session="26" />
+      <Span Start="46" End="51" Session="27" />
+      <Span Start="51" End="52" Session="24" />
+      <Span Start="52" End="58" Session="30" />
+      <Span Start="58" End="68" Session="32" />
+      <Span Start="68" End="72" Session="35" />
+      <Span Start="72" End="75" Session="36" />
+      <Span Start="75" End="78" Session="38" />
+      <Span Start="78" End="90" Session="41" />
+      <Span Start="90" End="105" Session="49" />
+      <Span Start="105" End="109" Session="56" />
+      <Span Start="109" End="119" Session="58" />
+      <Span Start="119" End="124" Session="62" />
+      <Span Start="124" End="128" Session="63" />
+      <Span Start="128" End="134" Session="64" />
+      <Span Start="134" End="143" Session="67" />
+      <Span Start="143" End="151" Session="71" />
+      <Span Start="151" End="153" Session="73" />
+      <Span Start="153" End="154" Session="74" />
+      <Span Start="154" End="157" Session="76" />
+      <Span Start="157" End="160" Session="77" />
+      <Span Start="160" End="163" Session="78" />
+      <Span Start="163" End="170" Session="79" />
+      <Span Start="170" End="174" Session="82" />
+      <Span Start="174" End="178" Session="86" />
+      <Span Start="178" End="185" Session="88" />
+      <Span Start="185" End="190" Session="89" />
+      <Span Start="190" End="193" Session="90" />
+      <Span Start="193" End="197" Session="91" />
+      <Span Start="197" End="200" Session="92" />
+    </Character>
+    <Character Id="6" Name="HAN" Color="#A3A3A3">
+      <Span Start="0" End="15" Session="5" />
+      <Span Start="15" End="17" Session="13" />
+      <Span Start="17" End="19" Session="14" />
+      <Span Start="19" End="22" Session="15" />
+      <Span Start="22" End="33" Session="17" />
+      <Span Start="33" End="38" Session="21" />
+      <Span Start="38" End="46" Session="25" />
+      <Span Start="46" End="51" Session="27" />
+      <Span Start="51" End="52" Session="24" />
+      <Span Start="52" End="58" Session="30" />
+      <Span Start="58" End="65" Session="31" />
+      <Span Start="65" End="68" Session="34" />
+      <Span Start="68" End="72" Session="35" />
+      <Span Start="72" End="75" Session="36" />
+      <Span Start="75" End="78" Session="38" />
+      <Span Start="78" End="87" Session="40" />
+      <Span Start="87" End="95" Session="47" />
+      <Span Start="95" End="102" Session="50" />
+      <Span Start="102" End="109" Session="52" />
+      <Span Start="109" End="131" Session="60" />
+      <Span Start="131" End="138" Session="66" />
+      <Span Start="138" End="146" Session="69" />
+      <Span Start="146" End="151" Session="72" />
+      <Span Start="151" End="153" Session="73" />
+      <Span Start="153" End="154" Session="74" />
+      <Span Start="154" End="163" Session="75" />
+      <Span Start="163" End="170" Session="79" />
+      <Span Start="170" End="174" Session="82" />
+      <Span Start="174" End="197" Session="85" />
+      <Span Start="197" End="200" Session="92" />
+    </Character>
+    <Character Id="7" Name="CHEWIE" Color="#AE6839">
+      <Span Start="0" End="15" Session="5" />
+      <Span Start="15" End="17" Session="13" />
+      <Span Start="17" End="19" Session="14" />
+      <Span Start="19" End="22" Session="15" />
+      <Span Start="22" End="33" Session="17" />
+      <Span Start="33" End="38" Session="21" />
+      <Span Start="38" End="46" Session="25" />
+      <Span Start="46" End="51" Session="27" />
+      <Span Start="51" End="52" Session="24" />
+      <Span Start="52" End="58" Session="30" />
+      <Span Start="58" End="65" Session="31" />
+      <Span Start="65" End="72" Session="33" />
+      <Span Start="72" End="75" Session="36" />
+      <Span Start="75" End="78" Session="38" />
+      <Span Start="78" End="87" Session="40" />
+      <Span Start="87" End="95" Session="47" />
+      <Span Start="95" End="102" Session="50" />
+      <Span Start="102" End="105" Session="51" />
+      <Span Start="105" End="109" Session="54" />
+      <Span Start="109" End="124" Session="59" />
+      <Span Start="124" End="128" Session="63" />
+      <Span Start="128" End="134" Session="64" />
+      <Span Start="134" End="143" Session="67" />
+      <Span Start="143" End="146" Session="70" />
+      <Span Start="146" End="151" Session="72" />
+      <Span Start="151" End="153" Session="73" />
+      <Span Start="153" End="154" Session="74" />
+      <Span Start="154" End="163" Session="75" />
+      <Span Start="163" End="170" Session="79" />
+      <Span Start="170" End="174" Session="82" />
+      <Span Start="174" End="197" Session="85" />
+      <Span Start="197" End="200" Session="92" />
+    </Character>
+    <Character Id="8" Name="JABBA" Color="#7BBD7F" Weight="10">
+      <Span Start="0" End="109" Session="6" />
+      <Span Start="109" End="131" Session="60" />
+      <Span Start="131" End="138" Session="66" />
+      <Span Start="138" End="146" Session="69" />
+      <Span Start="146" End="151" Session="72" />
+      <Span Start="151" End="153" Session="73" />
+    </Character>
+    <Character Id="9" Name="GREEDO" Color="#7BBD7F">
+      <Span Start="12" End="15" Session="12" />
+      <Span Start="15" End="17" Session="13" />
+    </Character>
+    <Character Id="10" Name="LANDO" Color="#A3A3A3">
+      <Span Start="72" End="81" Session="37" />
+      <Span Start="81" End="85" Session="42" />
+      <Span Start="85" End="87" Session="44" />
+      <Span Start="87" End="95" Session="47" />
+      <Span Start="95" End="102" Session="50" />
+      <Span Start="102" End="105" Session="51" />
+      <Span Start="105" End="109" Session="54" />
+      <Span Start="109" End="124" Session="59" />
+      <Span Start="124" End="128" Session="63" />
+      <Span Start="128" End="131" Session="65" />
+      <Span Start="131" End="138" Session="66" />
+      <Span Start="138" End="146" Session="69" />
+      <Span Start="146" End="151" Session="72" />
+      <Span Start="151" End="153" Session="73" />
+      <Span Start="153" End="154" Session="74" />
+      <Span Start="154" End="163" Session="75" />
+      <Span Start="163" End="170" Session="79" />
+      <Span Start="170" End="190" Session="83" />
+      <Span Start="190" End="193" Session="90" />
+      <Span Start="193" End="197" Session="91" />
+      <Span Start="197" End="200" Session="92" />
+    </Character>
+    <Character Id="11" Name="YODA" Color="#7BBD7F">
+      <Span Start="85" End="90" Session="45" />
+      <Span Start="90" End="105" Session="49" />
+      <Span Start="105" End="157" Session="57" />
+      <Span Start="157" End="160" Session="77" />
+    </Character>
+    <Character Id="12" Name="BOBA FETT" Color="#7BBD7F">
+      <Span Start="85" End="90" Session="46" />
+      <Span Start="90" End="95" Session="48" />
+      <Span Start="95" End="102" Session="50" />
+      <Span Start="102" End="109" Session="52" />
+      <Span Start="109" End="131" Session="60" />
+      <Span Start="131" End="138" Session="66" />
+      <Span Start="138" End="146" Session="69" />
+      <Span Start="146" End="151" Session="72" />
+      <Span Start="151" End="153" Session="73" />
+    </Character>
+    <Character Id="13" Name="EMPEROR" Color="#000000">
+      <Span Start="163" End="170" Session="80" />
+      <Span Start="170" End="174" Session="81" />
+      <Span Start="174" End="185" Session="87" />
+      <Span Start="185" End="190" Session="89" />
+      <Span Start="190" End="193" Session="90" />
+    </Character>
+  </Characters>
+</Story>
