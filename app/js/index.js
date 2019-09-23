@@ -63,7 +63,8 @@ function main(url) {
     // testInstance.merge([0,2],2,3);
     // testInstance.removeSession("even",4,10);
     // testInstance.straighten(["even",1,100])
-    testInstance.compress_new([[["Wolf","Grandmother"],11,13,0.3]]);
+    testInstance.compress_new([[["Wolf","Grandmother"],11,13,10]]);
+    testInstance.compress_new([[["Mother","Red cap"],2,5,0.1],[["Wolf","Grandmother"],11,13,10]]);
     // testInstance.straighten(["tq",1,100])
     // testInstance.straighten(['tt-111',1,100]);
     // storyGenerator.merge([2,1],0,1);

@@ -87,8 +87,8 @@ function storyCompress(d, s, a, compressInfo, merge, din, dout,compressInfo_new)
   for (let i = 0; i < sequence.length - 1; i++) {
     slot.push(getTimeframe(i));//change sequence into slot
   }
-  console.log("slot:",slot);
-
+  // console.log("slot:",slot);
+  console.log(compressInfo_new);
   for (let i = 0; i < sequence.length; i++) record[i] = new Map();
   if (slot.length !== 0)
     for (let i = 0; i < slot[0].length; i++) {
@@ -172,115 +172,154 @@ function storyCompress(d, s, a, compressInfo, merge, din, dout,compressInfo_new)
     return ans;
   }
   console.log("timeframe",timeframe);
+
+  let Ycoor=new Map();
+
+
   for (let j = 0; j < timeframe.length; j++) {
+    let max=0;
+    for (let key of Ycoor) max=Math.max(max,key[1]);
+    for (let key of Ycoor) Ycoor.set(key[0],max);
     let t = timeframe[j];
     t.forEach(x => {
       let content = x.content;
+
       for (let ii = 0; ii < content.length; ii++) {
+
         let num = 0;
         let s = 0;
-        let notEmptyslot = findEmptyslot(t, x.begin, x.end); //之前的非空slot
-
+        // let notEmptyslot = findEmptyslot(t, x.begin, x.end); //之前的非空slot
+        //
         data.entities.forEach(x => {
           if (x === content[ii].entity) {
             num = s;
           }
           s++;
         });
-        let mergeSpace = -1;
-        if (mergeInfo.length !== 0) mergeSpace = mergeInfo[0][0].indexOf(num);
-        if (
-          mergeSpace == -1 ||
-          (mergeInfo[0][1] > x.end || mergeInfo[0][2] <= x.begin)
-        )
-          mergeSpace = 0;
-
+        // let mergeSpace = -1;
+        // if (mergeInfo.length !== 0) mergeSpace = mergeInfo[0][0].indexOf(num);
+        // if (
+        //   mergeSpace == -1 ||
+        //   (mergeInfo[0][1] > x.end || mergeInfo[0][2] <= x.begin)
+        // )
+        //   mergeSpace = 0;
+        //
         content[ii].lineOrder = num;
-
-        if (content[ii].entity !== "") {
-          if (
-            compressTime.some(pair => x.begin >= pair[0] && x.end <= pair[1])
-          ) {
-            const compressPair = compressTime.find(
-              pair => x.begin >= pair[0] && x.end <= pair[1]
-            );
-            if (compressPair !== undefined) {
-              compressFlag = false;
+        if (content[ii].entity!==""){
+          let name=content[ii].entity;
+          let compressPair=compressInfo_new.find(pair=>(pair[0].includes(name))&&(pair[1]<=x.begin)&&(pair[2]>=x.end));
+          console.log("compress",compressPair,name,x.begin,x.end,compressInfo_new);
+          let range=1;
+          if (compressPair!==undefined) range=compressPair[3];
+            if (Ycoor.get(x.begin)===undefined){
+              Ycoor.set(x.begin,max+range*din);
+              node[num].push([x.begin*50,Ycoor.get(x.begin)]);
+              node[num].push([x.end*50+25,Ycoor.get(x.begin)]);
             }
-            let beforeCompress = beforedisCompress(
-              j,
-              compressPair[0],
-              compressPair[1]
-            );
+            else{
+              Ycoor.set(x.begin,Ycoor.get(x.begin)+range*din);
+              node[num].push([x.begin*50,Ycoor.get(x.begin)]);
+              node[num].push([x.end*50+25,Ycoor.get(x.begin)]);
+            }
 
-            node[num].push([
-              x.begin * 50,
-              notEmptyslot * d1 +
-              (ii-mergeSpace)  * d2 +
-                d1 +
-                beforeCompress * d2 +
-                compressPair[2]
-            ]);
-            node[num].push([
-              x.end * 50 + 25,
-              notEmptyslot * d1 +
-              (ii-mergeSpace) * d2 +
-                d1 +
-                beforeCompress * d2 +
-                compressPair[2]
-            ]);
-          } else if (
-            compressFlag &&
-            compressTime.length !== 0 &&
-            compressTime.find(
-              pair => !(x.begin > pair[1] || x.end < pair[0])
-            ) !== undefined
-          ) {
-            let compressPair = compressTime.find(
-              pair => !(x.begin > pair[1] || x.end < pair[0])
-            );
-            // debugger
-            compressPair[0] = x.begin;
-            compressPair[1] = x.end;
-            let beforeCompress = beforedisCompress(
-              j,
-              compressPair[0],
-              compressPair[1]
-            );
 
-            node[num].push([
-              x.begin * 50,
-              notEmptyslot * d1 +
-              (ii-mergeSpace)  * d2 +
-                d1 +
-                beforeCompress * d2 +
-                compressPair[2]
-            ]);
-            node[num].push([
-              x.end * 50 + 25,
-              notEmptyslot * d1 +
-              (ii-mergeSpace)  * d2 +
-                d1 +
-                beforeCompress * d2 +
-                compressPair[2]
-            ]);
-          } else {
-            node[num].push([
-              x.begin * 50,
-              notEmptyslot * d1 + (ii-mergeSpace)  * d2 + d1 + beforedis(j) * d2
-            ]);
-            node[num].push([
-              x.end * 50 + 25,
-              notEmptyslot * d1 + (ii-mergeSpace)  * d2 + d1 + beforedis(j) * d2
-            ]);
+        }
+        else{
+          let range=1;
+          if (Ycoor.get(x.begin)===undefined){
+            Ycoor.set(x.begin,max+range*din);
+            node[num].push([x.begin*50,Ycoor.get(x.begin)]);
+            node[num].push([x.end*50+25,Ycoor.get(x.begin)]);
+          }
+          else{
+            Ycoor.set(x.begin,Ycoor.get(x.begin)+range*din);
+            node[num].push([x.begin*50,Ycoor.get(x.begin)]);
+            node[num].push([x.end*50+25,Ycoor.get(x.begin)]);
           }
         }
+        // if (content[ii].entity !== "") {
+        //   if (
+        //     compressTime.some(pair => x.begin >= pair[0] && x.end <= pair[1])
+        //   ) {
+        //     const compressPair = compressTime.find(
+        //       pair => x.begin >= pair[0] && x.end <= pair[1]
+        //     );
+        //     if (compressPair !== undefined) {
+        //       compressFlag = false;
+        //     }
+        //     let beforeCompress = beforedisCompress(
+        //       j,
+        //       compressPair[0],
+        //       compressPair[1]
+        //     );
+        //
+        //     node[num].push([
+        //       x.begin * 50,
+        //       notEmptyslot * d1 +
+        //       (ii-mergeSpace)  * d2 +
+        //         d1 +
+        //         beforeCompress * d2 +
+        //         compressPair[2]
+        //     ]);
+        //     node[num].push([
+        //       x.end * 50 + 25,
+        //       notEmptyslot * d1 +
+        //       (ii-mergeSpace) * d2 +
+        //         d1 +
+        //         beforeCompress * d2 +
+        //         compressPair[2]
+        //     ]);
+        //   } else if (
+        //     compressFlag &&
+        //     compressTime.length !== 0 &&
+        //     compressTime.find(
+        //       pair => !(x.begin > pair[1] || x.end < pair[0])
+        //     ) !== undefined
+        //   ) {
+        //     let compressPair = compressTime.find(
+        //       pair => !(x.begin > pair[1] || x.end < pair[0])
+        //     );
+        //     // debugger
+        //     compressPair[0] = x.begin;
+        //     compressPair[1] = x.end;
+        //     let beforeCompress = beforedisCompress(
+        //       j,
+        //       compressPair[0],
+        //       compressPair[1]
+        //     );
+        //
+        //     node[num].push([
+        //       x.begin * 50,
+        //       notEmptyslot * d1 +
+        //       (ii-mergeSpace)  * d2 +
+        //         d1 +
+        //         beforeCompress * d2 +
+        //         compressPair[2]
+        //     ]);
+        //     node[num].push([
+        //       x.end * 50 + 25,
+        //       notEmptyslot * d1 +
+        //       (ii-mergeSpace)  * d2 +
+        //         d1 +
+        //         beforeCompress * d2 +
+        //         compressPair[2]
+        //     ]);
+        //   } else {
+        //     node[num].push([
+        //       x.begin * 50,
+        //       notEmptyslot * d1 + (ii-mergeSpace)  * d2 + d1 + beforedis(j) * d2
+        //     ]);
+        //     node[num].push([
+        //       x.end * 50 + 25,
+        //       notEmptyslot * d1 + (ii-mergeSpace)  * d2 + d1 + beforedis(j) * d2
+        //     ]);
+        //   }
+        // }
       }
     });
     // debugger;
   }
   console.log("node",node);
-  debugger;
   graph.names = data.entities;
   node.forEach(x => x.sort((a, b) => a[0] - b[0]));
   // graph.initNodes=JSON.parse(JSON.stringify(node));

@@ -56,6 +56,10 @@ export default class iStoryline_test extends CharacterStore {
 
 compress_new(compressInfo_new){
   this.compressInfo_new=compressInfo_new;
+  for (let compressData of compressInfo_new){
+    compressData[0].shift();
+    compressData[0].forEach(name=>{this.cutSession(name,compressData[1]);this.cutSession(name,compressData[2])});
+  }
   const graph=this.layout();
   return graph;
 }
@@ -311,7 +315,7 @@ compress_new(compressInfo_new){
     return graph;
   }
 
-  cutSession(characterName, time) {
+   cutSession(characterName, time) {
     super.cutSession(characterName, time);
   }
 
