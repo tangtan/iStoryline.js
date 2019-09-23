@@ -69,12 +69,12 @@ function name2num(time, name) {
 //graph is the output
 //data is the names and orders
 //sequence contains keytimes and sessions
-function storyCompress(d, s, a, compressInfo, merge, din, dout) {
-  mergeInfo = merge;
+function storyCompress(d, s, a, compressInfo, merge, din, dout,compressInfo_new) {
+  console.log(compressInfo_new);
+  mergeInfo = merge;//merge lines
   d2 = din;
   d1 = dout;
   let compressFlag = true;
-  let maxtime = 0;
   timeframe = [];
   record = [];
   slot = [];
@@ -85,8 +85,10 @@ function storyCompress(d, s, a, compressInfo, merge, din, dout) {
   alignedSession = a;
   let flag = 1;
   for (let i = 0; i < sequence.length - 1; i++) {
-    slot.push(getTimeframe(i));
+    slot.push(getTimeframe(i));//change sequence into slot
   }
+  console.log("slot:",slot);
+
   for (let i = 0; i < sequence.length; i++) record[i] = new Map();
   if (slot.length !== 0)
     for (let i = 0; i < slot[0].length; i++) {
@@ -169,6 +171,7 @@ function storyCompress(d, s, a, compressInfo, merge, din, dout) {
     }
     return ans;
   }
+  console.log("timeframe",timeframe);
   for (let j = 0; j < timeframe.length; j++) {
     let t = timeframe[j];
     t.forEach(x => {
@@ -276,6 +279,8 @@ function storyCompress(d, s, a, compressInfo, merge, din, dout) {
     });
     // debugger;
   }
+  console.log("node",node);
+  debugger;
   graph.names = data.entities;
   node.forEach(x => x.sort((a, b) => a[0] - b[0]));
   // graph.initNodes=JSON.parse(JSON.stringify(node));

@@ -22,6 +22,7 @@ export default class iStoryline_test extends CharacterStore {
     super(); // inherit data
     this.addCharacterInfo=[];
     this.changeSessionInfo=[];
+    this.compressInfo_new=[];
     this.mergeInfo = [];
     this.orderInfo = [];
     this.straigtenInfo = [];
@@ -52,6 +53,13 @@ export default class iStoryline_test extends CharacterStore {
     const graph=this.layout();
     return graph;
   }
+
+compress_new(compressInfo_new){
+  this.compressInfo_new=compressInfo_new;
+  const graph=this.layout();
+  return graph;
+}
+
 
   /**
    * add a new Character between startTime and endTime
@@ -166,7 +174,8 @@ export default class iStoryline_test extends CharacterStore {
       this.compressInfo,
       this.mergeInfo,
       this.din,
-      this.dout
+      this.dout,
+      this.compressInfo_new
     );
     this.graph = graph;
     let hitTest = new HitTest(graph, data);

@@ -39,12 +39,12 @@ function main(url) {
     let testInstance=new iStoryline();
     // storyGenerator.readFile(data);                                                                                                                                                                                                                                                             
     testInstance.readXMLFile(data);
-    console.log(JSON.stringify(testInstance.data));
+    //console.log(JSON.stringify(testInstance.data));
     testInstance.layout();
     // testInstance.addCharacter("even",1,100);
     // testInstance.addCharacter();
-    testInstance.addCharacter([["111",2,10]]);
-    testInstance.addCharacter([["111",2,10],["tq",2,200]]);
+    // testInstance.addCharacter([["111",2,10]]);
+    // testInstance.addCharacter([["111",2,10],["tq",2,200]]);
     // testInstance.order([['VADER','LEIA']]);
     // storyGenerator.changeSession(['VADER','R2-D2'],0,12);
     // storyGenerator.removeSession('VADER',10,15);
@@ -63,7 +63,7 @@ function main(url) {
     // testInstance.merge([0,2],2,3);
     // testInstance.removeSession("even",4,10);
     // testInstance.straighten(["even",1,100])
-
+    testInstance.compress_new([[["Wolf","Grandmother"],11,13,0.3]]);
     // testInstance.straighten(["tq",1,100])
     // testInstance.straighten(['tt-111',1,100]);
     // storyGenerator.merge([2,1],0,1);
@@ -91,7 +91,7 @@ function main(url) {
     groupdivide[0][1] = 81;
     groupdivide[0][2] = 105;
     groupdivide[0][3] = 'Collide';
-    console.log(graph);
+    // console.log(graph);
     // groupdivide[1] = new Array();
     // groupdivide[1][0] = new Array();
     // groupdivide[1][0][0] = 'BOBA FETT';
@@ -107,10 +107,10 @@ function main(url) {
     // groupdivide[2][1] = 19;
     // groupdivide[2][2] = 33;
     // groupdivide[2][3] = 'Twine';
-    console.log(groupdivide);
-    const newGraph = testInstance.collide(groupdivide);
-    console.log(graph);
-    graph = newGraph;
+    // console.log(groupdivide);
+    // const newGraph = testInstance.collide(groupdivide);
+    // console.log(graph);
+    // graph = newGraph;
     // storyGenerator.replacePartLine([[0,1],[1,1],[2,1],[100,5],[4,1],[5,2],[106,10]],0,0,14);
     testInstance.extent(100, 300, 1250);
     // storyGenerator.extent(100,300,1250);
@@ -206,4 +206,4 @@ function genInitialPathStr(points) {
   return `M ${points[0][0]} ${points[0][1]} `;
 }
 
-main("../data/StarWars.xml");
+main("../data/redhat.xml");
