@@ -1,6 +1,8 @@
 // import iStoryline from "../../src/js";
+import iStorylineNew from "../../src/js/index"
 import iStoryline from "../../src/js/istoryline"
-import * as d3 from "d3";
+import { xml } from "d3-fetch";
+import { scaleLinear } from "d3-scale";
 import Snap from "snapsvg";
 import { join } from "path";
 function testHit(graph){
@@ -33,7 +35,8 @@ function testHit(graph){
   console.log(graph.hitTest.getCharacterY("HAN",12));
 }
 function main(url) {
-  d3.xml(url, (error, data) => {
+  let ans=new iStorylineNew(url);
+  xml(url, (error, data) => {
     if (error) throw error;
     // let storyGenerator = new iStoryline();
     let testInstance=new iStoryline();
@@ -63,8 +66,11 @@ function main(url) {
     // testInstance.merge([0,2],2,3);
     // testInstance.removeSession("even",4,10);
     // testInstance.straighten(["even",1,100])
-    testInstance.compress_new([[["Wolf","Grandmother"],11,13,10]]);
-    testInstance.compress_new([[["Mother","Red cap"],2,5,0.1],[["Wolf","Grandmother"],11,13,10]]);
+    // testInstance.compress([[["Wolf","Grandmother"],11,13,10]]);
+    // testInstance.compress([[["Mother","Red cap"],2,5,0.1],[["Wolf","Grandmother"],11,13,10]]);
+    testInstance.merge([[["Wolf","Grandmother"],14,15]]);
+    testInstance.adjust([["Mother",2,5,[[0,1],[1,200],[3,500],[5,800],[10,1100],[12,0]]]]);
+    
     // testInstance.straighten(["tq",1,100])
     // testInstance.straighten(['tt-111',1,100]);
     // storyGenerator.merge([2,1],0,1);
@@ -135,8 +141,8 @@ function normalize(nodes, x0=0, y0=0, deltaX=1000) {
   const minY = Math.min(...nodes.map(line => Math.min(...line.map(node => node[1]))));
   const maxY = Math.max(...nodes.map(line => Math.max(...line.map(node => node[1]))));
   const ratio = (maxY - minY) / (maxX - minX);
-  const xScale = d3.scaleLinear().domain([minX, maxX]).range([x0, x0 + deltaX]);
-  const yScale = d3.scaleLinear().domain([minY, maxY]).range([y0, y0 + deltaX * ratio]);
+  const xScale = scaleLinear().domain([minX, maxX]).range([x0, x0 + deltaX]);
+  const yScale = scaleLinear().domain([minY, maxY]).range([y0, y0 + deltaX * ratio]);
   nodes.forEach(line => {
     line.forEach(node => {
       node[0] = xScale(node[0]);

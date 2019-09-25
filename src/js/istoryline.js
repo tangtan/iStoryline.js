@@ -20,7 +20,9 @@ import { scaleLinear } from "d3-scale";
 export default class iStoryline_test extends CharacterStore {
   constructor() {
     super(); // inherit data
+    this.adjustInfo=[];
     this.addCharacterInfo=[];
+    this.expandInfo=[];
     this.changeSessionInfo=[];
     this.compressInfo_new=[];
     this.mergeInfo = [];
@@ -48,18 +50,31 @@ export default class iStoryline_test extends CharacterStore {
     return graph;
   }
 
-  compress(compressInfo){
-    this.compressInfo=compressInfo;
-    const graph=this.layout();
-    return graph;
-  }
+  // compress(compressInfo){
+  //   this.compressInfo=compressInfo;
+  //   const graph=this.layout();
+  //   return graph;
+  // }
 
-compress_new(compressInfo_new){
-  this.compressInfo_new=compressInfo_new;
-  for (let compressData of compressInfo_new){
+compress(compressInfo){
+  for (let compressData of compressInfo){
     compressData[0].shift();
     compressData[0].forEach(name=>{this.cutSession(name,compressData[1]);this.cutSession(name,compressData[2])});
   }
+  this.compressInfo=compressInfo;
+  const graph=this.layout();
+  return graph;
+}
+
+expand(expandInfo){
+  for (let expandPair of expandInfo){
+    expandPair[0].shift();
+    expandPair[0].forEach(name=>{
+      this.cutSession(name,expandPair[1]);
+      this.cutSession(name,expandPair[2]);
+    })
+  }
+  this.expandInfo=expandInfo;
   const graph=this.layout();
   return graph;
 }
@@ -175,15 +190,15 @@ compress_new(compressInfo_new){
       data,
       sequence,
       alignedSessions,
-      this.compressInfo,
+      [...this.compressInfo,...this.expandInfo],
       this.mergeInfo,
       this.din,
       this.dout,
-      this.compressInfo_new
     );
     this.graph = graph;
     let hitTest = new HitTest(graph, data);
     this.graph.hitTest = hitTest;
+    graph=this.adjust(this.adjustInfo);
     return graph;
   }
   /**
@@ -199,7 +214,12 @@ compress_new(compressInfo_new){
    *   null.
    */
   merge(mergeInfo) {
-    this.mergeInfo = mergeInfo;
+    let temp=mergeInfo.map(x=>[...x,0]);
+    temp.forEach(x=>x[0].shift());
+    temp.forEach(x=>{
+      this.cutSession(x[0][0],x[1],x[2]);
+    })
+    this.mergeInfo = temp;
     const graph = this.layout();
     return graph;
   }
@@ -285,7 +305,23 @@ compress_new(compressInfo_new){
    * @return
    *   null.
    */
-  reshape(line, storyLineID, startStoryNodeID, endStoryNodeID) {
+  adjust(adjustInfo) {
+    this.adjustInfo=adjustInfo;
+    adjustInfo.forEach(x=>{
+    let [name,t1,t2,line]=x;
+    let storyLineID=this.graph.names.indexOf(name);
+    let [initX,_]=this.graph.nodes[storyLineID][0];
+    let startStoryNodeID=0, endStoryNodeID=0;
+    for (let [x,y] of this.graph.nodes[storyLineID]){
+      if (initX<=t1*50&&t1*50<=x) break;
+      startStoryNodeID+=1;
+      initX
+    }
+    for (let [x,y] of this.graph.nodes[storyLineID]){
+      if (initX<=2*50&&t2*50<=x) break;
+      endStoryNodeID+=1;
+    }
+    
     let startNode = this.graph.nodes[storyLineID][startStoryNodeID];
     let endNode = this.graph.nodes[storyLineID][endStoryNodeID];
     let smoothLine = line.filter(node => line.indexOf(node) % 3 === 0);
@@ -311,8 +347,17 @@ compress_new(compressInfo_new){
       endStoryNodeID - startStoryNodeID + 1,
       ...smoothLine
     );
-    const graph = this.layout();
-    return graph;
+    })
+    const { sketchNodes, renderNodes, smoothNodes, originNodes } = modifyLayout(
+      this.graph.nodes,
+      this.graph.names,
+    );
+    
+    this.graph.renderNodes = renderNodes;
+    this.graph.smoothNodes = smoothNodes;
+    this.graph.originNodes = originNodes;
+    this.graph.sketchNodes = sketchNodes;
+    return this.graph;
   }
 
    cutSession(characterName, time) {
@@ -329,7 +374,7 @@ compress_new(compressInfo_new){
    *
    * @param {[firstCharactername,lastCharactername,begintime,endtime]} orderpair
    */
-  order(orderInfo) {
+  sort(orderInfo) {
     for (let orderpair of orderInfo)
       if (orderpair.length === 4) {
         this.cutSession(orderpair[0], orderpair[2]);

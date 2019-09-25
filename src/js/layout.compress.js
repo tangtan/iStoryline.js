@@ -69,8 +69,7 @@ function name2num(time, name) {
 //graph is the output
 //data is the names and orders
 //sequence contains keytimes and sessions
-function storyCompress(d, s, a, compressInfo, merge, din, dout,compressInfo_new) {
-  console.log(compressInfo_new);
+function storyCompress(d, s, a, compressInfo, merge, din, dout) {
   mergeInfo = merge;//merge lines
   d2 = din;
   d1 = dout;
@@ -78,7 +77,7 @@ function storyCompress(d, s, a, compressInfo, merge, din, dout,compressInfo_new)
   timeframe = [];
   record = [];
   slot = [];
-  compressTime = compressInfo;
+  compressInfo=[...compressInfo,...mergeInfo];
   graph = {};
   data = d;
   sequence = s;
@@ -87,8 +86,6 @@ function storyCompress(d, s, a, compressInfo, merge, din, dout,compressInfo_new)
   for (let i = 0; i < sequence.length - 1; i++) {
     slot.push(getTimeframe(i));//change sequence into slot
   }
-  // console.log("slot:",slot);
-  console.log(compressInfo_new);
   for (let i = 0; i < sequence.length; i++) record[i] = new Map();
   if (slot.length !== 0)
     for (let i = 0; i < slot[0].length; i++) {
@@ -128,50 +125,49 @@ function storyCompress(d, s, a, compressInfo, merge, din, dout,compressInfo_new)
     }
     dis[i] = max;
   }
-  function beforedis(num) {
-    let ans = 0;
-    for (let i = 0; i < num; i++) {
-      ans += dis[i];
-    }
-    return ans;
-  }
-  function beforedisCompress(time, begin, end) {
-    let ansArr = [];
-    timeframe.forEach(x => ansArr.push(0));
-    let ans = 0;
-    for (let i = 0; i < time; i++) {
-      for (let j = 0; j < timeframe[i].length; j++) {
-        if (timeframe[i][j].begin >= begin && timeframe[i][j].end <= end) {
-          ansArr[i] = Math.max(timeframe[i][j].content.length, ansArr[i]);
-        }
-        //         (timeframe[i][j].content.length>max)?timeframe[i][j].content.length:max;
-      }
-    }
-    ansArr.forEach(x => (ans += x));
-    return ans;
-  }
-  function findEmptyslot(thistimeframe, begin, end) {
-    let ans = 0;
-    for (const t of timeframe) {
-      if (t === thistimeframe) return ans;
-      t.forEach(x => {
-        if (x.begin <= begin && x.end <= end && x.begin >= begin) {
-          ans++;
-          return;
-        }
-        if (x.begin <= begin && x.end >= end) {
-          ans++;
-          return;
-        }
-        if (x.begin >= begin && x.end >= end && x.begin < end) {
-          ans++;
-          return;
-        }
-      });
-    }
-    return ans;
-  }
-  console.log("timeframe",timeframe);
+  // function beforedis(num) {
+  //   let ans = 0;
+  //   for (let i = 0; i < num; i++) {
+  //     ans += dis[i];
+  //   }
+  //   return ans;
+  // }
+  // function beforedisCompress(time, begin, end) {
+  //   let ansArr = [];
+  //   timeframe.forEach(x => ansArr.push(0));
+  //   let ans = 0;
+  //   for (let i = 0; i < time; i++) {
+  //     for (let j = 0; j < timeframe[i].length; j++) {
+  //       if (timeframe[i][j].begin >= begin && timeframe[i][j].end <= end) {
+  //         ansArr[i] = Math.max(timeframe[i][j].content.length, ansArr[i]);
+  //       }
+  //       //         (timeframe[i][j].content.length>max)?timeframe[i][j].content.length:max;
+  //     }
+  //   }
+  //   ansArr.forEach(x => (ans += x));
+  //   return ans;
+  // }
+  // function findEmptyslot(thistimeframe, begin, end) {
+  //   let ans = 0;
+  //   for (const t of timeframe) {
+  //     if (t === thistimeframe) return ans;
+  //     t.forEach(x => {
+  //       if (x.begin <= begin && x.end <= end && x.begin >= begin) {
+  //         ans++;
+  //         return;
+  //       }
+  //       if (x.begin <= begin && x.end >= end) {
+  //         ans++;
+  //         return;
+  //       }
+  //       if (x.begin >= begin && x.end >= end && x.begin < end) {
+  //         ans++;
+  //         return;
+  //       }
+  //     });
+  //   }
+  //   return ans;
+  // }
 
   let Ycoor=new Map();
 
@@ -207,8 +203,8 @@ function storyCompress(d, s, a, compressInfo, merge, din, dout,compressInfo_new)
         content[ii].lineOrder = num;
         if (content[ii].entity!==""){
           let name=content[ii].entity;
-          let compressPair=compressInfo_new.find(pair=>(pair[0].includes(name))&&(pair[1]<=x.begin)&&(pair[2]>=x.end));
-          console.log("compress",compressPair,name,x.begin,x.end,compressInfo_new);
+          // if (name=="Wolf") debugger;
+          let compressPair=compressInfo.find(pair=>(pair[0].includes(name))&&(pair[1]<=x.begin)&&(pair[2]>=x.end));
           let range=1;
           if (compressPair!==undefined) range=compressPair[3];
             if (Ycoor.get(x.begin)===undefined){
@@ -319,7 +315,6 @@ function storyCompress(d, s, a, compressInfo, merge, din, dout,compressInfo_new)
     });
     // debugger;
   }
-  console.log("node",node);
   graph.names = data.entities;
   node.forEach(x => x.sort((a, b) => a[0] - b[0]));
   // graph.initNodes=JSON.parse(JSON.stringify(node));
