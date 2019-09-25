@@ -2,7 +2,7 @@ let compressTime = [];
 let d1 = 0; //out
 let d2 = 1000; //in
 
-import { modifyLayout } from "./layout.render.js";
+import { modifyLayout, render } from "./layout.render.js";
 
 let sequence;
 let data;
@@ -279,15 +279,18 @@ function storyCompress(d, s, a, compressInfo, merge, din, dout) {
   graph.names = data.entities;
   node.forEach(x => x.sort((a, b) => a[0] - b[0]));
   // graph.initNodes=JSON.parse(JSON.stringify(node));
-  const { sketchNodes, renderNodes, smoothNodes, originNodes } = modifyLayout(
-    node,
-    graph.names,
+  let initialGraph = {};
+  initialGraph.nodes = node;
+  initialGraph.names = graph.names;
+
+  const { renderGraph } = render(
+    initialGraph
   );
-  graph.nodes = node;
-  graph.renderNodes = renderNodes;
-  graph.smoothNodes = smoothNodes;
-  graph.originNodes = originNodes;
-  graph.sketchNodes = sketchNodes;
+  graph.nodes = renderGraph.nodes;
+  graph.renderNodes = renderGraph.renderNodes;
+  graph.smoothNodes = renderGraph.smoothNodes;
+  graph.originNodes = renderGraph.originNodes;
+  graph.sketchNodes = renderGraph.sketchNodes;
   return graph;
 }
 

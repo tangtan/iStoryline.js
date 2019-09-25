@@ -243,38 +243,18 @@ export default class iStoryline_test extends CharacterStore {
     let divideMarks=this.divideMarks;
     this.groupMarks=groupMarks;
     let newGraph = this.graph;
-    const {
-      sketchNodes,
-      renderNodes,
-      smoothNodes,
-      originNodes,
-      styleSegments
-    } = modifyLayout(newGraph.nodes, newGraph.names, divideMarks, groupMarks);
-    newGraph.renderNodes = renderNodes;
-    newGraph.smoothNodes = smoothNodes;
-    newGraph.originNodes = originNodes;
-    newGraph.sketchNodes = sketchNodes;
-    this.graph = newGraph;
-    return newGraph;
+    let renderGraph = render(newGraph, groupMarks, divideMarks);
+    this.graph = renderGraph;
+    return renderGraph;
   }
 
   collide(groupMarks) {
     let divideMarks=this.divideMarks;
     this.groupMarks=groupMarks;
     let newGraph = this.graph;
-    const {
-      sketchNodes,
-      renderNodes,
-      smoothNodes,
-      originNodes,
-      styleSegments
-    } = modifyLayout(newGraph.nodes, newGraph.names, divideMarks, groupMarks);
-    newGraph.renderNodes = renderNodes;
-    newGraph.smoothNodes = smoothNodes;
-    newGraph.originNodes = originNodes;
-    newGraph.sketchNodes = sketchNodes;
-    this.graph = newGraph;
-    return newGraph;
+    let renderGraph = render(newGraph, groupMarks, divideMarks);
+    this.graph = renderGraph;
+    return renderGraph;
   }
   /**
    * use a line to replace a part of a StoryLine
@@ -478,20 +458,11 @@ export default class iStoryline_test extends CharacterStore {
    *    [[name,segmentID,style]]
    */
   divide(divideMarks) {
-    this.divideMarks=divideMarks;
+    let divideMarks=this.divideMarks;
+    this.groupMarks=groupMarks;
     let newGraph = this.graph;
-    const {
-      sketchNodes,
-      renderNodes,
-      smoothNodes,
-      originNodes,
-      styleSegments
-    } = modifyLayout(newGraph.nodes, newGraph.names, divideMarks,this.groupMarks);
-    newGraph.renderNodes = renderNodes;
-    newGraph.smoothNodes = smoothNodes;
-    newGraph.originNodes = originNodes;
-    newGraph.sketchNodes = sketchNodes;
-    this.graph = newGraph;
-    return [ newGraph, styleSegments ];
+    let renderGraph = render(newGraph, groupMarks, divideMarks);
+    this.graph = renderGraph;
+    return [ renderGraph, renderGraph.styleConfig ];
   }
 }

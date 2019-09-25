@@ -1,56 +1,100 @@
 
-//效果和画布长宽比有很大关系。
-//canvas length:weight=6:1
-//
-function getAimPos(storyline, storylineID, segmentID, x) {
-    let left = 0;
-    let right = storyline[storylineID][segmentID].length - 1;
-    let mid = 0;
-    let aim = 0;
-    while (left <= right) {
-        mid = (left + right) >> 1;
-        if (storyline[storylineID][segmentID][mid][0] <= x) {
-            aim = mid;
-            left = mid + 1;
-        }
-        else {
-            right = mid - 1;
+let STEPLENGTH = 1;
+let SCALE = 20;
+let SCALELENGTH = 200000;
+let SPACELENGTH = 20;
+let EPS = 0;
+let LINESPACE = 4000;
+let SAMPLERATE = 20;
+let STDANGLE = 0.271975;
+let MINSEGMENTLEN = 15;
+let STDSEGLEN = 0;
+let SMOOTHY = 20;
+let SKETCHRANGE = 300;
+let SHAKEFAC = 10;
+let SHAKEFACSTD = 150;
+let RATESTD = 1000;
+let NEWRATESTD = 200;
+let WAVERATE = 1;
+let WAVEHEIGHT = 600;
+let ZIGHEIGHT = 500;
+let BUMPHEIGHT = 500;
+let PI = 3.1415926;
+let TWINEHEIGHT = 500;
+let KNOTHEIGHT = 2000;
+let COLLIDEHEIGHT = 250;
+
+function render(initialGraph, originRelate, originStylish) {
+    let _originNodes = _initializeOriginNodes(initialGraph.nodes);
+
+    let _group = _initializeGroup(_originNodes);
+    const { relate, stylish } = _judgeStylishAndRelate(originRelate, originStylish);
+    const { splitMarks, groupPosition } = _initializeSplitMarks(_originNodes, initialGraph.names, relate, stylish);
+
+    let renderNodes = _calculateRenderNodes(_originNodes, _group);
+
+    let _tmp = _calculateSmoothNodes(renderNodes, originNodes, _group, splitMarks);
+    let smoothNodes = _tmp[0];
+    let sketchStyles = _tmp[1];
+    let segmentTime = _tmp[2];
+    let sketchNodes = _calcluateSketchNodes(smoothNodes, sketchStyles, groupPosition);
+
+    let styleConfig = _calculateStyles(segmentTime, initialGraph.names, relate, stylish);
+
+    renderNodes = _extent(_originNodes, renderNodes);
+    smoothNodes = _extent(_originNodes, smoothNodes);
+    sketchNodes = _extent(_originNodes, sketchNodes);
+
+    let renderGraph = {};
+    renderGraph.nodes = deepCopy(initialGraph.nodes);
+    renderGraph.names = deepCopy(initialGraph.names);
+    renderGraph.renderNodes = renderNodes;
+    renderGraph.smoothNodes = smoothNodes;
+    renderGraph.sketchNodes = sketchNodes;
+    renderGraph.styleConfig = styleConfig;
+    return renderGraph;
+}
+
+function _initializeOriginNodes(nowCharList) {
+    let originNodes = new Array();
+    let totCharNum = nowCharList.length;
+    let segmentNum = 0;
+    let posNum = 0;
+    for (let i = 0; i < totCharNum; i++) {
+        let nodeNum = nowCharList[i].length;
+        originNodes[i] = new Array();
+        segmentNum = 0;
+        posNum = 0;
+        originNodes[i][segmentNum] = new Array();
+        for (let k = 0; k < nodeNum; k++) {
+            if (k && (!(k & 1)) && nowCharList[i][k][0] - nowCharList[i][k - 1][0] !== 25) {
+                segmentNum++;
+                originNodes[i][segmentNum] = new Array();
+                posNum = 0;
+            }
+            originNodes[i][segmentNum][posNum] = new Array();
+            originNodes[i][segmentNum][posNum][0] = nowCharList[i][k][0];
+            originNodes[i][segmentNum][posNum][1] = nowCharList[i][k][1];
+            posNum++;
         }
     }
-    return aim;
-}
-function sortByY(list, storyline) {
-    for (let i = 0; i < list.length; i++) {
-        for (let j = i + 1; j < list.length; j++) {
-            if (storyline[list[j][0]][list[j][1]][list[j][2]][1] < storyline[list[i][0]][list[i][1]][list[i][2]][1]) {
-                let tmpI = list[i][0];
-                let tmpJ = list[i][1];
-                let tmpK = list[i][2];
-                list[i][0] = list[j][0];
-                list[i][1] = list[j][1];
-                list[i][2] = list[j][2];
-                list[j][0] = tmpI;
-                list[j][1] = tmpJ;
-                list[j][2] = tmpK;
+    for (let i = 0; i < originNodes.length; i++) {
+        for (let j = 0; j < originNodes[i].length; j++) {
+            for (let k = 0; k < originNodes[i][j].length; k++) {
+                if (k & 1) {
+                    if (originNodes[i][j][k][0] < originNodes[i][j][k - 1][0]) {
+                        let tmpX = 0;
+                        tmpX = originNodes[i][j][k][0];
+                        originNodes[i][j][k][0] = originNodes[i][j][k - 1][0];
+                        originNodes[i][j][k - 1][0] = tmpX;
+                    }
+                }
             }
         }
     }
-    return list;
+    return originNodes;
 }
-function getTurningType(list, k, storyline) {
-    let storylineID = list[k][0];
-    let segmentID = list[k][1];
-    let storyNodeID = list[k][2];
-    let lasTime = storyNodeID - 1;
-    let nxtTime = storyNodeID + 1;
-    let ret = 0;//normal;
-    if (nxtTime < storyline[storylineID][segmentID].length && storyline[storylineID][segmentID][storyNodeID][1] > storyline[storylineID][segmentID][nxtTime][1]) ret = 1;//leftdown to rightup low
-    if (nxtTime < storyline[storylineID][segmentID].length && storyline[storylineID][segmentID][storyNodeID][1] < storyline[storylineID][segmentID][nxtTime][1]) ret = 2;//leftup to rightdown high
-    if (lasTime >= 0 && storyline[storylineID][segmentID][storyNodeID][1] < storyline[storylineID][segmentID][lasTime][1]) ret = 3;//leftdown to rightup high
-    if (lasTime >= 0 && storyline[storylineID][segmentID][storyNodeID][1] > storyline[storylineID][segmentID][lasTime][1]) ret = 4;//leftup to rightdown low
-    return ret;
-}
-function initializeGroup(storyline) {
+function _initializeGroup(storyline) {
     let group = new Array();
     let tot = 0;
 
@@ -95,8 +139,8 @@ function initializeGroup(storyline) {
                 for (let k = 0; k < storylineID; k++) {
                     for (let h = 0; h < storyline[k].length; h++) {
                         if (k === i && h === z) continue;
-                        let pos = getAimPos(storyline, k, h, firX);
-                        if (Math.abs(storyline[k][h][pos][0] - firX) > eps) continue;
+                        let pos = _getAimPos(storyline, k, h, firX);
+                        if (Math.abs(storyline[k][h][pos][0] - firX) > EPS) continue;
                         list[cnt] = new Array();
                         list[cnt][0] = k;
                         list[cnt][1] = h;
@@ -104,7 +148,7 @@ function initializeGroup(storyline) {
                         cnt++;
                     }
                 }
-                list = sortByY(list, storyline);
+                list = _sortByY(list, storyline);
                 let head = 0, tail = 0;
                 while (tail < cnt) {
                     while (tail < cnt && storyline[list[tail][0]][list[tail][1]][list[tail][2]][0] === firX) {
@@ -112,7 +156,7 @@ function initializeGroup(storyline) {
                     }//side by side
                     let turningType = new Array();
                     for (let k = head; k < tail; k++) {//the same turning direction
-                        turningType[k - head] = getTurningType(list, k, storyline);
+                        turningType[k - head] = _getTurningType(list, k, storyline);
                     }
                     let finK = 0;
                     for (let k = head; k < tail; k = finK) {
@@ -121,7 +165,7 @@ function initializeGroup(storyline) {
                             deal[list[k][0]][list[k][1]][list[k][2]] = 1;
                             continue;
                         }
-                        while (finK < tail && turningType[finK - head] === turningType[k - head] && Math.abs(storyline[list[finK][0]][list[finK][1]][list[finK][2]][1] - storyline[list[finK - 1][0]][list[finK - 1][1]][list[finK - 1][2]][1]) <= lineSpace) finK++;
+                        while (finK < tail && turningType[finK - head] === turningType[k - head] && Math.abs(storyline[list[finK][0]][list[finK][1]][list[finK][2]][1] - storyline[list[finK - 1][0]][list[finK - 1][1]][list[finK - 1][2]][1]) <= LINESPACE) finK++;
                         group[tot] = new Array();
                         group[tot][0] = new Array();
                         group[tot][0][0] = firX;
@@ -146,7 +190,7 @@ function initializeGroup(storyline) {
                     group[tot] = new Array();
                     group[tot][0] = new Array();
                     group[tot][0][0] = firX;
-                    group[tot][0][1] = getTurningType(list, 0, storyline);
+                    group[tot][0][1] = _getTurningType(list, 0, storyline);
                     group[tot][1] = new Array();
                     group[tot][1][0] = new Array();
                     group[tot][1][0][0] = list[0][0];
@@ -158,7 +202,57 @@ function initializeGroup(storyline) {
     }
     return group;
 }
-function getNxtPos(group, i, j, storyline) {
+function _getAimPos(storyline, storylineID, segmentID, x) {
+    let left = 0;
+    let right = storyline[storylineID][segmentID].length - 1;
+    let mid = 0;
+    let aim = 0;
+    while (left <= right) {
+        mid = (left + right) >> 1;
+        if (storyline[storylineID][segmentID][mid][0] <= x) {
+            aim = mid;
+            left = mid + 1;
+        }
+        else {
+            right = mid - 1;
+        }
+    }
+    return aim;
+}
+
+function _sortByY(list, storyline) {
+    for (let i = 0; i < list.length; i++) {
+        for (let j = i + 1; j < list.length; j++) {
+            if (storyline[list[j][0]][list[j][1]][list[j][2]][1] < storyline[list[i][0]][list[i][1]][list[i][2]][1]) {
+                let tmpI = list[i][0];
+                let tmpJ = list[i][1];
+                let tmpK = list[i][2];
+                list[i][0] = list[j][0];
+                list[i][1] = list[j][1];
+                list[i][2] = list[j][2];
+                list[j][0] = tmpI;
+                list[j][1] = tmpJ;
+                list[j][2] = tmpK;
+            }
+        }
+    }
+    return list;
+}
+function _getTurningType(list, k, storyline) {
+    let storylineID = list[k][0];
+    let segmentID = list[k][1];
+    let storyNodeID = list[k][2];
+    let lasTime = storyNodeID - 1;
+    let nxtTime = storyNodeID + 1;
+    let ret = 0;//normal;
+    if (nxtTime < storyline[storylineID][segmentID].length && storyline[storylineID][segmentID][storyNodeID][1] > storyline[storylineID][segmentID][nxtTime][1]) ret = 1;//leftdown to rightup low
+    if (nxtTime < storyline[storylineID][segmentID].length && storyline[storylineID][segmentID][storyNodeID][1] < storyline[storylineID][segmentID][nxtTime][1]) ret = 2;//leftup to rightdown high
+    if (lasTime >= 0 && storyline[storylineID][segmentID][storyNodeID][1] < storyline[storylineID][segmentID][lasTime][1]) ret = 3;//leftdown to rightup high
+    if (lasTime >= 0 && storyline[storylineID][segmentID][storyNodeID][1] > storyline[storylineID][segmentID][lasTime][1]) ret = 4;//leftup to rightdown low
+    return ret;
+}
+
+function _getNxtPos(group, i, j, storyline) {
     let slt = j + 1;
     let tot = group[i][1].length;
     let storylineID = group[i][1][j][0];
@@ -170,79 +264,41 @@ function getNxtPos(group, i, j, storyline) {
     let ret = 0;
     if (tot & 1) {
         if (slt * 2 - 1 < tot) {
-            ret = storyline[storylineID][segmentID][storyNodeID][0] + state * (Math.floor(tot / 2) - slt + 1) * spaceLength;
+            ret = storyline[storylineID][segmentID][storyNodeID][0] + state * (Math.floor(tot / 2) - slt + 1) * SPACELENGTH;
         }
         else if (slt * 2 - 1 === tot) {
             ret = storyline[storylineID][segmentID][storyNodeID][0];
         }
         else {
-            ret = storyline[storylineID][segmentID][storyNodeID][0] - state * (slt - Math.floor(tot / 2) - 1) * spaceLength;
+            ret = storyline[storylineID][segmentID][storyNodeID][0] - state * (slt - Math.floor(tot / 2) - 1) * SPACELENGTH;
         }
     }
     else {
         if (slt * 2 > tot) {
-            ret = storyline[storylineID][segmentID][storyNodeID][0] - state * ((slt - tot / 2 - 1) + 0.5) * spaceLength;
+            ret = storyline[storylineID][segmentID][storyNodeID][0] - state * ((slt - tot / 2 - 1) + 0.5) * SPACELENGTH;
         }
         else {
-            ret = storyline[storylineID][segmentID][storyNodeID][0] + state * ((tot / 2 - slt) + 0.5) * spaceLength;
+            ret = storyline[storylineID][segmentID][storyNodeID][0] + state * ((tot / 2 - slt) + 0.5) * SPACELENGTH;
         }
     }
 
     return ret;
 }
-function initializeOriginNodes(nowCharList) {
-    let originNodes = new Array();
-    let totCharNum = nowCharList.length;
-    let segmentNum = 0;
-    let posNum = 0;
-    for (let i = 0; i < totCharNum; i++) {
-        let nodeNum = nowCharList[i].length;
-        originNodes[i] = new Array();
-        segmentNum = 0;
-        posNum = 0;
-        originNodes[i][segmentNum] = new Array();
-        for (let k = 0; k < nodeNum; k++) {
-            if (k && (!(k & 1)) && nowCharList[i][k][0] - nowCharList[i][k - 1][0] !== 25) {
-                segmentNum++;
-                originNodes[i][segmentNum] = new Array();
-                posNum = 0;
-            }
-            originNodes[i][segmentNum][posNum] = new Array();
-            originNodes[i][segmentNum][posNum][0] = nowCharList[i][k][0];
-            originNodes[i][segmentNum][posNum][1] = nowCharList[i][k][1];
-            posNum++;
-        }
-    }
-    for (let i = 0; i < originNodes.length; i++) {
-        for (let j = 0; j < originNodes[i].length; j++) {
-            for (let k = 0; k < originNodes[i][j].length; k++) {
-                if (k & 1) {
-                    if (originNodes[i][j][k][0] < originNodes[i][j][k - 1][0]) {
-                        let tmpX = 0;
-                        tmpX = originNodes[i][j][k][0];
-                        originNodes[i][j][k][0] = originNodes[i][j][k - 1][0];
-                        originNodes[i][j][k - 1][0] = tmpX;
-                    }
-                }
-            }
-        }
-    }
-    return originNodes;
-}
-function checkAngle(storyline, storylineID, segmentID, storyNodeID, nxtTime) {
+
+function _checkAngle(storyline, storylineID, segmentID, storyNodeID, nxtTime) {
     let firX = storyline[storylineID][segmentID][storyNodeID][0];
     let firY = storyline[storylineID][segmentID][storyNodeID][1];
     let secX = storyline[storylineID][segmentID][nxtTime][0];
     let secY = storyline[storylineID][segmentID][nxtTime][1];
     let angle = Math.atan(Math.abs(firY - secY) / Math.abs(firX - secX));
-    if (angle > stdAngle) {
+    if (angle > STDANGLE) {
         return true;
     }
     else {
         return false;
     }
 }
-function checkTurn(storyline, storylineID, segmentID, storyNodeID) {
+function _checkTurn(storyline, storylineID, segmentID, storyNodeID) {
     let nxtTime = storyNodeID + 1;
     let ret = 0;
     if (storyNodeID < 0 || nxtTime >= storyline[storylineID][segmentID].length) {
@@ -254,16 +310,16 @@ function checkTurn(storyline, storylineID, segmentID, storyNodeID) {
     }
     return ret;
 }
-function fulfillMoveRules(storyline, storylineID, segmentID, storyNodeID) {
+function _fulfillMoveRules(storyline, storylineID, segmentID, storyNodeID) {
     let nowSeg = storyline[storylineID][segmentID];
     let nowID = storyNodeID;
     let nxtID = storyNodeID + 1;
     if (nxtID >= nowSeg.length) return false;
     if (nowSeg[nowID][1] === nowSeg[nxtID][1]) return false;
-    if (checkAngle(storyline, storylineID, segmentID, nowID, nxtID)) return true;
+    if (_checkAngle(storyline, storylineID, segmentID, nowID, nxtID)) return true;
     return false;
 }
-function getOptLen(storyline, storylineID, segmentID, storyNodeID) {
+function _getOptLen(storyline, storylineID, segmentID, storyNodeID) {
     let nowSeg = storyline[storylineID][segmentID];
     let nowID = storyNodeID;
     let nxtID = storyNodeID + 1;
@@ -272,10 +328,10 @@ function getOptLen(storyline, storylineID, segmentID, storyNodeID) {
     let aimX = Math.round(Y / 1500) * 25 - X;
     return aimX;
 }
-function sortNumber(a, b) {
+function _sortNumber(a, b) {
     return a - b;
 }
-function calculateRenderNodes(tmpStoryline, group) {
+function _calculateRenderNodes(tmpStoryline, group) {
     let renderNodes = new Array();
     let storylineID = tmpStoryline.length;
     for (let i = 0; i < storylineID; i++) {
@@ -303,7 +359,7 @@ function calculateRenderNodes(tmpStoryline, group) {
             }
         }
     }
-    timeStamps.sort(sortNumber);
+    timeStamps.sort(_sortNumber);
     for (let i = 1; i < tot; i++) {
         if (timeStamps[i] !== timeStamps[cnt]) {
             timeStamps[++cnt] = timeStamps[i];
@@ -318,8 +374,8 @@ function calculateRenderNodes(tmpStoryline, group) {
                 if (tmpK >= renderNodes[i][j].length) continue;
                 if (renderNodes[i][j][tmpK][0] > timeStamps[k]) continue;
                 if (renderNodes[i][j][tmpK][0] === timeStamps[k]) {
-                    if (fulfillMoveRules(renderNodes, i, j, tmpK)) {
-                        tmpOffset = Math.max(tmpOffset, getOptLen(renderNodes, i, j, tmpK));
+                    if (_fulfillMoveRules(renderNodes, i, j, tmpK)) {
+                        tmpOffset = Math.max(tmpOffset, _getOptLen(renderNodes, i, j, tmpK));
                     }
                 }
             }
@@ -338,7 +394,7 @@ function calculateRenderNodes(tmpStoryline, group) {
     }
     for (let i = 0; i < group.length; i++) {
         for (let j = 0; j < group[i][1].length; j++) {
-            let nxtPos = getNxtPos(group, i, j, renderNodes);
+            let nxtPos = _getNxtPos(group, i, j, renderNodes);
             let storylineID = group[i][1][j][0];
             let segmentID = group[i][1][j][1];
             let storyNodeID = group[i][1][j][2];
@@ -354,72 +410,42 @@ function calculateRenderNodes(tmpStoryline, group) {
     }
     return renderNodes;
 }
-function calBezier(p, t, d) {
+function _calBezier(p, t, d) {
     let ret = p[0][d] * (1 - t) * (1 - t) * (1 - t);
     ret += 3 * p[1][d] * t * (1 - t) * (1 - t);
     ret += 3 * p[2][d] * t * t * (1 - t);
     ret += p[3][d] * t * t * t;
     return ret;
 }
-function checkBack(storyline, storylineID, segmentID, storyNodeID, state, recK) {
-    let nxt = storyNodeID + state;
-    let nowSeg = storyline[storylineID][segmentID];
-    if (nxt < 0 || nxt >= storyline[storylineID][segmentID].length) {
-        return false;
-    }
-    if (nowSeg[nxt][1] !== nowSeg[storyNodeID][1]) {
-        return false;
-    }
-    while (nxt + state >= recK && nxt + state < nowSeg.length && nowSeg[nxt + state][1] === nowSeg[storyNodeID][1]) {
-        nxt += state;
-    }
-    if (Math.abs(nowSeg[storyNodeID][0] - nowSeg[nxt][0]) < minSegmentLen) {
-        return false;
-    }
-    return true;
-}
-function checkSame(tmpSmoothNodes, i, j, a, b) {
-    if (tmpSmoothNodes[i][j][a][0] !== tmpSmoothNodes[i][j][b][0]) return false;
-    if (tmpSmoothNodes[i][j][a][1] !== tmpSmoothNodes[i][j][b][1]) return false;
-    return true;
-}
-function fulfillChangeRule(storylineID, segmentID, storyNodeID, storyline, flagChange) {
-    if (flagChange[storylineID][segmentID][storyNodeID]) return false;
-    if (storyNodeID + 1 >= storyline[storylineID][segmentID].length) return false;
-    if (storyline[storylineID][segmentID][storyNodeID][1] === storyline[storyline][segmentID][storyNodeID + 1][1]) return false;
-    if (checkAngle(storyline, storylineID, segmentID, storyNodeID, storyNodeID + 1)) return true;
-    return false;
-}
-function getTime(storyline, storylineID, segmentID, storyNodeID) {
+function _getTime(storyline, storylineID, segmentID, storyNodeID) {
     return Math.floor((storyline[storylineID][segmentID][storyNodeID][0] + 25) / 50);
 }
-function checkSplit(splitMarks, ptOfSplit, storyline, storylineID, segmentID, storyNodeID) {
+function _checkSplit(splitMarks, ptOfSplit, storyline, storylineID, segmentID, storyNodeID) {
     let ret = 0;
     if (ptOfSplit >= splitMarks[storylineID].length) {
         ret = 0;
     }
     else {
         let stdTime = splitMarks[storylineID][ptOfSplit][0];
-        let tmpTime = getTime(storyline, storylineID, segmentID, storyNodeID);
-        if(tmpTime < stdTime){
-            ret =  0;
+        let tmpTime = _getTime(storyline, storylineID, segmentID, storyNodeID);
+        if (tmpTime < stdTime) {
+            ret = 0;
         }
-        else if(tmpTime === stdTime){
+        else if (tmpTime === stdTime) {
             ret = 1;
         }
-        else{
+        else {
             ret = 2;
         }
     }
     return ret;
 }
-function getSmoothPos(storyNodeNew, storyNodeOld, time)
-{
+function _getSmoothPos(storyNodeNew, storyNodeOld, time) {
     let tmpX = storyNodeNew[0] - storyNodeOld[0] + time * 50;
     let tmpY = storyNodeNew[1];
     return { tmpX, tmpY };
 }
-function calculateSmoothNodes(renderNodes, originNodes, group, splitMarks) {
+function _calculateSmoothNodes(renderNodes, originNodes, group, splitMarks) {
     let tmpSmoothNodes = new Array();
     let flagChange = new Array();
     for (let i = 0; i < renderNodes.length; i++) {
@@ -467,14 +493,14 @@ function calculateSmoothNodes(renderNodes, originNodes, group, splitMarks) {
             }
         }
         let minuLen = 0;
-        if (minLength < minSegmentLen) {
+        if (minLength < MINSEGMENTLEN) {
             minuLen = 0;
         }
-        else if (minLength < minSegmentLen + stdSegLen) {
-            minuLen = minLength - minSegmentLen;
+        else if (minLength < MINSEGMENTLEN + STDSEGLEN) {
+            minuLen = minLength - MINSEGMENTLEN;
         }
         else {
-            minuLen = stdSegLen;
+            minuLen = STDSEGLEN;
         }
         for (let j = 0; j < group[i][1].length; j++) {
             if (turnType <= 2) {
@@ -507,50 +533,54 @@ function calculateSmoothNodes(renderNodes, originNodes, group, splitMarks) {
     let cntSegments = 0;
     let ptOfSplit = 0;
     let sketchStyles = new Array();
+    let segmentTime = new Array();
     for (let i = 0; i < tmpSmoothNodes.length; i++) {
         smoothNodes[i] = new Array();
         sketchStyles[i] = new Array();
+        segmentTime[i] = new Array();
         cntSegments = -1;
         ptOfSplit = 0;
         for (let j = 0; j < tmpSmoothNodes[i].length; j++) {
-            ++ cntSegments;
+            ++cntSegments;
             smoothNodes[i][cntSegments] = new Array();
             cntNodes = 0;
             for (let k = 0; k < tmpSmoothNodes[i][j].length; k++) {
-                let turnType = checkTurn(tmpSmoothNodes, i, j, k);
-                let flagSplit = checkSplit(splitMarks, ptOfSplit, originNodes, i, j, k);
-                while(flagSplit === 1 || flagSplit === 2){
-                    if(flagSplit === 1){
-                        if(cntNodes !== 0){
+                let turnType = _checkTurn(tmpSmoothNodes, i, j, k);
+                let flagSplit = _checkSplit(splitMarks, ptOfSplit, originNodes, i, j, k);
+                while (flagSplit === 1 || flagSplit === 2) {
+                    if (flagSplit === 1) {
+                        if (cntNodes !== 0) {
                             smoothNodes[i][cntSegments][cntNodes] = new Array();
                             smoothNodes[i][cntSegments][cntNodes][0] = tmpSmoothNodes[i][j][k][0];
                             smoothNodes[i][cntSegments][cntNodes][1] = tmpSmoothNodes[i][j][k][1];
-                            ++ cntSegments;
+                            ++cntSegments;
                             cntNodes = 0;
-                            if(k < tmpSmoothNodes[i][j].length - 1)  smoothNodes[i][cntSegments] = new Array();  
+                            if (k < tmpSmoothNodes[i][j].length - 1) smoothNodes[i][cntSegments] = new Array();
                         }
                         sketchStyles[i][cntSegments] = splitMarks[i][ptOfSplit][1];
-                        ptOfSplit ++;
+                        segmentTime[i][cntSegments] = splitMarks[i][ptOfSplit][0];
+                        ptOfSplit++;
                         break;
                     }
                     else {
-                        const{tmpX , tmpY} = getSmoothPos(tmpSmoothNodes[i][j][k],originNodes[i][j][k],splitMarks[i][ptOfSplit][0]);
+                        const { tmpX, tmpY } = _getSmoothPos(tmpSmoothNodes[i][j][k], originNodes[i][j][k], splitMarks[i][ptOfSplit][0]);
                         smoothNodes[i][cntSegments][cntNodes] = new Array();
                         smoothNodes[i][cntSegments][cntNodes][0] = tmpX;
                         smoothNodes[i][cntSegments][cntNodes][1] = tmpY;
-                        ++ cntSegments;
+                        ++cntSegments;
                         smoothNodes[i][cntSegments] = new Array();
                         cntNodes = 0;
                         sketchStyles[i][cntSegments] = splitMarks[i][ptOfSplit][1];
-                        ptOfSplit ++;
+                        segmentTime[i][cntSegments] = splitMarks[i][ptOfSplit][0];
+                        ptOfSplit++;
                         smoothNodes[i][cntSegments][cntNodes] = new Array();
                         smoothNodes[i][cntSegments][cntNodes][0] = tmpX;
                         smoothNodes[i][cntSegments][cntNodes][1] = tmpY;
-                        cntNodes ++;
-                        flagSplit = checkSplit(splitMarks, ptOfSplit, originNodes, i, j, k);
+                        cntNodes++;
+                        flagSplit = _checkSplit(splitMarks, ptOfSplit, originNodes, i, j, k);
                     }
                 }
-                if(flagSplit === 1 && k === tmpSmoothNodes[i][j].length - 1) continue;
+                if (flagSplit === 1 && k === tmpSmoothNodes[i][j].length - 1) continue;
                 if (turnType === 0) {
                     smoothNodes[i][cntSegments][cntNodes] = new Array();
                     smoothNodes[i][cntSegments][cntNodes][0] = tmpSmoothNodes[i][j][k][0];
@@ -563,25 +593,25 @@ function calculateSmoothNodes(renderNodes, originNodes, group, splitMarks) {
                     if (turnType === 1) {
                         p[0] = tmpSmoothNodes[i][j][k];
                         p[1][0] = 0.5 * tmpSmoothNodes[i][j][k][0] + 0.5 * tmpSmoothNodes[i][j][k + 1][0];
-                        p[1][1] = tmpSmoothNodes[i][j][k][1] - smoothY;
+                        p[1][1] = tmpSmoothNodes[i][j][k][1] - SMOOTHY;
                         p[2][0] = 0.5 * tmpSmoothNodes[i][j][k][0] + 0.5 * tmpSmoothNodes[i][j][k + 1][0];
-                        p[2][1] = tmpSmoothNodes[i][j][k + 1][1] + smoothY;
+                        p[2][1] = tmpSmoothNodes[i][j][k + 1][1] + SMOOTHY;
                         p[3] = tmpSmoothNodes[i][j][k + 1];
                     }
                     else {
                         p[0] = tmpSmoothNodes[i][j][k];
                         p[1][0] = 0.5 * tmpSmoothNodes[i][j][k][0] + 0.5 * tmpSmoothNodes[i][j][k + 1][0];
-                        p[1][1] = tmpSmoothNodes[i][j][k][1] + smoothY;
+                        p[1][1] = tmpSmoothNodes[i][j][k][1] + SMOOTHY;
                         p[2][0] = 0.5 * tmpSmoothNodes[i][j][k][0] + 0.5 * tmpSmoothNodes[i][j][k + 1][0];
-                        p[2][1] = tmpSmoothNodes[i][j][k + 1][1] - smoothY;
+                        p[2][1] = tmpSmoothNodes[i][j][k + 1][1] - SMOOTHY;
                         p[3] = tmpSmoothNodes[i][j][k + 1];
                     }
-                    sampleRate = Math.floor(Math.sqrt((p[3][1] - p[0][1]) * (p[3][1] - p[0][1]) + (p[3][0] - p[1][0]) * (p[3][0] - p[1][0])) / rateStd);
-                    if (sampleRate & 1) sampleRate += 1;
-                    for (let z = 0; z < sampleRate; z ++) {
+                    SAMPLERATE = Math.floor(Math.sqrt((p[3][1] - p[0][1]) * (p[3][1] - p[0][1]) + (p[3][0] - p[1][0]) * (p[3][0] - p[1][0])) / RATESTD);
+                    if (SAMPLERATE & 1) SAMPLERATE += 1;
+                    for (let z = 0; z < SAMPLERATE; z++) {
                         smoothNodes[i][cntSegments][cntNodes] = new Array();
-                        smoothNodes[i][cntSegments][cntNodes][0] = calBezier(p, z / sampleRate, 0);
-                        smoothNodes[i][cntSegments][cntNodes][1] = calBezier(p, z / sampleRate, 1);
+                        smoothNodes[i][cntSegments][cntNodes][0] = _calBezier(p, z / SAMPLERATE, 0);
+                        smoothNodes[i][cntSegments][cntNodes][1] = _calBezier(p, z / SAMPLERATE, 1);
                         cntNodes++;
                     }
                 }
@@ -591,18 +621,16 @@ function calculateSmoothNodes(renderNodes, originNodes, group, splitMarks) {
     let ret = new Array();
     ret[0] = smoothNodes;
     ret[1] = sketchStyles;
+    ret[2] = segmentTime;
     return ret;
 }
-function styleIsNormal(sketchStyles, i, j){
+function _styleIsNormal(sketchStyles, i, j) {
     let ret = 0;
-    switch(sketchStyles[i][j]){
+    switch (sketchStyles[i][j]) {
         case 'Color':
             ret = 1;
             break;
         case 'Width':
-            ret = 1;
-            break;
-        case 'Dash':
             ret = 1;
             break;
         case 'Normal':
@@ -614,37 +642,36 @@ function styleIsNormal(sketchStyles, i, j){
     }
     return ret;
 }
-function cutString(originString, groupPosition)
-{
-    let i = 0,j = 0;
+function _cutString(originString, groupPosition) {
+    let i = 0, j = 0;
     let styleOption = new String();
     let tmpA = new Array();
     let tmpB = new Array();
     let len = originString.length;
-    for(i = 0;i < len;i ++){
-        if(originString[i] !== '_'){
+    for (i = 0; i < len; i++) {
+        if (originString[i] !== '_') {
             styleOption += originString[i];
         }
-        else{
-            i ++;
+        else {
+            i++;
             break;
         }
     }
-    for(j = 0;i < len;i ++,j ++){
-        if(originString[i] !== '_'){
+    for (j = 0; i < len; i++ , j++) {
+        if (originString[i] !== '_') {
             tmpA[j] = originString[i];
         }
-        else{
-            i ++;
+        else {
+            i++;
             break;
         }
     }
-    for(j = 0;i < len;i ++,j ++){
-        if(originString[i] !== '_'){
+    for (j = 0; i < len; i++ , j++) {
+        if (originString[i] !== '_') {
             tmpB[j] = originString[i];
         }
-        else{
-            i ++;
+        else {
+            i++;
             break;
         }
     }
@@ -654,10 +681,10 @@ function cutString(originString, groupPosition)
     cntNum = parseFloat(tmpB);
     let stdY = new Number;
     stdY = groupPosition[posY];
-    return {styleOption, stdY, cntNum};
+    return { styleOption, stdY, cntNum };
 }
 //#TODO:Combined lines need to be displayed only one time
-function calcluateSketchNodes(smoothNodes, sketchStyles, groupPosition) {
+function _calcluateSketchNodes(smoothNodes, sketchStyles, groupPosition) {
     let tmpSketchNodes = smoothNodes;
     let p = new Array();
     for (let z = 0; z < 4; z++) {
@@ -675,7 +702,7 @@ function calcluateSketchNodes(smoothNodes, sketchStyles, groupPosition) {
                 p[z][0] = 0;
                 p[z][1] = 0;
             }
-            if(styleIsNormal(sketchStyles,i,j)){
+            if (_styleIsNormal(sketchStyles, i, j)) {
                 for (let k = 0; k < tmpSketchNodes[i][j].length - 1; k++) {
                     p[0][0] = tmpSketchNodes[i][j][k][0];
                     p[0][1] = tmpSketchNodes[i][j][k][1];
@@ -702,7 +729,7 @@ function calcluateSketchNodes(smoothNodes, sketchStyles, groupPosition) {
                             let k = Math.sqrt(vecB[0] * vecB[0] + vecB[1] * vecB[1]);
                             vecB[0] /= k;
                             vecB[1] /= k;
-                            shakeFac = Math.floor(Math.sqrt((p[3][1] - p[0][1]) * (p[3][1] - p[0][1]) + (p[3][0] - p[1][0]) * (p[3][0] - p[1][0])) / shakeFacStd);
+                            SHAKEFAC = Math.floor(Math.sqrt((p[3][1] - p[0][1]) * (p[3][1] - p[0][1]) + (p[3][0] - p[1][0]) * (p[3][0] - p[1][0])) / SHAKEFACSTD);
                             if (p[2][0] !== 0) {
                                 p[1][0] = 2 * p[0][0] - p[2][0];
                                 p[1][1] = 2 * p[0][1] - p[2][1];
@@ -716,8 +743,8 @@ function calcluateSketchNodes(smoothNodes, sketchStyles, groupPosition) {
                                 p[2][0] = p[0][0] + 0.75 * (p[3][0] - p[0][0]);
                                 p[2][1] = p[0][1] + 0.75 * (p[3][1] - p[0][1]);
                                 let changeRate = Math.random();
-                                vecB[0] *= changeRate * shakeFac;
-                                vecB[1] *= changeRate * shakeFac;
+                                vecB[0] *= changeRate * SHAKEFAC;
+                                vecB[1] *= changeRate * SHAKEFAC;
                                 p[2][0] += vecB[0] * decrea;
                                 p[2][1] += vecB[1] * decrea;
                             }
@@ -734,7 +761,7 @@ function calcluateSketchNodes(smoothNodes, sketchStyles, groupPosition) {
                                 vecB[1] *= changeRate;
                                 p[2][0] += vecB[0] * decrea * (p[3][0] - p[0][0]);
                                 p[2][1] += vecB[1] * decrea * (p[3][1] - p[0][1]);
-    
+
                                 state = Math.random();
                                 if (state > 0.5) state -= 0.5;
                                 if (Math.random() > 0.7) decrea = 1;
@@ -744,12 +771,12 @@ function calcluateSketchNodes(smoothNodes, sketchStyles, groupPosition) {
                                 changeRate = Math.random();
                                 vecB[0] *= changeRate;
                                 vecB[1] *= changeRate;
-                                p[1][0] += vecB[0] * decrea * shakeFac;
-                                p[1][1] += vecB[1] * decrea * shakeFac;
+                                p[1][0] += vecB[0] * decrea * SHAKEFAC;
+                                p[1][1] += vecB[1] * decrea * SHAKEFAC;
                             }
-                            
-                            sampleRate = Math.floor(Math.sqrt((p[3][1] - p[0][1]) * (p[3][1] - p[0][1]) + (p[3][0] - p[1][0]) * (p[3][0] - p[1][0])) / newRateStd);
-                            if (!(sampleRate & 1)) sampleRate += 1;
+
+                            SAMPLERATE = Math.floor(Math.sqrt((p[3][1] - p[0][1]) * (p[3][1] - p[0][1]) + (p[3][0] - p[1][0]) * (p[3][0] - p[1][0])) / NEWRATESTD);
+                            if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
                         }
                         else {
                             if (p[2][0] !== 0) {
@@ -765,7 +792,7 @@ function calcluateSketchNodes(smoothNodes, sketchStyles, groupPosition) {
                                 if (Math.random() > 0.5) decrea = 1;
                                 else decrea = -1;
                                 p[2][0] = p[0][0] + state * (p[3][0] - p[0][0]);
-                                p[2][1] = sketchRange * Math.random() * decrea + p[0][1];
+                                p[2][1] = SKETCHRANGE * Math.random() * decrea + p[0][1];
                             }
                             else {
                                 let state = Math.random();
@@ -774,90 +801,163 @@ function calcluateSketchNodes(smoothNodes, sketchStyles, groupPosition) {
                                 if (Math.random() > 0.5) decrea = 1;
                                 else decrea = -1;
                                 p[2][0] = p[0][0] + state * (p[3][0] - p[0][0]);
-                                p[2][1] = sketchRange * Math.random() * decrea + p[0][1];
-    
+                                p[2][1] = SKETCHRANGE * Math.random() * decrea + p[0][1];
+
                                 state = Math.random();
                                 if (state > 0.5) state -= 0.5;
                                 if (Math.random() > 0.7) decrea = 1;
                                 else decrea = -1;
                                 p[1][0] = p[0][0] + state * (p[3][0] - p[0][0]);
-                                p[1][1] = sketchRange * Math.random() * decrea + p[0][1];
+                                p[1][1] = SKETCHRANGE * Math.random() * decrea + p[0][1];
                             }
-                            sampleRate = 20;
+                            SAMPLERATE = 20;
                         }
-                        for (let z = 0; z <= sampleRate; z++) {
+                        for (let z = 0; z <= SAMPLERATE; z++) {
                             sketchNodes[i][j][cnt] = new Array();
-                            sketchNodes[i][j][cnt][0] = calBezier(p, z / sampleRate, 0);
-                            sketchNodes[i][j][cnt][1] = calBezier(p, z / sampleRate, 1);
+                            sketchNodes[i][j][cnt][0] = _calBezier(p, z / SAMPLERATE, 0);
+                            sketchNodes[i][j][cnt][1] = _calBezier(p, z / SAMPLERATE, 1);
                             cnt++;
                         }
                     }
                 }
             }
-            else if(sketchStyles[i][j] === 'SinWave'){
-                sampleRate = 100;
-                for(let k = 0;k < tmpSketchNodes[i][j].length - 1;k ++){
-                    if(tmpSketchNodes[i][j][k][1] !== tmpSketchNodes[i][j][k + 1][1]){
+            else if (sketchStyles[i][j] === 'Wave') {
+                SAMPLERATE = 100;
+                for (let k = 0; k < tmpSketchNodes[i][j].length - 1; k++) {
+                    if (tmpSketchNodes[i][j][k][1] !== tmpSketchNodes[i][j][k + 1][1]) {
                         sketchNodes[i][j][cnt] = new Array();
                         sketchNodes[i][j][cnt][0] = tmpSketchNodes[i][j][k][0];
                         sketchNodes[i][j][cnt][1] = tmpSketchNodes[i][j][k][1];
-                        cnt ++;
+                        cnt++;
                     }
-                    else{
+                    else {
                         let nxtK = k + 1;
-                        while(nxtK < tmpSketchNodes[i][j].length && tmpSketchNodes[i][j][k][1] === tmpSketchNodes[i][j][nxtK][1]) nxtK ++;
-                        nxtK --;
+                        while (nxtK < tmpSketchNodes[i][j].length && tmpSketchNodes[i][j][k][1] === tmpSketchNodes[i][j][nxtK][1]) nxtK++;
+                        nxtK--;
                         let tmpLength = tmpSketchNodes[i][j][nxtK][0] - tmpSketchNodes[i][j][k][0];
-                        sinWaveRate = Math.ceil(tmpLength / 80); 
-                        sampleRate = Math.ceil(tmpLength / 5);
-                        for(let z = 0;z <= sampleRate;z ++){
+                        WAVERATE = Math.ceil(tmpLength / 80);
+                        SAMPLERATE = Math.ceil(tmpLength / 5);
+                        for (let z = 0; z <= SAMPLERATE; z++) {
                             sketchNodes[i][j][cnt] = new Array();
-                            sketchNodes[i][j][cnt][0] = tmpSketchNodes[i][j][k][0] + tmpLength * z / sampleRate;
-                            sketchNodes[i][j][cnt][1] = Math.sin(z * sinWaveRate * pi / sampleRate) * sinHeight + tmpSketchNodes[i][j][k][1];
-                            cnt ++;
+                            sketchNodes[i][j][cnt][0] = tmpSketchNodes[i][j][k][0] + tmpLength * z / SAMPLERATE;
+                            sketchNodes[i][j][cnt][1] = Math.sin(z * WAVERATE * PI / SAMPLERATE) * WAVEHEIGHT + tmpSketchNodes[i][j][k][1];
+                            cnt++;
                         }
                         k = nxtK;
                     }
                 }
             }
-            else if(sketchStyles[i][j] === 'ZigZag'){
-                sampleRate = 10;
-                for(let k = 0;k < tmpSketchNodes[i][j].length - 1;k ++){
-                    if(tmpSketchNodes[i][j][k][1] !== tmpSketchNodes[i][j][k + 1][1]){
+            else if (sketchStyles[i][j] === 'Zigzag') {
+                SAMPLERATE = 10;
+                for (let k = 0; k < tmpSketchNodes[i][j].length - 1; k++) {
+                    if (tmpSketchNodes[i][j][k][1] !== tmpSketchNodes[i][j][k + 1][1]) {
                         sketchNodes[i][j][cnt] = new Array();
                         sketchNodes[i][j][cnt][0] = tmpSketchNodes[i][j][k][0];
                         sketchNodes[i][j][cnt][1] = tmpSketchNodes[i][j][k][1];
-                        cnt ++;
+                        cnt++;
                     }
-                    else{
+                    else {
                         let nxtK = k + 1;
-                        while(nxtK < tmpSketchNodes[i][j].length && tmpSketchNodes[i][j][k][1] === tmpSketchNodes[i][j][nxtK][1]) nxtK ++;
-                        nxtK --;
+                        while (nxtK < tmpSketchNodes[i][j].length && tmpSketchNodes[i][j][k][1] === tmpSketchNodes[i][j][nxtK][1]) nxtK++;
+                        nxtK--;
                         let tmpLength = tmpSketchNodes[i][j][nxtK][0] - tmpSketchNodes[i][j][k][0];
-                        let tmpHeight = zigHeight;
-                        sampleRate = Math.ceil(tmpLength / 50);
+                        let tmpHeight = ZIGHEIGHT;
+                        SAMPLERATE = Math.ceil(tmpLength / 50);
                         sketchNodes[i][j][cnt] = new Array();
                         sketchNodes[i][j][cnt][0] = tmpSketchNodes[i][j][k][0];
                         sketchNodes[i][j][cnt][1] = tmpSketchNodes[i][j][k][1];
-                        cnt ++;
-                        for(let z = 0;z < sampleRate;z ++){
+                        cnt++;
+                        for (let z = 0; z < SAMPLERATE; z++) {
                             sketchNodes[i][j][cnt] = new Array();
-                            sketchNodes[i][j][cnt][0] = tmpSketchNodes[i][j][k][0] + tmpLength * (z + 0.5) / sampleRate;
+                            sketchNodes[i][j][cnt][0] = tmpSketchNodes[i][j][k][0] + tmpLength * (z + 0.5) / SAMPLERATE;
                             sketchNodes[i][j][cnt][1] = tmpSketchNodes[i][j][k][1] + tmpHeight;
                             tmpHeight = 0 - tmpHeight;
-                            cnt ++;
+                            cnt++;
                         }
                         sketchNodes[i][j][cnt] = new Array();
                         sketchNodes[i][j][cnt][0] = tmpSketchNodes[i][j][nxtK][0];
                         sketchNodes[i][j][cnt][1] = tmpSketchNodes[i][j][nxtK][1];
-                        cnt ++;
+                        cnt++;
                         k = nxtK;
                     }
                 }
             }
-            else{
-                const{ styleOption, stdY, cntNum} = cutString(sketchStyles[i][j], groupPosition);
-                if(styleOption === 'Collide'){
+            else if (sketchStyles[i][j] === 'Bump'){
+                SAMPLERATE = 10;
+                for (let k = 0; k < tmpSketchNodes[i][j].length - 1; k++) {
+                    if (tmpSketchNodes[i][j][k][1] !== tmpSketchNodes[i][j][k + 1][1]) {
+                        sketchNodes[i][j][cnt] = new Array();
+                        sketchNodes[i][j][cnt][0] = tmpSketchNodes[i][j][k][0];
+                        sketchNodes[i][j][cnt][1] = tmpSketchNodes[i][j][k][1];
+                        cnt++;
+                    }
+                    else {
+                        let nxtK = k + 1;
+                        while (nxtK < tmpSketchNodes[i][j].length && tmpSketchNodes[i][j][k][1] === tmpSketchNodes[i][j][nxtK][1]) nxtK++;
+                        nxtK--;
+                        let tmpLength = tmpSketchNodes[i][j][nxtK][0] - tmpSketchNodes[i][j][k][0];
+                        let tmpHeight = BUMPHEIGHT;
+                        SAMPLERATE = Math.ceil(tmpLength / 50);
+                        sketchNodes[i][j][cnt] = new Array();
+                        sketchNodes[i][j][cnt][0] = tmpSketchNodes[i][j][k][0];
+                        sketchNodes[i][j][cnt][1] = tmpSketchNodes[i][j][k][1];
+                        cnt ++;
+                        sketchNodes[i][j][cnt] = new Array();
+                        sketchNodes[i][j][cnt][0] = tmpSketchNodes[i][j][k][0];
+                        sketchNodes[i][j][cnt][1] = tmpSketchNodes[i][j][k][1] + tmpHeight;
+                        cnt ++;
+                        for (let z = 1; z < SAMPLERATE; z++) {
+                            sketchNodes[i][j][cnt] = new Array();
+                            sketchNodes[i][j][cnt][0] = tmpSketchNodes[i][j][k][0] + tmpLength * z / SAMPLERATE;
+                            sketchNodes[i][j][cnt][1] = tmpSketchNodes[i][j][k][1] + tmpHeight;
+                            tmpHeight = 0 - tmpHeight;
+                            cnt++;
+                            sketchNodes[i][j][cnt] = new Array();
+                            sketchNodes[i][j][cnt][0] = tmpSketchNodes[i][j][k][0] + tmpLength * z / SAMPLERATE;
+                            sketchNodes[i][j][cnt][1] = tmpSketchNodes[i][j][k][1] + tmpHeight;
+                            cnt++;
+                        }
+                        sketchNodes[i][j][cnt] = new Array();
+                        sketchNodes[i][j][cnt][0] = tmpSketchNodes[i][j][k][0] + tmpLength;
+                        sketchNodes[i][j][cnt][1] = tmpSketchNodes[i][j][k][1] + tmpHeight;
+                        tmpHeight = 0 - tmpHeight;
+                        cnt++;
+                        sketchNodes[i][j][cnt] = new Array();
+                        sketchNodes[i][j][cnt][0] = tmpSketchNodes[i][j][k][0] + tmpLength;
+                        sketchNodes[i][j][cnt][1] = tmpSketchNodes[i][j][k][1];
+                        cnt++;
+                        k = nxtK;
+                    }
+                }
+            }
+            else if (sketchStyles[i][j] === 'Dash'){
+                SAMPLERATE = 10;
+                for (let k = 0; k < tmpSketchNodes[i][j].length - 1; k++) {
+                    if (tmpSketchNodes[i][j][k][1] !== tmpSketchNodes[i][j][k + 1][1]) {
+                        sketchNodes[i][j][cnt] = new Array();
+                        sketchNodes[i][j][cnt][0] = tmpSketchNodes[i][j][k][0];
+                        sketchNodes[i][j][cnt][1] = tmpSketchNodes[i][j][k][1];
+                        cnt++;
+                    }
+                    else {
+                        let nxtK = k + 1;
+                        while (nxtK < tmpSketchNodes[i][j].length && tmpSketchNodes[i][j][k][1] === tmpSketchNodes[i][j][nxtK][1]) nxtK++;
+                        nxtK--;
+                        let tmpLength = tmpSketchNodes[i][j][nxtK][0] - tmpSketchNodes[i][j][k][0];
+                        SAMPLERATE = Math.ceil(tmpLength / 50);
+                        for (let z = 0; z <= SAMPLERATE; z++) {
+                            sketchNodes[i][j][cnt] = new Array();
+                            sketchNodes[i][j][cnt][0] = tmpSketchNodes[i][j][k][0] + tmpLength * z / SAMPLERATE;
+                            sketchNodes[i][j][cnt][1] = tmpSketchNodes[i][j][k][1];
+                            cnt++;
+                        }
+                        k = nxtK;
+                    }
+                }
+            }
+            else {
+                const { styleOption, stdY, cntNum } = _cutString(sketchStyles[i][j], groupPosition);
+                if (styleOption === 'Collide') {
                     let head = 0;
                     let tail = tmpSketchNodes[i][j].length - 1;
                     let tmpLength = tmpSketchNodes[i][j][tail][0] - tmpSketchNodes[i][j][head][0];
@@ -866,43 +966,43 @@ function calcluateSketchNodes(smoothNodes, sketchStyles, groupPosition) {
                     let endX = 0.8 * tmpLength + tmpSketchNodes[i][j][head][0];
                     let midLength = endX - staX;
 
-                    sampleRate = Math.ceil(0.2 * tmpLength / 8);
+                    SAMPLERATE = Math.ceil(0.2 * tmpLength / 8);
                     let p = new Array();
-                    for (let z = 0; z <= 4; z ++) p[z] = new Array();
-                    
+                    for (let z = 0; z <= 4; z++) p[z] = new Array();
+
                     p[0] = tmpSketchNodes[i][j][head];
                     p[1][0] = 0.5 * tmpSketchNodes[i][j][head][0] + 0.5 * staX;
                     p[1][1] = tmpSketchNodes[i][j][head][1];
                     p[2][0] = 0.5 * tmpSketchNodes[i][j][head][0] + 0.5 * staX;
-                    p[2][1] = stdY + ((cntNum & 1) ? -1 : 1) * collideHeight;
+                    p[2][1] = stdY + ((cntNum & 1) ? -1 : 1) * COLLIDEHEIGHT;
                     p[3][0] = staX;
-                    p[3][1] = stdY + ((cntNum & 1) ? -1 : 1) * collideHeight;
-                    if(!(sampleRate & 1)) sampleRate += 1;
-                    for (let z = 0; z <= sampleRate; z ++) {
+                    p[3][1] = stdY + ((cntNum & 1) ? -1 : 1) * COLLIDEHEIGHT;
+                    if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
+                    for (let z = 0; z <= SAMPLERATE; z++) {
                         sketchNodes[i][j][cnt] = new Array();
-                        sketchNodes[i][j][cnt][0] = calBezier(p, z / sampleRate, 0);
-                        sketchNodes[i][j][cnt][1] = calBezier(p, z / sampleRate, 1);
+                        sketchNodes[i][j][cnt][0] = _calBezier(p, z / SAMPLERATE, 0);
+                        sketchNodes[i][j][cnt][1] = _calBezier(p, z / SAMPLERATE, 1);
                         cnt++;
                     }
 
                     p[0][0] = endX;
-                    p[0][1] = stdY + ((cntNum & 1) ? -1 : 1) * collideHeight;
+                    p[0][1] = stdY + ((cntNum & 1) ? -1 : 1) * COLLIDEHEIGHT;
                     p[1][0] = 0.5 * tmpSketchNodes[i][j][tail][0] + 0.5 * endX;
-                    p[1][1] = stdY + ((cntNum & 1) ? -1 : 1) * collideHeight;
+                    p[1][1] = stdY + ((cntNum & 1) ? -1 : 1) * COLLIDEHEIGHT;
                     p[2][0] = 0.5 * tmpSketchNodes[i][j][tail][0] + 0.5 * endX;
                     p[2][1] = tmpSketchNodes[i][j][tail][1];
                     p[3][0] = tmpSketchNodes[i][j][tail][0];
                     p[3][1] = tmpSketchNodes[i][j][tail][1];
-                    sampleRate = Math.ceil(0.2 * tmpLength / 8);
-                    if(!(sampleRate & 1)) sampleRate += 1;
-                    for (let z = 0; z <= sampleRate; z ++) {
+                    SAMPLERATE = Math.ceil(0.2 * tmpLength / 8);
+                    if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
+                    for (let z = 0; z <= SAMPLERATE; z++) {
                         sketchNodes[i][j][cnt] = new Array();
-                        sketchNodes[i][j][cnt][0] = calBezier(p, z / sampleRate, 0);
-                        sketchNodes[i][j][cnt][1] = calBezier(p, z / sampleRate, 1);
+                        sketchNodes[i][j][cnt][0] = _calBezier(p, z / SAMPLERATE, 0);
+                        sketchNodes[i][j][cnt][1] = _calBezier(p, z / SAMPLERATE, 1);
                         cnt++;
                     }
                 }
-                else if(styleOption === 'Knot'){
+                else if (styleOption === 'Knot') {
                     let head = 0;
                     let tail = tmpSketchNodes[i][j].length - 1;
                     let tmpLength = tmpSketchNodes[i][j][tail][0] - tmpSketchNodes[i][j][head][0];
@@ -911,10 +1011,10 @@ function calcluateSketchNodes(smoothNodes, sketchStyles, groupPosition) {
                     let endX = 0.60 * tmpLength + tmpSketchNodes[i][j][head][0];
                     let midLength = endX - staX;
 
-                    sampleRate = Math.ceil(0.2 * tmpLength / 8);
+                    SAMPLERATE = Math.ceil(0.2 * tmpLength / 8);
                     let p = new Array();
-                    for (let z = 0; z <= 4; z ++) p[z] = new Array();
-                    
+                    for (let z = 0; z <= 4; z++) p[z] = new Array();
+
                     p[0] = tmpSketchNodes[i][j][head];
                     p[1][0] = 0.5 * tmpSketchNodes[i][j][head][0] + 0.5 * staX;
                     p[1][1] = tmpSketchNodes[i][j][head][1];
@@ -922,20 +1022,20 @@ function calcluateSketchNodes(smoothNodes, sketchStyles, groupPosition) {
                     p[2][1] = stdY;
                     p[3][0] = staX;
                     p[3][1] = stdY;
-                    
-                    for (let z = 0; z <= sampleRate; z ++) {
+
+                    for (let z = 0; z <= SAMPLERATE; z++) {
                         sketchNodes[i][j][cnt] = new Array();
-                        sketchNodes[i][j][cnt][0] = calBezier(p, z / sampleRate, 0);
-                        sketchNodes[i][j][cnt][1] = calBezier(p, z / sampleRate, 1);
+                        sketchNodes[i][j][cnt][0] = _calBezier(p, z / SAMPLERATE, 0);
+                        sketchNodes[i][j][cnt][1] = _calBezier(p, z / SAMPLERATE, 1);
                         cnt++;
                     }
 
-                    sampleRate = Math.ceil(midLength / 40);
-                    for(let z = 0;z <= sampleRate;z ++){
+                    SAMPLERATE = Math.ceil(midLength / 40);
+                    for (let z = 0; z <= SAMPLERATE; z++) {
                         sketchNodes[i][j][cnt] = new Array();
                         sketchNodes[i][j][cnt][0] = Math.random() * midLength + staX;
-                        sketchNodes[i][j][cnt][1] = Math.random() * knotHeight * (Math.random > 0.5 ? 1 : -1) + stdY;
-                        cnt ++;
+                        sketchNodes[i][j][cnt][1] = Math.random() * KNOTHEIGHT * (Math.random > 0.5 ? 1 : -1) + stdY;
+                        cnt++;
                     }
 
                     p[0][0] = endX;
@@ -946,15 +1046,15 @@ function calcluateSketchNodes(smoothNodes, sketchStyles, groupPosition) {
                     p[2][1] = tmpSketchNodes[i][j][tail][1];
                     p[3][0] = tmpSketchNodes[i][j][tail][0];
                     p[3][1] = tmpSketchNodes[i][j][tail][1];
-                    sampleRate = Math.ceil(0.2 * tmpLength / 8);
-                    for (let z = 0; z <= sampleRate; z ++) {
+                    SAMPLERATE = Math.ceil(0.2 * tmpLength / 8);
+                    for (let z = 0; z <= SAMPLERATE; z++) {
                         sketchNodes[i][j][cnt] = new Array();
-                        sketchNodes[i][j][cnt][0] = calBezier(p, z / sampleRate, 0);
-                        sketchNodes[i][j][cnt][1] = calBezier(p, z / sampleRate, 1);
+                        sketchNodes[i][j][cnt][0] = _calBezier(p, z / SAMPLERATE, 0);
+                        sketchNodes[i][j][cnt][1] = _calBezier(p, z / SAMPLERATE, 1);
                         cnt++;
                     }
                 }
-                else if(styleOption === 'Twine'){
+                else if (styleOption === 'Twine') {
                     let head = 0;
                     let tail = tmpSketchNodes[i][j].length - 1;
                     let tmpLength = tmpSketchNodes[i][j][tail][0] - tmpSketchNodes[i][j][head][0];
@@ -963,10 +1063,10 @@ function calcluateSketchNodes(smoothNodes, sketchStyles, groupPosition) {
                     let endX = 0.8 * tmpLength + tmpSketchNodes[i][j][head][0];
                     let midLength = endX - staX;
 
-                    sampleRate = Math.ceil(0.2 * tmpLength / 8);
+                    SAMPLERATE = Math.ceil(0.2 * tmpLength / 8);
                     let p = new Array();
-                    for (let z = 0; z <= 4; z ++) p[z] = new Array();
-                    
+                    for (let z = 0; z <= 4; z++) p[z] = new Array();
+
                     p[0][0] = tmpSketchNodes[i][j][head][0];
                     p[0][1] = tmpSketchNodes[i][j][head][1];
                     p[1][0] = 0.5 * tmpSketchNodes[i][j][head][0] + 0.5 * staX;
@@ -975,23 +1075,23 @@ function calcluateSketchNodes(smoothNodes, sketchStyles, groupPosition) {
                     p[2][1] = stdY;
                     p[3][0] = staX;
                     p[3][1] = stdY;
-                    if(!(sampleRate & 1)) sampleRate += 1;
-                   
-                    for (let z = 0; z <= sampleRate; z ++) {
+                    if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
+
+                    for (let z = 0; z <= SAMPLERATE; z++) {
                         sketchNodes[i][j][cnt] = new Array();
-                        sketchNodes[i][j][cnt][0] = calBezier(p, z / sampleRate, 0);
-                        sketchNodes[i][j][cnt][1] = calBezier(p, z / sampleRate, 1);
+                        sketchNodes[i][j][cnt][0] = _calBezier(p, z / SAMPLERATE, 0);
+                        sketchNodes[i][j][cnt][1] = _calBezier(p, z / SAMPLERATE, 1);
                         cnt++;
                     }
 
-                    sinWaveRate = Math.ceil(midLength / 100); 
-                    sampleRate = Math.ceil(midLength / 8);
-                    if(!(sampleRate & 1)) sampleRate += 1;
-                    for(let z = 0;z <= sampleRate;z ++){
+                    WAVERATE = Math.ceil(midLength / 100);
+                    SAMPLERATE = Math.ceil(midLength / 8);
+                    if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
+                    for (let z = 0; z <= SAMPLERATE; z++) {
                         sketchNodes[i][j][cnt] = new Array();
-                        sketchNodes[i][j][cnt][0] = staX + midLength * z / sampleRate;
-                        sketchNodes[i][j][cnt][1] = ((cntNum & 1) ? -1 : 1) * (Math.sin(z * sinWaveRate * pi / sampleRate)) * twineHeight + stdY;
-                        cnt ++;
+                        sketchNodes[i][j][cnt][0] = staX + midLength * z / SAMPLERATE;
+                        sketchNodes[i][j][cnt][1] = ((cntNum & 1) ? -1 : 1) * (Math.sin(z * WAVERATE * PI / SAMPLERATE)) * TWINEHEIGHT + stdY;
+                        cnt++;
                     }
 
                     p[0][0] = endX;
@@ -1002,21 +1102,21 @@ function calcluateSketchNodes(smoothNodes, sketchStyles, groupPosition) {
                     p[2][1] = tmpSketchNodes[i][j][tail][1];
                     p[3][0] = tmpSketchNodes[i][j][tail][0];
                     p[3][1] = tmpSketchNodes[i][j][tail][1];
-                    sampleRate = Math.ceil(0.2 * tmpLength / 8);
-                    if(!(sampleRate & 1)) sampleRate += 1;
-                    for (let z = 0; z <= sampleRate; z ++) {
+                    SAMPLERATE = Math.ceil(0.2 * tmpLength / 8);
+                    if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
+                    for (let z = 0; z <= SAMPLERATE; z++) {
                         sketchNodes[i][j][cnt] = new Array();
-                        sketchNodes[i][j][cnt][0] = calBezier(p, z / sampleRate, 0);
-                        sketchNodes[i][j][cnt][1] = calBezier(p, z / sampleRate, 1);
-                        cnt ++;
+                        sketchNodes[i][j][cnt][0] = _calBezier(p, z / SAMPLERATE, 0);
+                        sketchNodes[i][j][cnt][1] = _calBezier(p, z / SAMPLERATE, 1);
+                        cnt++;
                     }
                 }
-            } 
+            }
         }
     }
     return sketchNodes;
 }
-function extent(storyline, retStoryline) {
+function _extent(storyline, retStoryline) {
     let maxLength = 0;
     for (let i = 0; i < storyline.length; i++) {
         for (let j = 0; j < storyline[i].length; j++) {
@@ -1026,139 +1126,161 @@ function extent(storyline, retStoryline) {
     for (let i = 0; i < retStoryline.length; i++) {
         for (let j = 0; j < retStoryline[i].length; j++) {
             for (let k = 0; k < retStoryline[i][j].length; k++) {
-                retStoryline[i][j][k][0] = retStoryline[i][j][k][0] * ((maxLength + scaleLength) / maxLength);
+                retStoryline[i][j][k][0] = retStoryline[i][j][k][0] * ((maxLength + SCALELENGTH) / maxLength);
             }
         }
     }
-    scale = scale * ((maxLength + scaleLength) / maxLength);
-    stepLength = stepLength * ((maxLength + scaleLength) / maxLength);
+    SCALE = SCALE * ((maxLength + SCALELENGTH) / maxLength);
+    STEPLENGTH = STEPLENGTH * ((maxLength + SCALELENGTH) / maxLength);
     return retStoryline;
 }
-let stepLength = 1;
-let scale = 20;
-let scaleLength = 200000;
-let spaceLength = 20;
-let eps = 0;
-let lineSpace = 4000;
-let sampleRate = 20;
-let stdAngle = 0.271975;
-let minSegmentLen = 15;
-let stdSegLen = 0;
-let smoothY = 20;
-let sketchRange = 300;
-let shakeFac = 10;
-let shakeFacStd = 150;
-let rateStd = 1000;
-let newRateStd = 200;
-let sinWaveRate = 1;
-let sinHeight = 600;
-let zigHeight = 500;
-let pi = 3.1415926;
-let twineHeight = 500;
-let knotHeight = 2000;
-let collideHeight = 250;
-function getstorylineID(characterName, name)
-{
+
+function _getstorylineID(characterName, name) {
     let ret = 0;
-    for(let i = 0;i < characterName.length;i ++){
-        if(characterName[i] === name)
-        {
+    for (let i = 0; i < characterName.length; i++) {
+        if (characterName[i] === name) {
             ret = i;
         }
     }
     return ret;
 }
-function getstoryNodeY(storyline, storylineID, time)
-{
+function _getstoryNodeY(storyline, storylineID, time) {
     let x = time * 50;
-    for(let i = 0;i < storyline[storylineID].length;i ++){
-        let L = 0,R = storyline[storylineID][i].length - 1,mid = 0;
+    for (let i = 0; i < storyline[storylineID].length; i++) {
+        let L = 0, R = storyline[storylineID][i].length - 1, mid = 0;
         let ret = -1;
-        while(L <= R){
+        while (L <= R) {
             mid = (L + R) >> 1;
-            if(storyline[storylineID][i][mid][0] <= x){
+            if (storyline[storylineID][i][mid][0] <= x) {
                 ret = mid;
                 L = mid + 1;
             }
-            else{
+            else {
                 R = mid - 1;
             }
         }
-        if(ret !== -1){
+        if (ret !== -1) {
             return storyline[storylineID][i][ret][1];
         }
     }
     return ret;
 }
-function calculateMarks(storyline, characterName, options, groupMarks)
-{
+function _getStyleType(stylish) {
+    let ret = -1;
+    switch (stylish) {
+        case 'Collide': ret = 0; break;
+        case 'Knot': ret = 0; break;
+        case 'Twine': ret = 0; break;
+        case 'Dash': ret = 1; break;
+        case 'Zigzag': ret = 1; break;
+        case 'Wave': ret = 1; break;
+        case 'Bump': ret = 1; break;
+        case 'Color': ret = 2; break;
+        case 'Width': ret = 2; break;
+        case 'Normal': ret = 3; break;
+        default: ret = 4; break;
+    }
+    return ret;
+}
+function _checkStyleRank(stylishNxt, stylishNow) {
+    let nxtRank = _getStyleType(stylishNxt);
+    let nowRank = _getStyleType(stylishNow);
+    return nxtRank < nowRank;
+}
+function _checkDivideUpdate(tmpDivideMarks, storylineID, nxt, now) {
+    if (tmpDivideMarks[storylineID][nxt][0] < tmpDivideMarks[storylineID][now][0]) {
+        return true;
+    }
+    if (tmpDivideMarks[storylineID][nxt][0] === tmpDivideMarks[storylineID][now][0]) {
+        let stylishNxt = new String;
+        for (let i = 0; i < tmpDivideMarks[storylineID][nxt][1].length; i++) {
+            if (tmpDivideMarks[storylineID][nxt][1][i] !== '_') {
+                stylishNxt += tmpDivideMarks[storylineID][nxt][1][i]
+            }
+            else {
+                break;
+            }
+        }
+        let stylishNow = new String;
+        for (let i = 0; i < tmpDivideMarks[storylineID][now][1].length; i++) {
+            if (tmpDivideMarks[storylineID][now][1][i] !== '_') {
+                stylishNow += tmpDivideMarks[storylineID][now][1][i]
+            }
+            else {
+                break;
+            }
+        }
+        if (_checkStyleRank(stylishNxt, stylishNow)) {
+            return true;
+        }
+    }
+    return false;
+}
+function _calculateMarks(storyline, characterName, relate, stylish) {
     let divideMarks = new Array();
     let tmpDivideMarks = new Array();
     let divideCnts = new Array();
     let groupPosition = new Array();
-    for(let i = 0;i < storyline.length;i ++){
+    for (let i = 0; i < storyline.length; i++) {
         divideMarks[i] = new Array();
         tmpDivideMarks[i] = new Array();
         divideCnts[i] = 0;
     }
-    if(options !== undefined || groupMarks !== undefined){
-        if(options !== undefined){
-            for(let i = 0;i < options.length;i ++){
-                let storylineID = getstorylineID(characterName, options[i][0]);
+    if (stylish !== undefined || relate !== undefined) {
+        if (stylish !== undefined) {
+            for (let i = 0; i < stylish.length; i++) {
+                let storylineID = _getstorylineID(characterName, stylish[i][0]);
                 tmpDivideMarks[storylineID][divideCnts[storylineID]] = new Array();
-                tmpDivideMarks[storylineID][divideCnts[storylineID]][0] = options[i][1];
-                tmpDivideMarks[storylineID][divideCnts[storylineID]][1] = options[i][3];
-                divideCnts[storylineID] ++;
+                tmpDivideMarks[storylineID][divideCnts[storylineID]][0] = stylish[i][1];
+                tmpDivideMarks[storylineID][divideCnts[storylineID]][1] = stylish[i][3];
+                divideCnts[storylineID]++;
                 tmpDivideMarks[storylineID][divideCnts[storylineID]] = new Array();
-                tmpDivideMarks[storylineID][divideCnts[storylineID]][0] = options[i][2];
+                tmpDivideMarks[storylineID][divideCnts[storylineID]][0] = stylish[i][2];
                 tmpDivideMarks[storylineID][divideCnts[storylineID]][1] = 'Normal';
-                divideCnts[storylineID] ++;
+                divideCnts[storylineID]++;
             }
         }
-        if(groupMarks != undefined){
-            for(let i = 0;i < groupMarks.length;i ++){
+        if (relate != undefined) {
+            for (let i = 0; i < relate.length; i++) {
                 let allY = new Array();
                 let cntY = 0;
                 let maxY = 0;
                 let minY = 1e9;
-                for(let j = 0;j < groupMarks[i][0].length;j ++){
-                    let storylineID = getstorylineID(characterName, groupMarks[i][0][j]);
-                    let storynodeY = getstoryNodeY(storyline, storylineID, groupMarks[i][1]);
-                     allY[cntY ++] = storynodeY;
+                for (let j = 0; j < relate[i][0].length; j++) {
+                    let storylineID = _getstorylineID(characterName, relate[i][0][j]);
+                    let storynodeY = _getstoryNodeY(storyline, storylineID, relate[i][1]);
+                    allY[cntY++] = storynodeY;
                     maxY = Math.max(maxY, storynodeY);
                     minY = Math.min(minY, storynodeY);
                 }
                 groupPosition[i] = (maxY + minY) * 0.5;
-               for(let j = 0;j < groupMarks[i][0].length;j ++){
-                    let storylineID = getstorylineID(characterName, groupMarks[i][0][j]);
-                    let storynodeY = getstoryNodeY(storyline, storylineID, groupMarks[i][1]);
+                for (let j = 0; j < relate[i][0].length; j++) {
+                    let storylineID = _getstorylineID(characterName, relate[i][0][j]);
+                    let storynodeY = _getstoryNodeY(storyline, storylineID, relate[i][1]);
                     let num = 0;
-                    for(let k = 0;k < cntY;k ++){
-                        if(allY[k] <= storynodeY){
-                            num ++;
+                    for (let k = 0; k < cntY; k++) {
+                        if (allY[k] <= storynodeY) {
+                            num++;
                         }
                     }
                     tmpDivideMarks[storylineID][divideCnts[storylineID]] = new Array();
-                    tmpDivideMarks[storylineID][divideCnts[storylineID]][0] = groupMarks[i][1];
-                    tmpDivideMarks[storylineID][divideCnts[storylineID]][1] = groupMarks[i][3] + '_' + String(i) + '_' + String(num);
-                    divideCnts[storylineID] ++;
+                    tmpDivideMarks[storylineID][divideCnts[storylineID]][0] = relate[i][1];
+                    tmpDivideMarks[storylineID][divideCnts[storylineID]][1] = relate[i][3] + '_' + String(i) + '_' + String(num);
+                    divideCnts[storylineID]++;
                     tmpDivideMarks[storylineID][divideCnts[storylineID]] = new Array();
-                    tmpDivideMarks[storylineID][divideCnts[storylineID]][0] = groupMarks[i][2];
+                    tmpDivideMarks[storylineID][divideCnts[storylineID]][0] = relate[i][2];
                     tmpDivideMarks[storylineID][divideCnts[storylineID]][1] = 'Normal';
-                    divideCnts[storylineID] ++;
+                    divideCnts[storylineID]++;
                 }
             }
         }
-        for(let i = 0;i < tmpDivideMarks.length;i ++){
-            for(let j = 0;j < tmpDivideMarks[i].length;j ++){
+        for (let i = 0; i < tmpDivideMarks.length; i++) {
+            for (let j = 0; j < tmpDivideMarks[i].length; j++) {
                 let rec = j;
-                for(let k = j + 1;k < tmpDivideMarks[i].length;k ++){
-                    if(tmpDivideMarks[i][k][0] < tmpDivideMarks[i][rec][0]){
+                for (let k = j + 1; k < tmpDivideMarks[i].length; k++) {
+                    if (_checkDivideUpdate(tmpDivideMarks, i, k, rec)) {
                         rec = k;
                     }
-                    if(tmpDivideMarks[i][k][0] === tmpDivideMarks[i][rec][0] && tmpDivideMarks[i][k][1] !== 'Normal'){
-                        rec = k;
-                    }   
                 }
                 let recA = tmpDivideMarks[i][j][0];
                 let recB = tmpDivideMarks[i][j][1];
@@ -1167,14 +1289,14 @@ function calculateMarks(storyline, characterName, options, groupMarks)
                 tmpDivideMarks[i][rec][0] = recA;
                 tmpDivideMarks[i][rec][1] = recB;
             }
-            if(tmpDivideMarks[i][0]===undefined) continue;
+            if (tmpDivideMarks[i][0] === undefined) continue;
             let cnt = 0;
             divideMarks[i][cnt] = new Array();
             divideMarks[i][cnt][0] = tmpDivideMarks[i][0][0];
             divideMarks[i][cnt][1] = tmpDivideMarks[i][0][1];
-            for(let j = 1;j < tmpDivideMarks[i].length;j ++){
-                if(tmpDivideMarks[i][j][0] !== divideMarks[i][cnt][0]){
-                    cnt ++;
+            for (let j = 1; j < tmpDivideMarks[i].length; j++) {
+                if (tmpDivideMarks[i][j][0] !== divideMarks[i][cnt][0]) {
+                    cnt++;
                     divideMarks[i][cnt] = new Array();
                     divideMarks[i][cnt][0] = tmpDivideMarks[i][j][0];
                     divideMarks[i][cnt][1] = tmpDivideMarks[i][j][1];
@@ -1182,84 +1304,163 @@ function calculateMarks(storyline, characterName, options, groupMarks)
             }
         }
     }
-    return {divideMarks, groupPosition};
+    return { divideMarks, groupPosition };
 }
-function initializeSplitMarks(storyline, characterName, options, groupMarks)
-{
-    const{ divideMarks, groupPosition} = calculateMarks(storyline, characterName, options, groupMarks);
+function _checkNames(relate,i,j) {
+    for(let k = 0;k < relate[i][0].length;k ++){
+        for(let g = 0;g < relate[j][0].length;g++){
+            if(relate[i][0][k] === relate[j][0][g]){
+                return true;
+            }
+        }
+    }
+    return false;
+}
+function _judgeStylishAndRelate(originRelate, originStylish) {
+    let stylish = new Array();
+    let relate = new Array();
+    let tmp = new Array();
+    let cnt = 0;
+    for (let i = 0; i < originRelate.length; i++) {
+        tmp[i] = 1;
+    }
+    for (let i = 0; i < originRelate.length; i++) {
+        if (tmp[i] === 0) continue;
+        for (let j = i + 1; j < originRelate.length; j++) {
+            if (_checkNames(originRelate, i, j)) {
+                if (originRelate[i][2] < originRelate[j][1] || originRelate[i][1] > originRelate[j][2]) {
+                    continue;
+                }
+                else {
+                    tmp[i] = 0;
+                    tmp[j] = 0;
+                }
+            }
+        }
+    }
+    for (let i = 0; i < originRelate.length; i++) {
+        if (tmp[i] === 1) {
+            relate[cnt] = new Array();
+            relate[cnt] = deepCopy(originRelate[i]);
+            cnt++;
+        }
+    }
+    cnt = 0;
+    //#TODO: solve the conflicts between stylish color1 and color2
+    for (let i = 0; i < originStylish.length; i++) {
+        let flag = 1;
+        for (let j = 0; j < originRelate.length && flag; j++) {
+            for (let k = 0; k < originRelate[j][0].length && flag; k++) {
+                if (originRelate[j][0][k] === originStylish[i][0]) {
+                    if (originRelate[j][2] < originStylish[i][1] || originRelate[j][1] > originStylish[i][2] || _getStyleType(originStylish[i][3] >= 2)) {
+                        continue;
+                    }
+                    else {
+                        flag = 0;
+                    }
+                }
+            }
+        }
+        for (let j = 0; j < originStylish.length; j++) {
+            if (i !== j && originStylish[i][0] === originStylish[j][0]) {
+                if (originStylish[i][2] < originStylish[j][1] || originStylish[i][1] > originStylish[j][2] || _getStyleType(originStylish[i][3] >= 2)) {
+                    continue;
+                }
+                else {
+                    flag = 0;
+                }
+            }
+        }
+        if (flag === 1) {
+            stylish[cnt] = new Array();
+            stylish[cnt] = deepCopy(originStylish[i]);
+            cnt++;
+        }
+    }
+    return { relate, stylish };
+}
+function _initializeSplitMarks(storyline, characterName, originRelate, originStylish) {
+    const { divideMarks, groupPosition } = _calculateMarks(storyline, characterName, originRelate, originStylish);
     let splitMarks = new Array();
-    for(let i = 0;i < storyline.length;i ++){
+    for (let i = 0; i < storyline.length; i++) {
         splitMarks[i] = new Array();
         let cnt = 0;
-        let insTime = new Array(); 
+        let insTime = new Array();
         let insCnt = 0;
-        for(let j = 0;j < storyline[i].length;j ++){
-            insTime[insCnt ++] = getTime(storyline,i,0,0,0);
-            insTime[insCnt ++] = getTime(storyline,i,0,storyline[i][0].length - 1,0); 
+        for (let j = 0; j < storyline[i].length; j++) {
+            insTime[insCnt++] = _getTime(storyline, i, 0, 0, 0);
+            insTime[insCnt++] = _getTime(storyline, i, 0, storyline[i][0].length - 1, 0);
         }
         let k = 0;
-        for(let j = 0;j < insCnt;j ++){
-            while(k < divideMarks[i].length && divideMarks[i][k][0] < insTime[j]){
+        for (let j = 0; j < insCnt; j++) {
+            while (k < divideMarks[i].length && divideMarks[i][k][0] < insTime[j]) {
                 splitMarks[i][cnt] = new Array();
                 splitMarks[i][cnt][0] = divideMarks[i][k][0];
                 splitMarks[i][cnt][1] = divideMarks[i][k][1];
-                cnt ++;
-                k ++;
-            } 
-            if(k < divideMarks[i].length && divideMarks[i][k][0] === insTime[j]){
+                cnt++;
+                k++;
+            }
+            if (k < divideMarks[i].length && divideMarks[i][k][0] === insTime[j]) {
                 splitMarks[i][cnt] = new Array();
                 splitMarks[i][cnt][0] = divideMarks[i][k][0];
                 splitMarks[i][cnt][1] = divideMarks[i][k][1];
-                cnt ++;
-                k ++;
+                cnt++;
+                k++;
                 continue;
             }
-            if(k >= divideMarks[i].length || divideMarks[i][k][0] > insTime[j]){
+            if (k >= divideMarks[i].length || divideMarks[i][k][0] > insTime[j]) {
                 splitMarks[i][cnt] = new Array();
                 splitMarks[i][cnt][0] = insTime[j];
                 splitMarks[i][cnt][1] = 'Normal';
-                cnt ++;
+                cnt++;
             }
-            if(k < divideMarks[i].length){
+            if (k < divideMarks[i].length) {
                 splitMarks[i][cnt] = new Array();
                 splitMarks[i][cnt][0] = divideMarks[i][k][0];
                 splitMarks[i][cnt][1] = divideMarks[i][k][1];
-                cnt ++;
-                k ++;
+                cnt++;
+                k++;
             }
         }
     }
-    return {splitMarks, groupPosition};
+    return { splitMarks, groupPosition };
 }
-function calculateStyles(sketchStyles,characterName)
-{
-    let styleSegments = new Array();
+function _calculateStyles(segmentTime, characterName, relate, stylish) {
+    let styleConfig = new Array();
     let cnt = 0;
-    for(let i = 0;i < sketchStyles.length;i ++){
-        for(let j = 0;j < sketchStyles[i].length;j ++){
-            if(sketchStyles[i][j] === 'Normal') continue;
-            styleSegments[cnt] = new Array();
-            styleSegments[cnt][0] = characterName[i];
-            styleSegments[cnt][1] = j;
-            styleSegments[cnt][2] = sketchStyles[i][j];
-            cnt ++;
+    for (let i = 0; i < segmentTime.length; i++) {
+        for (let j = 0; j < segmentTime[i].length; j++) {
+            let styleCnt =0;
+            for (let k = 0;k < relate.length; k ++) {
+                for (let g = 0;g < relate[k].length; g ++){
+                    if(relate[k][0][g] === characterName[i] && segmentTime[i][j] >= relate[k][1] && segmentTime[i][j] <= relate[k][2]){
+                        if(styleCnt === 0) {
+                            styleConfig[cnt] = new Array();
+                            styleConfig[cnt][0] = characterName[i];
+                            styleConfig[cnt][1] = j;
+                            styleConfig[cnt][2] = new Array();
+                            cnt ++;
+                        }
+                        styleConfig[cnt - 1][2][styleCnt] = relate[k][3];
+                        styleCnt ++;
+                    }
+                }
+            }
+            for (let k = 0;k < stylish.length;k ++) {
+                if(stylish[k][0] === characterName[i] && segmentTime[i][j] >= stylish[k][1] && segmentTime[i][j] <= stylish[k][2]) {
+                    if(styleCnt === 0) {
+                        styleConfig[cnt] = new Array();
+                        styleConfig[cnt][0] = characterName[i];
+                        styleConfig[cnt][1] = j;
+                        styleConfig[cnt][2] = new Array();
+                        cnt ++;
+                    }
+                    styleConfig[cnt - 1][2][styleCnt] = stylish[k][3];
+                    styleCnt ++;
+                }
+            }
         }
     }
-    return styleSegments;
+    return styleConfig;
 }
-function modifyLayout(nowCharList, characterName, divideMarks, groupMarks) {
-    let originNodes = initializeOriginNodes(nowCharList);
-    let group = initializeGroup(originNodes);
-    let renderNodes = calculateRenderNodes(originNodes, group);
-    const{ splitMarks, groupPosition} = initializeSplitMarks(originNodes, characterName, divideMarks, groupMarks);
-    let tmp = calculateSmoothNodes(renderNodes, originNodes, group, splitMarks);
-    let smoothNodes = tmp[0];
-    let sketchStyles = tmp[1];
-    let styleSegments = calculateStyles(sketchStyles,characterName);
-    let sketchNodes = calcluateSketchNodes(smoothNodes, sketchStyles, groupPosition);
-    renderNodes = extent(originNodes, renderNodes);
-    smoothNodes = extent(originNodes, smoothNodes);
-    sketchNodes = extent(originNodes, sketchNodes);
-    return { sketchNodes, renderNodes, smoothNodes, originNodes , styleSegments};
-}
-export { modifyLayout }
+export { render }
