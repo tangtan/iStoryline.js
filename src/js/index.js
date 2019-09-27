@@ -1,12 +1,12 @@
-import iStoryline_test from "../../src/js/istoryline";
 import { CharacterStore } from "./istoryline.character";
-import { HitTest } from "./istoryline.hitTest";
 import { storyOrder } from "./layout.order";
 import { storyAlign } from "./layout.align";
-import { storyCompress } from "./layout.compress";
-import { distortion } from "./layout.distortion";
-import { modifyLayout } from "./layout.render";
+import { storyCompact } from "./layout.compress";
+import { storyRender } from "./layout.render";
+import { storyTransform } from "./layout.transform";
+import { HitTest } from "./istoryline.hitTest";
 
+import { logNameError, logTimeError } from "./utils";
 import { scaleLinear } from "d3-scale";
 import { xml } from "d3-fetch";
 
@@ -18,9 +18,10 @@ export default class iStoryline extends CharacterStore {
    * @param {String} fileSrc
    * - "./data/JurassicPark.xml"
    * @param {Array} pipeline
-   * - ['GreedyOrder', 'GreedyAlign', 'GreedyCompact', 'Render', 'Transform']
+   * - ['GreedyOrder', 'GreedyAlign', 'GreedyCompact', 'Render', 'FreeTransform']
    */
   constructor(fileSrc, pipeline=[]) {
+    super();
     // Pipeline configuration
     this.orderModule = pipeline[0] | 'GreedyOrder';
     this.alignModule = pipeline[1] | 'GreedyAlign';
@@ -32,6 +33,7 @@ export default class iStoryline extends CharacterStore {
     xml(fileSrc, (error, data) => {
       if (error) throw error;
       this.iStoryline.readXMLFile(data)
+      this.graph = null;
     });
   }
 
@@ -40,35 +42,60 @@ export default class iStoryline extends CharacterStore {
    *
    * @return graph
    */
-  _layout() {}
+  _layout(inSep=10, outSep=10, upperPath=[], lowerPath=[]) {
+    const {
+      data,
+      orderInfo,
+      bendInfo,
+      straightenInfo,
+      compactInfo,
+      extendInfo,
+      mergeInfo,
+      splitInfo,
+      adjustInfo,
+      relateInfo,
+      stylishInfo
+    } = this;
+    let sequence = storyOrder(this.orderModule, data, orderInfo);
+    let alignedSession = storyAlign(this.alignModule, sequence, bendInfo, straightenInfo);
+    let initialGraph = storyCompact(this.compactModule, alignedSession, compactInfo, extendInfo, mergeInfo, splitInfo, inSep, outSep);
+    let renderedGraph = storyRender(this.renderModule, initialGraph, adjustInfo, relateInfo, stylishInfo);
+    let storyGraph = storyTransform(this.transformModule, renderedGraph);
+    return storyGraph;
+  }
 
   _removeConflicts() {}
 
   /**
    * Rearrange the order of lines
    *
+   * @param {String[]} names
+   * @param {Number[]} span
    * @param {Array} constraints
    * 
    * @example
    * - constraint: {
    *   "names": ['upperName', 'lowerName'],
-   *   "timeSpan": [t1, t2]
+   *   "timeSpan": [t1, t2],
+   *   "style": 'Sort',
+   *   "param": {}
    * }
    *
    * @return graph
    */
   sort(names, span, ctrs=[]) {
+    // check params
     if (ctrs.length > 0) {
       this.sortInfo = ctrs;
-    } else if (names.length !== 2) {
-      console.error('SortInfo should only contain two names.');
-    } else if (span.length !== 2 || span[0] > span[1]) {
-      console.error('Invalid time span in SortInfo');
+    } else if (logNameError('Sort', names, 2) && logTimeError('Sort', span)) {
+      this.sortInfo.push({
+        'names': names,
+        'timeSpan': span,
+        'style': 'Sort',
+        'param': {}
+      });
     }
-    this.sortInfo.push({
-      'names': names,
-      'timeSpan': span
-    });
+    // remove conflicted timeSpans
     this._removeConflicts(this.sortInfo);
     return this._layout();
   }
@@ -76,73 +103,141 @@ export default class iStoryline extends CharacterStore {
   /**
    * Bend a line
    *
+   * @param {String[]} names
+   * @param {Number[]} span
    * @param {Array} constraints
    * 
    * @example
    * - constraint: {
    *   "names": ['name'],
-   *   "timeSpan": [t1, t2]
+   *   "timeSpan": [t1, t2],
+   *   "style": 'Bend',
+   *   "param": {}
    * }
    *
    * @return graph
    */
-  bend(bendInfo) {
-    return this.iStoryline.bend(bendInfo);
+  bend(names, span, ctrs=[]) {
+    // check params
+    if (ctrs.length > 0) {
+      this.bendInfo = ctrs;
+    } else if (logNameError('Bend', names, 1) && logTimeError('Bend', span)) {
+      this.bendInfo.push({
+        'names': names,
+        'timeSpan': span,
+        'style': 'Bend',
+        'param': {}
+      });
+    }
+    // remove conflicted timeSpans
+    this._removeConflicts(this.bendInfo);
+    return this._layout();
   }
 
   /**
    * Straighten a line
    *
+   * @param {String[]} names
+   * @param {Number[]} span
    * @param {Array} constraints
    * 
    * @example
    * - constraint: { 
    *   "names": ['name'],
-   *   "timeSpan": [t1, t2]
+   *   "timeSpan": [t1, t2],
+   *   "style": 'Straighten',
+   *   "param": {}
    * }
    *
    * @return graph
    */
   straighten(straightenInfo) {
-    return this.iStoryline.straighten(straightenInfo);
+    // check params
+    if (ctrs.length > 0) {
+      this.straightenInfo = ctrs;
+    } else if (logNameError('Straighten', names, 1) && logTimeError('Straighten', span)) {
+      this.straightenInfo.push({
+        'names': names,
+        'timeSpan': span,
+        'style': 'Straighten',
+        'param': {}
+      });
+    }
+    // remove conflicted timeSpans
+    this._removeConflicts(this.straightenInfo);
+    return this._layout();
   }
 
   /**
    * Remove white space
    *
-   * @param {Array} constraints
+   * @param {String[]} names
+   * @param {Number[]} span
    * @param {Number} scale
+   * @param {Array} constraints
    * 
    * @example
+   * - scale: 0<<1
    * - constraint: {
    *   "names": ['name1', 'name2', ...],
-   *   "timeSpan": [t1, t2]
+   *   "timeSpan": [t1, t2],
+   *   "style": 'Compact',
+   *   "param": { 'scale': 0.5 }
    * }
-   * - scale: 0<<1
    *
    * @return graph
    */
-  compress(compressInfo) {
-    return this.iStoryline.compress(compressInfo);
+  compact(names, span, scale=0.5, ctrs=[]) {
+    // check params
+    if (ctrs.length > 0) {
+      this.compactInfo = ctrs;
+    } else if (logNameError('Compact', names) && logTimeError('Compact', span)) {
+      this.compactInfo.push({
+        'names': names,
+        'timeSpan': span,
+        'style': 'Compact',
+        'param': { 'scale': 0.5 }
+      });
+    }
+    // remove conflicted timeSpans
+    this._removeConflicts(this.compactInfo);
+    return this._layout();
   }
 
   /**
    * Expand white space
    *
-   * @param {Array} constraints
+   * @param {String[]} names
+   * @param {Number[]} span
    * @param {Number} scale
+   * @param {Array} constraints
    * 
    * @example
+   * - scale: >1
    * - constraint: {
    *   "names": ['name1', 'name2', ...],
-   *   "timeSpan": [t1, t2]
+   *   "timeSpan": [t1, t2],
+   *   "style": 'Expand',
+   *   "param": {}
    * }
-   * - scale: >1
    *
    * @return graph
    */
-  expand(expandInfo) {
-    return this.iStoryline.expand(expandInfo);
+  expand(names, span, scale=2, ctrs=[]) {
+    // check params
+    if (ctrs.length > 0) {
+      this.extendInfo = ctrs;
+    } else if (logNameError('Extend', names) && logTimeError('Extend', span)) {
+      this.extendInfo.push({
+        'names': names,
+        'timeSpan': span,
+        'style': 'Expand',
+        'param': { 'scale': 2 }
+      });
+    }
+    // remove conflicted timeSpans
+    this._removeConflicts(this.extendInfo);
+    return this._layout();
   }
 
   /**
@@ -153,107 +248,198 @@ export default class iStoryline extends CharacterStore {
    *
    * @return graph
    */
-  space(intraSep,interSep) {
-    return this.iStoryline.space(intraSep,interSep);
+  space(intraSep, interSep) {
+    return this._layout(inSep=intraSep, outSep=interSep);
   }
 
   /**
    * Merge lines
    *
+   * @param {String[]} names
+   * @param {Number[]} span
    * @param {Array} constraints
    * 
    * @example
    * - constraint: {
    *   "names": ['name1', 'name2', ...],
-   *   "timeSpan": [t1, t2]
+   *   "timeSpan": [t1, t2],
+   *   "style": 'Merge',
+   *   "param": {}
    * }
    *
    * @return graph
    */
-  merge(mergeInfo) {
-    return this.iStoryline.merge(mergeInfo);
+  merge(names, span, ctrs=[]) {
+    // check params
+    if (ctrs.length > 0) {
+      this.mergeInfo = ctrs;
+    } else if (logNameError('Merge', names) && logTimeError('Merge', span)) {
+      this.mergeInfo.push({
+        'names': names,
+        'timeSpan': span,
+        'style': 'Merge',
+        'param': {}
+      });
+    }
+    // remove conflicted timeSpans
+    this._removeConflicts(this.mergeInfo);
+    return this._layout();
   }
 
   /**
    * Split merged lines
    *
+   * @param {String[]} names
+   * @param {Number[]} span
    * @param {Array} constraints
    * 
    * @example
    * - constraint: {
    *   "names": ['name1', 'name2', ...],
-   *   "timeSpan": [t1, t2]
+   *   "timeSpan": [t1, t2],
+   *   "style": 'Split',
+   *   "param": {}
    * }
    *
    * @return graph
    */
-  split(splitInfo) {
-    return this.iStoryline.split(splitInfo);
+  split(names, span, ctrs=[]) {
+    // check params
+    if (ctrs.length > 0) {
+      this.splitInfo = ctrs;
+    } else if (logNameError('Split', names) && logTimeError('Split', span)) {
+      this.splitInfo.push({
+        'names': names,
+        'timeSpan': span,
+        'style': 'Split',
+        'param': {}
+      });
+    }
+    // remove conflicted timeSpans
+    this._removeConflicts(this.splitInfo);
+    return this._layout();
   }
 
   /**
    * Change line paths
    *
+   * @param {String[]} names
+   * @param {Number[]} span
+   * @param {Point[]} path
    * @param {Array} constraints
-   * @param {Array} points
    * 
    * @example
    * - constraint: {
    *   "names": ['name'],
-   *   "timeSpan": [t1, t2]
+   *   "timeSpan": [t1, t2],
+   *   "style": 'Adjust',
+   *   "param": {'path': [[x1, y1], [x2, y2], ...]}
    * }
    * - point: [x, y]
    *
    * @return graph
    */
-  adjust(adjustInfo) {
-    return this.iStoryline.adjust(adjustInfo);
+  adjust(names, span, path, ctrs) {
+      // check params
+    if (ctrs.length > 0) {
+      this.adjustInfo = ctrs;
+    } else if (logNameError('Split', names) && logTimeError('Split', span)) {
+      this.adjustInfo.push({
+        'names': names,
+        'timeSpan': span,
+        'style': 'Adjust',
+        'param': { 'path': path }
+      });
+    }
+    // remove conflicted timeSpans
+    this._removeConflicts(this.adjustInfo);
+    return this._layout();
   }
 
   /**
    * Relate lines acccording to the semantic connections
    *
+   * @param {String[]} names
+   * @param {Number[]} span
+   * @param {String} style
    * @param {Array} constraints
    * 
    * @example
    * - constraint: {
    *   "names": ['name1', 'name2'],
    *   "timeSpan": [t1, t2],
-   *   "style": 'Twine' | 'Knot' | 'Collide'
+   *   "style": 'Twine' | 'Knot' | 'Collide',
+   *   "param": {}
    * }
    *
    * @return graph
    */
-  relate() {}
+  relate(names, span, style, ctrs) {
+    // check params
+    if (ctrs.length > 0) {
+      this.relateInfo = ctrs;
+    } else if (logNameError('Relate', names, 2) && logTimeError('Relate', span)) {
+      this.relateInfo.push({
+        'names': names,
+        'timeSpan': span,
+        'style': style,
+        'param': {}
+      });
+    }
+    // remove conflicted timeSpans
+    this._removeConflicts(this.relateInfo);
+    return this._layout();
+  }
 
   /**
    * Set the style of lines
    *
+   * @param {String[]} names
+   * @param {Number[]} span
+   * @param {String} style
    * @param {Array} constraints
    * 
    * @example
    * - constraint: {
    *   "names": ['name'],
    *   "timeSpan": [t1, t2],
-   *   "style": 'Color' | 'Width' | 'Dash' | 'Zigzag' | 'Wave' | 'Bump'
+   *   "style": 'Color' | 'Width' | 'Dash' | 'Zigzag' | 'Wave' | 'Bump',
+   *   "param": {}
    * }
    *
    * @return graph
    */
-  stylish() {}
+  stylish(names, span, style, ctrs=[]) {
+    // check params
+    if (ctrs.length > 0) {
+      this.stylishInfo = ctrs;
+    } else if (logNameError('Stylish', names, 2) && logTimeError('Stylish', span)) {
+      this.stylishInfo.push({
+        'names': names,
+        'timeSpan': span,
+        'style': style,
+        'param': {}
+      });
+    }
+    // remove conflicted timeSpans
+    this._removeConflicts(this.stylishInfo);
+    return this._layout();
+  }
 
   /**
    * Reshape the layout of storyline visualization
    *
-   * @param {Array} upperPoints
-   * @param {Array} lowerPoints
+   * @param {Point[]} upperPath
+   * @param {Point[]} lowerPath
    * 
    * @example
    * - points: [[x1, y1], [x2, y2], ...]
    *
    * @return graph
    */
-  reshape() {}
+  reshape(upperPath, lowerPath) {
+    return this._layout(upperPath=upperPath, lowerPath=lowerPath);
+  }
 
   /**
    * Change the size of storyline visualization
@@ -264,5 +450,7 @@ export default class iStoryline extends CharacterStore {
    *
    * @return graph
    */
-  scale() {}
+  scale(width, height, reserveRatio=false) {
+    return this._layout(width, height, reserveRatio);
+  }
 }
