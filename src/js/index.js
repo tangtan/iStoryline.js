@@ -18,9 +18,10 @@ export default class iStoryline extends CharacterStore {
    * @param {String} fileSrc
    * - "./data/JurassicPark.xml"
    * @param {Array} pipeline
-   * - ['GreedyOrder', 'GreedyAlign', 'GreedyCompact', 'Render', 'Transform']
+   * - ['GreedyOrder', 'GreedyAlign', 'GreedyCompact', 'Render', 'FreeTransform']
    */
   constructor(fileSrc, pipeline=[]) {
+    super();
     // Pipeline configuration
     this.orderModule = pipeline[0] | 'GreedyOrder';
     this.alignModule = pipeline[1] | 'GreedyAlign';
@@ -42,11 +43,24 @@ export default class iStoryline extends CharacterStore {
    * @return graph
    */
   _layout(inSep=10, outSep=10, upperPath=[], lowerPath=[]) {
-    let sequence = storyOrder(this.orderModule);
-    let alignedSession = storyAlign(this.alignModule);
-    let initialGraph = storyCompact(this.compactModule);
-    let renderGraph = storyRender(this.renderModule);
-    let storyGraph = storyTransform(this.transformModule);
+    const {
+      data,
+      orderInfo,
+      bendInfo,
+      straightenInfo,
+      compactInfo,
+      extendInfo,
+      mergeInfo,
+      splitInfo,
+      adjustInfo,
+      relateInfo,
+      stylishInfo
+    } = this;
+    let sequence = storyOrder(this.orderModule, data, orderInfo);
+    let alignedSession = storyAlign(this.alignModule, sequence, bendInfo, straightenInfo);
+    let initialGraph = storyCompact(this.compactModule, alignedSession, compactInfo, extendInfo, mergeInfo, splitInfo, inSep, outSep);
+    let renderedGraph = storyRender(this.renderModule, initialGraph, adjustInfo, relateInfo, stylishInfo);
+    let storyGraph = storyTransform(this.transformModule, renderedGraph);
     return storyGraph;
   }
 
