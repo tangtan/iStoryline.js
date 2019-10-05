@@ -44,7 +44,6 @@ export default class iStoryline extends CharacterStore {
    * @return graph
    */
   _layout(inSep=10, outSep=10, upperPath=[], lowerPath=[]) {
-<<<<<<< HEAD
     let data = this.data;
     let constraints = this.ctrInfo.constraints;
     let sortedSequence = storyOrder(this.orderModule, data, constraints);
@@ -52,26 +51,6 @@ export default class iStoryline extends CharacterStore {
     let initialGraph = storyCompact(this.compactModule, alignedSession, constraints, inSep, outSep);
     let renderedGraph = storyRender(this.renderModule, initialGraph, constraints);
     let storyGraph = storyTransform(this.transformModule, renderedGraph, upperPath, lowerPath);
-=======
-    const {
-      data,
-      orderInfo,
-      bendInfo,
-      straightenInfo,
-      compactInfo,
-      extendInfo,
-      mergeInfo,
-      splitInfo,
-      adjustInfo,
-      relateInfo,
-      stylishInfo
-    } = this;
-    let sequence = storyOrder(this.orderModule, data, orderInfo);
-    let alignedSession = storyAlign(this.alignModule, sequence, bendInfo, straightenInfo);
-    let initialGraph = storyCompact(this.compactModule, alignedSession, compactInfo, extendInfo, mergeInfo, splitInfo, inSep, outSep);
-    let renderedGraph = storyRender(this.renderModule, initialGraph, adjustInfo, relateInfo, stylishInfo);
-    let storyGraph = storyTransform(this.transformModule, renderedGraph);
->>>>>>> finish circle/freeTransform and rebase dev
     return storyGraph;
   }
 
