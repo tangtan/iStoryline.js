@@ -568,6 +568,9 @@ export function greedySort(data, orderInfo) {
     }
 
   }
-  return sequence;
+  let greedySort={};
+  greedySort.sequence=sequence;
+  greedySort.data=data;
+  return greedySort;
 }
 

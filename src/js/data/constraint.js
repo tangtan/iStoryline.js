@@ -1,6 +1,6 @@
 export class CtrInfo {
   constructor(ctrs) {
-    this.ctrs = ctrs | [];
+    this.ctrs = [] || ctrs;
   }
 
   get constraints() {
