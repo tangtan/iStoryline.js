@@ -25,7 +25,7 @@ export default class iStoryline extends CharacterStore {
     this.alignModule = pipeline[1] || "GreedyAlign";
     this.compactModule = pipeline[2] || "GreedySlotCompact";
     this.renderModule = pipeline[3] || "Render";
-    this.transformModule = pipeline[4] || "Transform";
+    this.transformModule = pipeline[4] || "FreeTransform";
     // Constraints for opimization models
     this.ctrInfo=new CtrInfo();
     this.fileSrc = fileSrc;
@@ -68,7 +68,7 @@ export default class iStoryline extends CharacterStore {
       upperPath,
       lowerPath
     );
-    return storyGraph;
+    return renderedGraph;
   }
 
   /**

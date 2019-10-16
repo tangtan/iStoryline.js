@@ -9,17 +9,17 @@ async function main(url) {
   let graph=ans._layout();
   // ans.extent(100, 300, 1250);
   // let graph=ans._layout();
-
-  // for(let i = 0;i < graph.sketchNodes.length;i ++){
-  //   let nodes = graph.sketchNodes[i];
-  //   let storylines = drawInitial(nodes);
-  //   let completePathStrs = nodes.map(line => genSmoothPathStr(line));
-  //   storylines.forEach((storyline, i) => {
-  //     storyline.animate({
-  //       d: completePathStrs[i]
-  //     }, 1000);
-  //   });
-  // }
+  // console.log(graph);
+  for(let i = 0;i < graph.sketchNodes.length;i ++){
+    let nodes = graph.sketchNodes[i];
+    let storylines = drawInitial(nodes);
+    let completePathStrs = nodes.map(line => genSmoothPathStr(line));
+    storylines.forEach((storyline, i) => {
+      storyline.animate({
+        d: completePathStrs[i]
+      }, 1000);
+    });
+  }
 }
 
 function normalize(nodes, x0=0, y0=0, deltaX=1000) {
@@ -100,4 +100,4 @@ function genInitialPathStr(points) {
   return `M ${points[0][0]} ${points[0][1]} `;
 }
 
-main("./data/redhat.xml");
+main("./data/StarWars.xml");
