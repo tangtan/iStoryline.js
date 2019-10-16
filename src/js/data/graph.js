@@ -42,6 +42,14 @@ export class Graph {
     this.maxTimeframeTable = data.maxTimeframeTable;
   }
 
+  update(graph) {
+    this.nodes = graph.nodes;
+    this.names = graph.names;
+    this.renderNodes = graph.renderNodes;
+    this.smoothNodes = graph.smoothNodes;
+    this.sketchNodes = graph.sketchNodes;
+  }
+
   /**
    * Get the x pos of the specified render node.
    * 

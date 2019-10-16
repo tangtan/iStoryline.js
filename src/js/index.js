@@ -2,11 +2,11 @@ import { CharacterStore } from "./istoryline.character";
 import { storyOrder } from "./order/index";
 import { storyAlign } from "./align/index";
 import { storyCompact } from "./compact/index";
+import { storyRender } from "./render/index";
 import { storyTransform } from "./transform/index";
-import {storyRender} from "./render/index";
 import { CtrInfo } from "./data/constraint";
+import { Graph } from "./data/graph";
 import { logNameError, logTimeError } from "./utils";
-import { scaleLinear } from "d3-scale";
 
 export default class iStoryline extends CharacterStore {
   /**
@@ -43,8 +43,13 @@ export default class iStoryline extends CharacterStore {
    */
   _layout(inSep = 1000, outSep = 10, upperPath = [], lowerPath = []) {
     let data = this.data;
+    let graph = new Graph(data);
     let constraints = this.ctrInfo.ctrs;
-    let sortedSequence = storyOrder(this.orderModule, data, constraints);
+    let sortedSequence = storyOrder(
+      this.orderModule,
+      data,
+      constraints
+    );
     let alignedSession = storyAlign(
       this.alignModule,
       sortedSequence,
@@ -62,13 +67,14 @@ export default class iStoryline extends CharacterStore {
       initialGraph,
       constraints
     );
-    let storyGraph = storyTransform(
-      this.transformModule,
-      renderedGraph,
-      upperPath,
-      lowerPath
-    );
-    return renderedGraph;
+    // let storyGraph = storyTransform(
+    //   this.transformModule,
+    //   renderedGraph,
+    //   upperPath,
+    //   lowerPath
+    // );
+    graph.update(renderedGraph);
+    return graph;
   }
 
   /**

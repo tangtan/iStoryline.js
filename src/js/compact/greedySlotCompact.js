@@ -1,12 +1,9 @@
 let compressTime = [];
 let d1 = 0; //out
 let d2 = 1000; //in
-
-import { modifyLayout, render } from "../layout.render.js";
-
+let graph = {};
 let sequence;
 let data;
-let graph;
 let timeframe = [];
 let slot = [];
 let alignedSession;
@@ -86,7 +83,6 @@ export function greedySlotCompact(
   record = [];
   slot = [];
   compressInfo = [...compressInfo, ...mergeInfo, ...extendInfo];
-  graph = {};
   data = alignAns.data;
   sequence = alignAns.sequence;
   alignedSession = alignAns.alignedSessions;
@@ -192,11 +188,12 @@ export function greedySlotCompact(
   }
   graph.names = data.entities;
   node.forEach(x => x.sort((a, b) => a[0] - b[0]));
+  graph.nodes = node;
   // graph.initNodes=JSON.parse(JSON.stringify(node));
-  let initialGraph = {};
-  initialGraph.nodes = node;
-  initialGraph.names = graph.names;
-  return initialGraph;
+  // let initialGraph = {};
+  // initialGraph.nodes = node;
+  // initialGraph.names = graph.names;
+  return graph;
 }
 
 function frame2num(frame) {
