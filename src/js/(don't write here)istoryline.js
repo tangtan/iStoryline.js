@@ -17,8 +17,17 @@ import { scaleLinear } from "d3-scale";
  * @methods
  *   - so on
  */
-export default class iStoryline_test extends CharacterStore {
-  constructor() {
+export default class iStoryline extends CharacterStore {
+
+  static build(fileSrc){
+    return readXMLFile(fileSrc).then(
+      function(data){
+        return new iStoryline(storyData);
+      }
+    );
+  }
+
+  constructor(storyData) {
     super(); // inherit data
     this.adjustInfo=[];
     this.addCharacterInfo=[];
@@ -36,6 +45,7 @@ export default class iStoryline_test extends CharacterStore {
     this.din = 1000;
     this.dout = 0;
     this.xml=null;
+    this.data=storyData;
     // TODO: add other properties
   }
   /**
@@ -142,9 +152,9 @@ expand(expandInfo){
     return graph;
   }
 
-  readXMLFile(xml) {
+  async readXMLFile(xml) {
     this.xml=xml.cloneNode(true);
-    super.readXMLFile(xml);
+    return await super.readXMLFile(xml);
   }
 
   init() {

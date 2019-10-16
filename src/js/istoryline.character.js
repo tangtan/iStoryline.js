@@ -43,6 +43,10 @@ export class CharacterStore extends SessionStore {
   }
 
 
+  async readXMLFile(fileSrc){
+    return await super.readXMLFile(fileSrc);
+  }
+
   /**
    * remove character from startTime to endTime
    *
