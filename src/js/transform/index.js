@@ -9,7 +9,7 @@ export function storyTransform(
   lowerPath) {
   switch (transformModule) {
     case "CircleTransform": return circleTransform();
-    case "FreeTransform": return freeTransform(renderedGraph);
+    case "FreeTransform": return freeTransform(renderedGraph,upperPath,lowerPath);
     default:
       transformModelError(transformModule);
   }

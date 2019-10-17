@@ -41,7 +41,7 @@ export default class iStoryline extends CharacterStore {
    *
    * @return graph
    */
-  _layout(inSep = 1000, outSep = 10, upperPath = [], lowerPath = []) {
+  _layout(inSep = 1000, outSep = 10, upperPath = [/*[1,1],[2,3],[3,4]*/], lowerPath = [/*[1,5],[2,5],[3,9]*/]) {
     let data = this.data;
     let graph = new Graph(data);
     let constraints = this.ctrInfo.ctrs;
@@ -67,13 +67,13 @@ export default class iStoryline extends CharacterStore {
       initialGraph,
       constraints
     );
-    // let storyGraph = storyTransform(
-    //   this.transformModule,
-    //   renderedGraph,
-    //   upperPath,
-    //   lowerPath
-    // );
-    graph.update(renderedGraph);
+    let storyGraph = storyTransform(
+      this.transformModule,
+      renderedGraph,
+      upperPath,
+      lowerPath
+    );
+    graph.update(storyGraph);
     return graph;
   }
 
