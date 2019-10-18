@@ -1,4 +1,4 @@
-import { SessionStore } from "./istoryline.session";
+import { SessionStore } from "./session";
 
 /**
  * dealing with the Character operations, e.g., add/change/remove

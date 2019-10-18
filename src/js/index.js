@@ -1,4 +1,4 @@
-import { CharacterStore } from "./istoryline.character";
+import { CharacterStore } from "./data/character";
 import { storyOrder } from "./order/index";
 import { storyAlign } from "./align/index";
 import { storyCompact } from "./compact/index";

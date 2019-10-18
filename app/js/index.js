@@ -6,16 +6,19 @@ async function main(url) {
   let ans = new iStoryline(url);
   await ans.ready();
   let graph = ans._layout();
-  // const sketchNodes = graph.smoothNodes;
-  const sketchNodes = normalize(graph.sketchNodes);
-  for(let i = 0; i < sketchNodes.length; i++){
-    let nodes = graph.sketchNodes[i];
+  const sketchNodes = normalize(graph.smoothNodes);
+  // const sketchNodes = normalize(graph.sketchNodes);
+  for (let i = 0; i < sketchNodes.length; i++) {
+    let nodes = sketchNodes[i];
     let storylines = drawInitial(nodes);
     let completePathStrs = nodes.map(line => genSmoothPathStr(line));
     storylines.forEach((storyline, i) => {
-      storyline.animate({
-        d: completePathStrs[i]
-      }, 1000);
+      storyline.animate(
+        {
+          d: completePathStrs[i]
+        },
+        1000
+      );
     });
   }
 }

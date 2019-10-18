@@ -1,4 +1,4 @@
-import { DataStore } from "./istoryline.data";
+import { DataStore } from "./data";
 import {xml} from "d3-fetch"
 /**
  * dealing with the Sessig0f on operations, e.g., add/change/remove
