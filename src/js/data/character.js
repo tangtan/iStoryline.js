@@ -1,4 +1,4 @@
-import { SessionStore } from "./istoryline.session";
+import { SessionStore } from "./session";
 
 /**
  * dealing with the Character operations, e.g., add/change/remove
@@ -42,6 +42,10 @@ export class CharacterStore extends SessionStore {
     );
   }
 
+
+  async readXMLFile(fileSrc){
+    return await super.readXMLFile(fileSrc);
+  }
 
   /**
    * remove character from startTime to endTime

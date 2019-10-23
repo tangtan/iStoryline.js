@@ -1,5 +1,5 @@
-import { DataStore } from "./istoryline.data";
-
+import { DataStore } from "./data";
+import {xml} from "d3-fetch"
 /**
  * dealing with the Sessig0f on operations, e.g., add/change/remove
  *
@@ -20,8 +20,8 @@ export class SessionStore extends DataStore {
     super();
   }
 
-readXMLFile(xml){
-  super.readXMLFile(xml);
+async readXMLFile(fileSrc){
+  return await super.readXMLFile(fileSrc);
 }
 
   /**
