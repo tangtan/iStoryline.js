@@ -28,6 +28,8 @@ yarn add https://github.com/tangtan/istoryline.git
 
 ## Documentation
 
+[Data Structure and Workflow](https://github.com/tangtan/istoryline/wiki/Data-Structure-and-Workflow)
+
 ## iStoryline Editor
 
 iStoryline.js provides a build-in editor for producing storyline visualizations.
