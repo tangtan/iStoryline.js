@@ -27,29 +27,33 @@ export default class iStoryline extends CharacterStore {
     this.renderModule = pipeline[3] || "Render";
     this.transformModule = pipeline[4] || "FreeTransform";
     // Constraints for opimization models
-    this.ctrInfo=new CtrInfo();
+    this.ctrInfo = new CtrInfo();
     this.fileSrc = fileSrc;
   }
 
-  async ready(){
+  async ready() {
     await this.readXMLFile(this.fileSrc);
   }
-  
 
   /**
    * Generate storyline visualization
    *
    * @return graph
    */
-  _layout(inSep = 1000, outSep = 10, upperPath = [/*[1,1],[2,3],[3,4]*/], lowerPath = [/*[1,5],[2,5],[3,9]*/]) {
+  _layout(
+    inSep = 1000,
+    outSep = 10,
+    upperPath = [
+      /*[1,1],[2,3],[3,4]*/
+    ],
+    lowerPath = [
+      /*[1,5],[2,5],[3,9]*/
+    ]
+  ) {
     let data = this.data;
     let graph = new Graph(data);
     let constraints = this.ctrInfo.ctrs;
-    let sortedSequence = storyOrder(
-      this.orderModule,
-      data,
-      constraints
-    );
+    let sortedSequence = storyOrder(this.orderModule, data, constraints);
     let alignedSession = storyAlign(
       this.alignModule,
       sortedSequence,

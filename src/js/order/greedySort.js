@@ -3,30 +3,6 @@ let CharacterOrder = [];
 let order;
 let storydata;
 
-function preprocessData(data) {
-  // console.log(data);
-  // use set to remove duplicate
-  let entities = new Set(),
-    keyTimeframe = new Set(),
-    maxTimeframeTable = new Map();
-  for (let [sessionId, entityInfoArray] of data.sessionTable) {
-    entityInfoArray.forEach(entityInfo => {
-      let entity = entityInfo.entity;
-      if (!entities.has(entity)) {
-        entities.add(entity);
-        maxTimeframeTable.set(entity, Number.MIN_SAFE_INTEGER);
-      }
-      keyTimeframe.add(entityInfo.start);
-      keyTimeframe.add(entityInfo.end);
-      if (entityInfo.end > maxTimeframeTable.get(entity))
-        maxTimeframeTable.set(entity, entityInfo.end);
-    });
-  }
-  data.entities = [...entities];
-  data.keyTimeframe = [...keyTimeframe].sort((a, b) => a - b);
-  data.maxTimeframeTable = maxTimeframeTable;
-}
-
 function sortLocationTree(locationTree) {
   // recursion exit
   // current is undefined or has no child
@@ -192,13 +168,14 @@ function deepCopyLocationTree(sourceTree, timeframe) {
       if (!infoList) {
         return { key: session, value: [] };
       }
-      // [start, end) except for maxTimeframe
+      // [start, end) except for timeframe
       // because the data is  like {start: 0, end: 7}, {start: 7, end: 21}
       // second condition is for the last session in this entity
       let ret = infoList.filter(
         info =>
           (info.start <= timeframe && timeframe < info.end) ||
-          (timeframe === storydata.maxTimeframeTable.get(info.entity) &&
+          (timeframe ===
+            storydata.timeframeTable.get(info.entity).slice(-1)[0][1] &&
             timeframe === info.end)
       );
       return {
@@ -391,8 +368,7 @@ function sortRelationTreeByReference(referenceTree, rtree) {
 export function greedySort(data, orderInfo) {
   CharacterOrder = orderInfo;
   storydata = data;
-  //entity keyTimeframe maxTimeframeTable
-  preprocessData(data);
+  //entity keyTimeframe timeframeTable
   sortLocationTree(data.locationTree);
 
   let sequence = constructRelationshipTreeSequence();
@@ -441,8 +417,7 @@ export function greedySort(data, orderInfo) {
       //光交换不行，把东西存到三个数组，然后排序才行。
       let firstSessionId = cha2Session(firstCha, timeframe[0]);
       let lastSessionId = cha2Session(lastCha, timeframe[0]);
-      if (firstSessionId === undefined || lastSessionId === undefined)
-        return;
+      if (firstSessionId === undefined || lastSessionId === undefined) return;
       if (firstSessionId === lastSessionId) {
         let session = data.sessionTable.get(firstSessionId);
         let firstOrder = session.map(x => x.entity).indexOf(firstCha),
@@ -454,18 +429,20 @@ export function greedySort(data, orderInfo) {
           // session[lastOrder]=temp;
           let sessionOrder = inSessionPair.get(session);
           if (sessionOrder === undefined)
-            inSessionPair.set(session, [[session[firstOrder], session[lastOrder]]]);
+            inSessionPair.set(session, [
+              [session[firstOrder], session[lastOrder]]
+            ]);
           else
-            inSessionPair.set(
-              session,
-              [...sessionOrder,[session[firstOrder], session[lastOrder]]]
-            );
+            inSessionPair.set(session, [
+              ...sessionOrder,
+              [session[firstOrder], session[lastOrder]]
+            ]);
         }
         return;
       }
       let firstLocation = session2Loction(firstSessionId),
         lastLocation = session2Loction(lastSessionId);
-      if (firstLocation===undefined||lastLocation===undefined) return;
+      if (firstLocation === undefined || lastLocation === undefined) return;
       if (firstLocation === lastLocation) {
         let time = timeframe[0];
         let locations = timeframe[1].children;
@@ -495,10 +472,10 @@ export function greedySort(data, orderInfo) {
         if (sessionsOrder === undefined)
           betweenSessionPair.set(sessions, [[indexofFirst, indexofLast]]);
         else
-          betweenSessionPair.set(
-            sessions,
-            [...sessionsOrder,[indexofFirst, indexofLast]]
-          );
+          betweenSessionPair.set(sessions, [
+            ...sessionsOrder,
+            [indexofFirst, indexofLast]
+          ]);
         return;
       } else {
         let locations = timeframe[1].children;
@@ -518,59 +495,89 @@ export function greedySort(data, orderInfo) {
           // locations[lastOrder]=temp;
           let LocationOrder = betweenLocationPair.get(locations);
           if (LocationOrder === undefined)
-            betweenLocationPair.set(locations, [[locations[firstOrder], locations[lastOrder]]]);
+            betweenLocationPair.set(locations, [
+              [locations[firstOrder], locations[lastOrder]]
+            ]);
           else
-            betweenLocationPair.set(
-              locations,
-              [...LocationOrder,[locations[firstOrder], locations[lastOrder]]]
-            );
+            betweenLocationPair.set(locations, [
+              ...LocationOrder,
+              [locations[firstOrder], locations[lastOrder]]
+            ]);
         }
       }
     });
-    let Locations=timeframe[1].children;
-    if (Locations!==undefined){
-      let order=betweenLocationPair.get(Locations);
-      if (order!==undefined){
+    let Locations = timeframe[1].children;
+    if (Locations !== undefined) {
+      let order = betweenLocationPair.get(Locations);
+      if (order !== undefined) {
         // order=order.map(x=>Locations[x]);
-        Locations.sort((a,b)=>{
-          let locationOrder=order.find(x=>x.includes(a)&&x.includes(b));
-          if (locationOrder===undefined) return 0;
-          if (locationOrder[0]===a) return -1;
+        Locations.sort((a, b) => {
+          let locationOrder = order.find(x => x.includes(a) && x.includes(b));
+          if (locationOrder === undefined) return 0;
+          if (locationOrder[0] === a) return -1;
           return 1;
         });
       }
-      for (let location of Locations){
-        let sessions=location.sessions;
-        let order=betweenSessionPair.get(sessions);
-        let allsession=new Array(...sessions);
-        if (order!==undefined)
-          allsession.sort((a,b)=>{
-            let sessionOrder=order.find(x=>x.includes(a[0])&&x.includes(b[0]));
-            if (sessionOrder===undefined) return 0;
-            if (sessionOrder[0]===a[0]) return -1;
+      for (let location of Locations) {
+        let sessions = location.sessions;
+        let order = betweenSessionPair.get(sessions);
+        let allsession = new Array(...sessions);
+        if (order !== undefined)
+          allsession.sort((a, b) => {
+            let sessionOrder = order.find(
+              x => x.includes(a[0]) && x.includes(b[0])
+            );
+            if (sessionOrder === undefined) return 0;
+            if (sessionOrder[0] === a[0]) return -1;
             return 1;
           });
-        location.sessions=new Map(allsession);
-        for (let [_,session] of sessions){
-          let order=inSessionPair.get(session);
-          if (order===undefined) continue;
+        location.sessions = new Map(allsession);
+        for (let [_, session] of sessions) {
+          let order = inSessionPair.get(session);
+          if (order === undefined) continue;
           // order.map(x=>sess)
-          session.sort((a,b)=>{
-            let chaOrder=order.find(x=>x.includes(a)&&x.includes(b));
-            if (chaOrder===undefined) return 0;
-            if (chaOrder[0]===a) return -1;
+          session.sort((a, b) => {
+            let chaOrder = order.find(x => x.includes(a) && x.includes(b));
+            if (chaOrder === undefined) return 0;
+            if (chaOrder[0] === a) return -1;
             return 1;
-          })
+          });
         }
-
       }
-
     }
-
   }
-  let greedySort={};
-  greedySort.sequence=sequence;
-  greedySort.data=data;
+  for (let [_, order] of sequence) {
+    order.sessionOrder = _getSessionOrder(order);
+  }
+  let greedySort = data;
+  greedySort.sequence = sequence.map(order => {
+    let [_, session] = order;
+    session.sessionOrder.shift();
+    return [_, session.sessionOrder];
+  });
   return greedySort;
 }
 
+function _getSessionOrder(root) {
+  let result = [];
+  _alignSingleGap(root);
+  // the output array should use index that starts from 1 for dynammic programming
+  result.unshift(undefined);
+  return result;
+
+  function _alignSingleGap(rtree) {
+    if (_hasChildren(rtree)) {
+      for (let child of rtree.children) {
+        _alignSingleGap(child);
+      }
+    }
+    for (let entry of rtree.sessions) {
+      result.push(entry);
+    }
+    delete rtree.order;
+  }
+}
+
+function _hasChildren(_) {
+  return !(!Array.isArray(_.children) || _.children.length === 0);
+}

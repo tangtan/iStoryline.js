@@ -10,17 +10,17 @@ const LEFT = "LEFT",
   LEFT_UP = "LEFT_UP",
   UP = "UP";
 
-function hasChildren(_) {
+function _hasChildren(_) {
   return !(!Array.isArray(_.children) || _.children.length === 0);
 }
 
-function create2DArray(row, column, defaultValue) {
+function _create2DArray(row, column, defaultValue) {
   return defaultValue === undefined
     ? [...Array(row).keys()].map(() => Array(column))
     : [...Array(row).keys()].map(() => Array(column).fill(defaultValue));
 }
 
-function longestCommonSubstring(sessionA, sessionB) {
+function _longestCommonSubstring(sessionA, sessionB) {
   // session: [sessionId, [EntityInfo]]
   // make its index starts from 1 for DP
   // copy array for re-entrance
@@ -34,7 +34,7 @@ function longestCommonSubstring(sessionA, sessionB) {
   let z = 0;
   let result = [];
 
-  let table = create2DArray(m + 1, n + 1);
+  let table = _create2DArray(m + 1, n + 1);
 
   for (let i = 0; i <= m; i++) {
     table[i][0] = 0;
@@ -61,22 +61,13 @@ function longestCommonSubstring(sessionA, sessionB) {
   return result;
 }
 
-function alignSequence(sequence) {
+function _alignSequence(sequence) {
   let result = [];
   result.push([0, undefined]);
   // initial position has no aligned pairs
   for (let i = 0; i + 1 < sequence.length; i++) {
-    let [_, previous] = sequence[i];
-    let [__, next] = sequence[i + 1];
-
-    let previousOrder = previous.sessionOrder;
-    if (previousOrder === undefined) {
-      // intial one
-      previousOrder = previous.sessionOrder = _getSessionOrder(previous);
-    }
-
-    let nextOrder = _getSessionOrder(next);
-    next.sessionOrder = nextOrder;
+    let [_, previousOrder] = sequence[i];
+    let [__, nextOrder] = sequence[i + 1];
     // it contains aligned session pairs
     // between j and j - 1 timeframe
     result.push([
@@ -96,7 +87,7 @@ function _getSessionOrder(root) {
   return result;
 
   function _alignSingleGap(rtree) {
-    if (hasChildren(rtree)) {
+    if (_hasChildren(rtree)) {
       for (let child of rtree.children) {
         _alignSingleGap(child);
       }
@@ -121,10 +112,9 @@ function _alignSingleGap(previousOrder, nextOrder, time) {
   // length include the dummy undefined
   let m = previousOrder.length - 1,
     n = nextOrder.length - 1;
-  // debugger
   // zero index included
-  let dynamicTable = create2DArray(m + 1, n + 1);
-  let pathTable = create2DArray(m + 1, n + 1);
+  let dynamicTable = _create2DArray(m + 1, n + 1);
+  let pathTable = _create2DArray(m + 1, n + 1);
 
   // match(i,j) = max (match(i-1, j-1) + sim(li, rj), match(i-1, j), match(i, j-1)) : if i > 0 and j > 0
   //            = 0 : if i = 0 or j = 0
@@ -200,7 +190,6 @@ function _similarity(sessionA, sessionB, previousOrder, nextOrder, t) {
     .filter(pair => pair[1] <= t && pair[2] >= t)
     .map(pair => pair[0]);
   let bendCha = bendLine.filter(pair => pair[1] === t).map(pair => pair[0]);
-  // debugger
   if (
     straightenCha.some(straightchaName =>
       sessionA[1].some(cha => cha.entity === straightchaName)
@@ -210,7 +199,7 @@ function _similarity(sessionA, sessionB, previousOrder, nextOrder, t) {
     )
   ) {
     return (
-      longestCommonSubstring(sessionA, sessionB).length +
+      _longestCommonSubstring(sessionA, sessionB).length +
       RELATIVE_FACTOR_ALPHA *
         _relative_similarity(
           previousOrder.indexOf(sessionA),
@@ -227,7 +216,7 @@ function _similarity(sessionA, sessionB, previousOrder, nextOrder, t) {
     bendCha.some(Name => sessionB[1].some(cha => cha.entity === Name))
   ) {
     return (
-      longestCommonSubstring(sessionA, sessionB).length +
+      _longestCommonSubstring(sessionA, sessionB).length +
       RELATIVE_FACTOR_ALPHA *
         _relative_similarity(
           previousOrder.indexOf(sessionA),
@@ -240,7 +229,7 @@ function _similarity(sessionA, sessionB, previousOrder, nextOrder, t) {
   }
 
   return (
-    longestCommonSubstring(sessionA, sessionB).length +
+    _longestCommonSubstring(sessionA, sessionB).length +
     RELATIVE_FACTOR_ALPHA *
       _relative_similarity(
         previousOrder.indexOf(sessionA),
@@ -290,12 +279,12 @@ function _getAlignedSessionPairs(pathTable) {
 }
 
 export function greedyAlign(sortAns, straightInfo, bendInfo) {
-  let data = sortAns.data;
+  let data = sortAns;
   let sequence = sortAns.sequence;
   bendLine = bendInfo;
   straightenLine = straightInfo;
-  let alignedSessions = alignSequence(sequence);
-  let chaOrder = sequence.map(timeframe => [...timeframe[1].sessionOrder]);
+  let alignedSessions = _alignSequence(sequence);
+  let chaOrder = sequence.map(timeframe => [...timeframe[1]]);
 
   for (let i = 0; i < chaOrder.length; i++) {
     chaOrder[i][0] = sequence[i][0];
@@ -352,7 +341,6 @@ export function greedyAlign(sortAns, straightInfo, bendInfo) {
         formerSession = formerSession.sessionOrder[alignedsessionId];
         return [formerSession, thisSession];
       }
-      // if (time===18) debugger;
       let [formerSession, thisSession] = timesessionId2Alignedsession(
         time,
         sessionId
@@ -364,7 +352,6 @@ export function greedyAlign(sortAns, straightInfo, bendInfo) {
             thisNum = 0;
           let formFlag = false,
             thisFlag = false;
-          // debugger
           for (let formerCha of formerSession[1]) {
             if (formerCha.entity !== pair[0]) formNum++;
             else {
@@ -392,7 +379,6 @@ export function greedyAlign(sortAns, straightInfo, bendInfo) {
             let count = formNum - thisNum;
             for (let i = 0; i < count; i++)
               thisSession[1].splice(0, 0, { entity: "" });
-            // debugger
           }
         } else continue;
       }
@@ -402,10 +388,8 @@ export function greedyAlign(sortAns, straightInfo, bendInfo) {
   //在sequence中找到straightchaName，对应得alignSessions，再调换角色
   //在其前加入假的角色，在其后调换位置
   //拉直结束
-  let greedyAlignAns = {};
+  let greedyAlignAns = data;
   greedyAlignAns.alignedSessions = alignedSessions;
-  greedyAlignAns.data = data;
-  greedyAlignAns.sequence = sequence;
   return greedyAlignAns;
 }
 

@@ -23,7 +23,43 @@ export class DataStore {
     this.Keytimeframe.push(time);
   }
 
-
+  preprocessData(data) {
+    let entities = new Set(),
+      keyTimeframe = new Set(),
+      timeframeTable = new Map();
+    for (let [sessionId, entityInfoArray] of data.sessionTable) {
+      entityInfoArray.forEach(entityInfo => {
+        let entity = entityInfo.entity;
+        if (!entities.has(entity)) {
+          entities.add(entity);
+          timeframeTable.set(entity, []);
+        }
+        keyTimeframe.add(entityInfo.start);
+        keyTimeframe.add(entityInfo.end);
+        timeframeTable.get(entity).push([entityInfo.start,entityInfo.end]);
+        // if (entityInfo.end > timeframeTable.get(entity))
+        //   timeframeTable.set(entity, entityInfo.end);
+      });
+    }
+    data.entities = [...entities];
+    data.keyTimeframe = [...keyTimeframe].sort((a, b) => a - b);
+    for (let [_,value] of timeframeTable)
+    {
+      let resortTable=[...value].sort((a,b)=>a[0]-b[0]);
+      let head=1;
+      let ans=[resortTable[0]];
+      for (;head<resortTable.length;head++){
+        if (resortTable[head][0]===ans[ans.length-1][1]){
+          ans[ans.length-1][1]=resortTable[head][1];
+        }
+        else {
+          ans.push(resortTable[head]);
+        }
+      }
+      timeframeTable.set(_,ans);
+    }
+    data.timeframeTable = timeframeTable;
+  }
 
   async readXMLFile(fileSrc) {
     let xmldata= await xml(fileSrc);
@@ -50,11 +86,8 @@ export class DataStore {
       locationTree: locationTree,
       sessionTable: sessionTable
     };
-
+    this.preprocessData(this.data);
     return this.data;
-    // )
-    // .catch(error=>console.error(`file error in $error`));
-    
   }
 
   addLocation(LocationName) {

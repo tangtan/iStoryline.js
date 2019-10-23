@@ -16,7 +16,7 @@ function _getTimeframe(time) {
   let inflag = 1;
   let timeframe = sequence[time];
   const Sessions = [];
-  let order = timeframe[1].sessionOrder;
+  let order = timeframe[1];
   for (let i = 1; i < order.length; i++) {
     let session = {};
     session.begin = timeframe[0];
@@ -83,7 +83,7 @@ export function greedySlotCompact(
   record = [];
   slot = [];
   compressInfo = [...compressInfo, ...mergeInfo, ...extendInfo];
-  data = alignAns.data;
+  data = alignAns;
   sequence = alignAns.sequence;
   alignedSession = alignAns.alignedSessions;
   let flag = 1;
@@ -135,7 +135,7 @@ export function greedySlotCompact(
   for (let j = 0; j < timeframe.length; j++) {
     let max = 0;
     for (let key of Ycoor) max = Math.max(max, key[1]);
-    for (let key of Ycoor) Ycoor.set(key[0], max+dout);
+    for (let key of Ycoor) Ycoor.set(key[0], max + dout);
     let t = timeframe[j];
     t.forEach(x => {
       let content = x.content;
@@ -184,11 +184,10 @@ export function greedySlotCompact(
         }
       }
     });
-    // debugger;
   }
-  graph.names = data.entities;
+  graph = data;
   node.forEach(x => x.sort((a, b) => a[0] - b[0]));
-  graph.nodes = node;
+  graph.initialNodes = node;
   // graph.initNodes=JSON.parse(JSON.stringify(node));
   // let initialGraph = {};
   // initialGraph.nodes = node;
