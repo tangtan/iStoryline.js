@@ -66,6 +66,7 @@ export default class iStoryline extends CharacterStore {
       inSep,
       outSep
     );
+    console.log(initialGraph);
     let renderedGraph = storyRender(
       this.renderModule,
       initialGraph,

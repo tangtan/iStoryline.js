@@ -552,7 +552,7 @@ export function greedySort(data, orderInfo) {
   let greedySort = data;
   greedySort.sequence = sequence.map(order => {
     let [_, session] = order;
-    session.sessionOrder.shift();
+    //session.sessionOrder.shift();
     return [_, session.sessionOrder];
   });
   return greedySort;
