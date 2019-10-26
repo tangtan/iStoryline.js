@@ -26,15 +26,12 @@ let KNOTHEIGHT = 2000;
 let COLLIDEHEIGHT = 250;
 
 function render(initialGraph, adjustInfo, relateInfo, stylishInfo) {
-    console.log(initialGraph);
     let _originNodes = _initializeOriginNodes(initialGraph.initialNodes, initialGraph.timeframeTable, initialGraph.entities);
-    console.log(_originNodes);
     let _group = _initializeGroup(_originNodes);
     const { relate, stylish } = _judgeStylishAndRelate(relateInfo, stylishInfo);
     const { splitMarks, groupPosition } = _initializeSplitMarks(_originNodes, initialGraph.entities, relate, stylish);
 
     let renderNodes = _calculateRenderNodes(_originNodes, _group);
-    console.log(renderNodes);
     let _tmp = _calculateSmoothNodes(renderNodes, _originNodes, _group, splitMarks);
     let smoothNodes = _tmp[0];
     let sketchStyles = _tmp[1];

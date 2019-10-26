@@ -562,7 +562,7 @@ function _getSessionOrder(root) {
   let result = [];
   _alignSingleGap(root);
   // the output array should use index that starts from 1 for dynammic programming
-  result.unshift(undefined);
+  // result.unshift(undefined);
   return result;
 
   function _alignSingleGap(rtree) {
