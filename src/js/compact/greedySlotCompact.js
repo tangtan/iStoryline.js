@@ -86,6 +86,10 @@ export function greedySlotCompact(
   data = alignAns;
   sequence = alignAns.sequence;
   alignedSession = alignAns.alignedSessions;
+  for (let [_,order] of sequence)
+  {
+    order.unshift(undefined);
+  }
   let flag = 1;
   for (let i = 0; i < sequence.length - 1; i++) {
     slot.push(_getTimeframe(i)); //change sequence into slot
@@ -192,6 +196,10 @@ export function greedySlotCompact(
   // let initialGraph = {};
   // initialGraph.nodes = node;
   // initialGraph.names = graph.names;
+  for (let [_,order] of sequence)
+  {
+    order.shift();
+  }
   return graph;
 }
 

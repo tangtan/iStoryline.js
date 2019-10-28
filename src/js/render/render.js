@@ -1,5 +1,6 @@
 
 let STEPLENGTH = 1;
+let TIMEFRAMESPAN = 50;
 let SCALE = 20;
 let SCALELENGTH = 200000;
 let SPACELENGTH = 20;
@@ -25,16 +26,12 @@ let KNOTHEIGHT = 2000;
 let COLLIDEHEIGHT = 250;
 
 function render(initialGraph, adjustInfo, relateInfo, stylishInfo) {
-    let _originNodes = _initializeOriginNodes(initialGraph.nodes);
-
+    let _originNodes = _initializeOriginNodes(initialGraph.initialNodes, initialGraph.timeframeTable, initialGraph.entities);
     let _group = _initializeGroup(_originNodes);
-    console.log("group");
-    console.log(_group);
     const { relate, stylish } = _judgeStylishAndRelate(relateInfo, stylishInfo);
-    const { splitMarks, groupPosition } = _initializeSplitMarks(_originNodes, initialGraph.names, relate, stylish);
+    const { splitMarks, groupPosition } = _initializeSplitMarks(_originNodes, initialGraph.entities, relate, stylish);
 
     let renderNodes = _calculateRenderNodes(_originNodes, _group);
-
     let _tmp = _calculateSmoothNodes(renderNodes, _originNodes, _group, splitMarks);
     let smoothNodes = _tmp[0];
     let sketchStyles = _tmp[1];
@@ -57,29 +54,27 @@ function render(initialGraph, adjustInfo, relateInfo, stylishInfo) {
     return renderedGraph;
 }
 
-function _initializeOriginNodes(nowCharList) {
+function _initializeOriginNodes(initialNodes, timeframeTable, entities) {
     let originNodes = new Array();
-    let totCharNum = nowCharList.length;
-    let segmentNum = 0;
-    let posNum = 0;
-    for (let i = 0; i < totCharNum; i++) {
-        let nodeNum = nowCharList[i].length;
+    let cnt = 0;
+    let tot = 0;
+    for (let i = 0; i < entities.length;i ++){
+        let _characterName = entities[i];
+        let _storySegment = timeframeTable.get(_characterName);
         originNodes[i] = new Array();
-        segmentNum = 0;
-        posNum = 0;
-        originNodes[i][segmentNum] = new Array();
-        for (let k = 0; k < nodeNum; k++) {
-            if (k && (!(k & 1)) && nowCharList[i][k][0] - nowCharList[i][k - 1][0] !== 25) {
-                segmentNum++;
-                originNodes[i][segmentNum] = new Array();
-                posNum = 0;
+        cnt = 0;
+        for (let j = 0;j < _storySegment.length;j ++){
+            tot = 0;
+            originNodes[i][j] = new Array();
+            while(cnt < initialNodes[i].length && checkInSameSegment(_storySegment[j], Math.floor(initialNodes[i][cnt][0] / TIMEFRAMESPAN))) {
+                originNodes[i][j][tot] = new Array();
+                originNodes[i][j][tot][0] = initialNodes[i][cnt][0];
+                originNodes[i][j][tot][1] = initialNodes[i][cnt][1];
+                cnt ++;
+                tot ++;
             }
-            originNodes[i][segmentNum][posNum] = new Array();
-            originNodes[i][segmentNum][posNum][0] = nowCharList[i][k][0];
-            originNodes[i][segmentNum][posNum][1] = nowCharList[i][k][1];
-            posNum++;
         }
-    }
+    }   
     for (let i = 0; i < originNodes.length; i++) {
         for (let j = 0; j < originNodes[i].length; j++) {
             for (let k = 0; k < originNodes[i][j].length; k++) {
@@ -95,6 +90,9 @@ function _initializeOriginNodes(nowCharList) {
         }
     }
     return originNodes;
+}
+function checkInSameSegment(bound, x) {
+    return (x <= bound[1] && x >= bound[0])
 }
 function _initializeGroup(storyline) {
     let group = new Array();
@@ -529,7 +527,6 @@ function _calculateSmoothNodes(renderNodes, originNodes, group, splitMarks) {
             }
         }
     }
-    console.log(tmpSmoothNodes);
     //now tmpsmoothnodes 下标一致，坐标不再和时间完美对应
     let smoothNodes = new Array();
     let cntNodes = 0;
@@ -538,7 +535,6 @@ function _calculateSmoothNodes(renderNodes, originNodes, group, splitMarks) {
     let sketchStyles = new Array();
     let segmentTime = new Array();
     for (let i = 0; i < tmpSmoothNodes.length; i++) {
-        console.log(i-1,cntSegments);
         smoothNodes[i] = new Array();
         sketchStyles[i] = new Array();
         segmentTime[i] = new Array();
@@ -585,11 +581,6 @@ function _calculateSmoothNodes(renderNodes, originNodes, group, splitMarks) {
                     }
                 }
                 if (flagSplit === 1 && k === tmpSmoothNodes[i][j].length - 1) continue;
-                console.log(
-                    "i = ",i,
-                    "j = ",j,
-                    "turnType = ",turnType
-                );
                 if (turnType === 0) {
                     smoothNodes[i][cntSegments][cntNodes] = new Array();
                     smoothNodes[i][cntSegments][cntNodes][0] = tmpSmoothNodes[i][j][k][0];
@@ -616,7 +607,6 @@ function _calculateSmoothNodes(renderNodes, originNodes, group, splitMarks) {
                         p[3] = tmpSmoothNodes[i][j][k + 1];
                     }
                     SAMPLERATE = Math.floor(Math.sqrt((p[3][1] - p[0][1]) * (p[3][1] - p[0][1]) + (p[3][0] - p[1][0]) * (p[3][0] - p[1][0])) / RATESTD);
-                    console.log("ss",SAMPLERATE);
                     if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
                     for (let z = 0; z <= SAMPLERATE; z++) {
                         smoothNodes[i][cntSegments][cntNodes] = new Array();

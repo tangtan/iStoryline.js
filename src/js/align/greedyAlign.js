@@ -70,34 +70,38 @@ function _alignSequence(sequence) {
     let [__, nextOrder] = sequence[i + 1];
     // it contains aligned session pairs
     // between j and j - 1 timeframe
+    // previousOrder.unshift(undefined);
+    // nextOrder.unshift(undefined);
     result.push([
       sequence[i + 1][0],
       _alignSingleGap(previousOrder, nextOrder, sequence[i + 1][0])
     ]);
+    // previousOrder.shift();
+    // nextOrder.shift();
   }
 
   return result;
 }
 
-function _getSessionOrder(root) {
-  let result = [];
-  _alignSingleGap(root);
-  // the output array should use index that starts from 1 for dynammic programming
-  result.unshift(undefined);
-  return result;
+// function _getSessionOrder(root) {
+//   let result = [];
+//   _alignSingleGap(root);
+//   // the output array should use index that starts from 1 for dynammic programming
+//   result.unshift(undefined);
+//   return result;
 
-  function _alignSingleGap(rtree) {
-    if (_hasChildren(rtree)) {
-      for (let child of rtree.children) {
-        _alignSingleGap(child);
-      }
-    }
-    for (let entry of rtree.sessions) {
-      result.push(entry);
-    }
-    delete rtree.order;
-  }
-}
+//   function _alignSingleGap(rtree) {
+//     if (_hasChildren(rtree)) {
+//       for (let child of rtree.children) {
+//         _alignSingleGap(child);
+//       }
+//     }
+//     for (let entry of rtree.sessions) {
+//       result.push(entry);
+//     }
+//     delete rtree.order;
+//   }
+// }
 
 // previousOrder: [[sessionId, [EntityInfo: {entity: String, start:Int, end:Int}]]
 // dynamic programming
@@ -281,6 +285,10 @@ function _getAlignedSessionPairs(pathTable) {
 export function greedyAlign(sortAns, straightInfo, bendInfo) {
   let data = sortAns;
   let sequence = sortAns.sequence;
+  for (let [_,order] of sequence)
+  {
+    order.unshift(undefined);
+  }
   bendLine = bendInfo;
   straightenLine = straightInfo;
   let alignedSessions = _alignSequence(sequence);
@@ -384,7 +392,10 @@ export function greedyAlign(sortAns, straightInfo, bendInfo) {
       }
     }
   }
-
+  for (let [_,order] of sequence)
+  {
+    order.shift();
+  }
   //在sequence中找到straightchaName，对应得alignSessions，再调换角色
   //在其前加入假的角色，在其后调换位置
   //拉直结束
