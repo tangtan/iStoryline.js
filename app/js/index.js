@@ -3,9 +3,8 @@ import iStoryline from "../../src/js/index";
 import { scaleLinear } from "d3-scale";
 
 async function main(url) {
-  let ans = new iStoryline(url);
-  await ans.ready();
-  let graph = ans._layout();
+  let ans = new iStoryline();
+  let graph = await ans.readFile(url);
   const sketchNodes = normalize(graph.smoothNodes);
   // const sketchNodes = normalize(graph.sketchNodes);
   for (let i = 0; i < sketchNodes.length; i++) {

@@ -26,11 +26,20 @@ or
 yarn add https://github.com/tangtan/istoryline.git
 ```
 
-## Documentation
+## Basic Usage
 
-[Data Structure and Workflow](https://github.com/tangtan/istoryline/wiki/Data-Structure-and-Workflow)
+```JavaScript
+import iStoryline from "istoryline"
+let iStoryliner = new iStoryline();
 
-## iStoryline Editor
+// generate storyline visualizations from the story script
+let storyScriptUrl = './data/JurassicPark.xml';
+
+// graph can be drawed using any canvas or svg libraries
+let graph = iStoryliner.readFile(storyScriptUrl);
+```
+
+## Interactive Storyline Editor
 
 iStoryline.js provides a build-in editor for producing storyline visualizations.
 
@@ -40,6 +49,10 @@ iStoryline.js provides a build-in editor for producing storyline visualizations.
 3. Start the editor `npm start`
 
 4. Please visit [localhost:8080](http://localhost:8080)
+
+## Documentation
+
+[Data Structure and Workflow](https://github.com/tangtan/istoryline/wiki/Data-Structure-and-Workflow)
 
 ## Reference
 

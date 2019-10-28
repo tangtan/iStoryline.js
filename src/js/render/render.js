@@ -44,14 +44,14 @@ function render(initialGraph, adjustInfo, relateInfo, stylishInfo) {
     smoothNodes = _extent(_originNodes, smoothNodes);
     sketchNodes = _extent(_originNodes, sketchNodes);
 
-    let renderedGraph = {};
-    renderedGraph.nodes = _deepCopy(initialGraph.nodes);
-    renderedGraph.names = _deepCopy(initialGraph.names);
-    renderedGraph.renderNodes = renderNodes;
-    renderedGraph.smoothNodes = smoothNodes;
-    renderedGraph.sketchNodes = sketchNodes;
-    renderedGraph.styleConfig = styleConfig;
-    return renderedGraph;
+    // let renderedGraph = {};
+    // renderedGraph.nodes = _deepCopy(initialGraph.nodes);
+    // renderedGraph.names = _deepCopy(initialGraph.names);
+    initialGraph.renderNodes = renderNodes;
+    initialGraph.smoothNodes = smoothNodes;
+    initialGraph.sketchNodes = sketchNodes;
+    initialGraph.styleConfig = styleConfig;
+    return initialGraph;
 }
 
 function _initializeOriginNodes(initialNodes, timeframeTable, entities) {
