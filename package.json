@@ -39,7 +39,7 @@
         "quadprog": "^1.5.1",
         "snapsvg": "^0.5.1",
         "webpack": "^3.3.0",
-        "webpack-dev-server": "^2.9.1"
+        "webpack-dev-server": "^3.1.11"
     },
     "devDependencies": {
         "babel-cli": "^6.24.1",
