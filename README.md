@@ -53,6 +53,7 @@ iStoryline.js provides a build-in editor for producing storyline visualizations.
 ## Documentation
 
 [Data Structure and Workflow](https://github.com/tangtan/istoryline/wiki/Data-Structure-and-Workflow)
+[API Reference](https://github.com/tangtan/istoryline/wiki/API-Reference)
 
 ## Reference
 
