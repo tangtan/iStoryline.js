@@ -293,7 +293,6 @@
     <Character Name="OSWALD " Color="#e3a4bb">
       <Span Start="35" End="40" Session="7"/>
       <Span Start="40" End="55" Session="77"/>
-      <Span Start="45" End="50" Session="9"/>
       <Span Start="95" End="100" Session="19"/>
       <Span Start="100" End="115" Session="83"/>
       <Span Start="115" End="120" Session="23"/>
