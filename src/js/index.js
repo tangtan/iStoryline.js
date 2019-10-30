@@ -53,7 +53,11 @@ export default class iStoryline extends CharacterStore {
     let data = this.data;
     let graph = new Graph(data);
     let constraints = this.ctrInfo.ctrs;
-    let sortedSequence = storyOrder(this.orderModule, data, constraints);
+    let sortedSequence = storyOrder(
+      this.orderModule, 
+      data, 
+      constraints
+    );
     let alignedSession = storyAlign(
       this.alignModule,
       sortedSequence,

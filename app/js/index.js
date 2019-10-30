@@ -6,6 +6,7 @@ async function main(url) {
   let ans = new iStoryline(url);
   await ans.ready();
   let graph = ans._layout();
+  graph=ans.straighten(["Red cap"],[1,10]);
   const sketchNodes = normalize(graph.smoothNodes);
   // const sketchNodes = normalize(graph.sketchNodes);
   for (let i = 0; i < sketchNodes.length; i++) {
@@ -142,4 +143,6 @@ function genInitialPathStr(points) {
   return `M ${points[0][0]} ${points[0][1]} `;
 }
 
-main("./data/StarWars.xml");
+// main("./data/StarWars.xml");
+main("./data/redhat.xml");
+
