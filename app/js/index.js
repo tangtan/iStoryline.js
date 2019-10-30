@@ -22,7 +22,7 @@ async function main(url) {
   }
 }
 
-function normalize(nodes, x0=0, y0=0, width=1000) {
+function normalize(nodes, x0=100, y0=100, width=1000) {
   const minX = Math.min(
     ...nodes.map(storyline =>
       Math.min(
@@ -59,7 +59,8 @@ function normalize(nodes, x0=0, y0=0, width=1000) {
       )
     )
   );
-  const ratio = (maxY - minY) / (maxX - minX);
+  let ratio = (maxY - minY) / (maxX - minX);
+  ratio = ratio < 0.15 ? 0.372 : ratio;
   const xScale = scaleLinear()
     .domain([minX, maxX])
     .range([x0, x0 + width]);
@@ -142,3 +143,19 @@ function genInitialPathStr(points) {
 }
 
 main("./data/StarWars.xml");
+// main("./data/redhat.xml");
+// main("./data/ChasingDragon.xml");
+// main("./data/Coco.xml");
+// main("./data/Frozen.xml");
+// main("./data/Guowuguan.xml");
+// main("./data/InceptionTune.xml");
+// main("./data/JurassicParkTune.xml");
+// main("./data/KingLearTune.xml");
+// main("./data/LetBulletFlyTune.xml");
+// main("./data/MatrixTune.xml");
+// main("./data/Moon.xml");
+// main("./data/NaniaTune.xml");
+// main("./data/Naruto.xml");
+// main("./data/Suiciders.xml");
+// main("./data/TrainToBusan.xml");
+
