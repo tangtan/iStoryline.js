@@ -5,6 +5,7 @@ import { scaleLinear } from "d3-scale";
 async function main(url) {
   let ans = new iStoryline();
   let graph = await ans.readFile(url);
+  graph=ans.straighten(["Red cap"],[1,10]);
   const sketchNodes = normalize(graph.smoothNodes);
   // const sketchNodes = normalize(graph.sketchNodes);
   for (let i = 0; i < sketchNodes.length; i++) {
@@ -141,4 +142,6 @@ function genInitialPathStr(points) {
   return `M ${points[0][0]} ${points[0][1]} `;
 }
 
-main("./data/StarWars.xml");
+// main("./data/StarWars.xml");
+main("./data/redhat.xml");
+

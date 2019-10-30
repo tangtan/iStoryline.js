@@ -285,12 +285,20 @@ function _getAlignedSessionPairs(pathTable) {
 export function greedyAlign(sortAns, straightInfo, bendInfo) {
   let data = sortAns;
   let sequence = sortAns.sequence;
+  bendLine=[];
+  straightenLine=[];
   for (let [_,order] of sequence)
   {
     order.unshift(undefined);
   }
-  bendLine = bendInfo;
-  straightenLine = straightInfo;
+  if (bendInfo.length>=1)
+  bendInfo.forEach(pair => {
+    bendLine.push(...pair.name,...pair.timeSpan)
+  });
+  if (straightInfo.lenghth>=1)
+  straightInfo.forEach(pair=>{
+    straightenLine.push(...pair.name,...pair.timeSpan)
+  });
   let alignedSessions = _alignSequence(sequence);
   let chaOrder = sequence.map(timeframe => [...timeframe[1]]);
 

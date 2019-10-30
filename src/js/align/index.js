@@ -6,8 +6,8 @@ export function storyAlign(alignModule, sequence, constraints) {
     case "GreedyAlign":
       return greedyAlign(
         sequence,
-        constraints.filter(ctrs => ctrs.style === "Bend"),
-        constraints.filter(ctrs => ctrs.style === "Straighten")
+        constraints.filter(ctrs => ctrs.style === "Straighten"),
+        constraints.filter(ctrs => ctrs.style === "Bend")
       );
     default:
       alignModelError(alignModule);

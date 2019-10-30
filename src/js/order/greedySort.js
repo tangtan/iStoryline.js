@@ -203,14 +203,14 @@ function sortRelationTreeSequence(sequence) {
     let referenceTree;
     for (let j = 0; j < sequence.length; j++) {
       // sequence is [[timeframe, rtree]]
-      let [_, rtree] = sequence[j];
+      let [time, rtree] = sequence[j];
       if (referenceTree === undefined) {
         referenceTree = rtree;
         // use initial as reference
         rtree.order = getEntitiesOrder(rtree);
         continue;
       }
-      sortRelationTreeByReference(referenceTree, rtree);
+      sortRelationTreeByReference(referenceTree, rtree, time);
       // update reference frame
       referenceTree = rtree;
     }
@@ -266,7 +266,7 @@ function entitysort(a, b) {
   return weightOfA - weightOfB;
 }
 
-function sortSingleRelationTree(target) {
+function sortSingleRelationTree(target, time) {
   if (target === undefined) {
     return;
   }
@@ -285,8 +285,10 @@ function sortSingleRelationTree(target) {
 
     let CharaInfoArray = entityInfoArray.map(x => x.entity);
 
-    for (let [firstCha, lastCha] of CharacterOrder) {
+    for (let [firstCha, lastCha, startTime, endTime] of CharacterOrder) {
       if (
+        time <= endTime &&
+        time >= startTime &&
         CharaInfoArray.indexOf(firstCha) !== -1 &&
         CharaInfoArray.indexOf(lastCha) !== -1 &&
         order.get(lastCha) < order.get(firstCha)
@@ -323,11 +325,12 @@ function sortSingleRelationTree(target) {
     )
   );
 
-  for (let [firstCha, lastCha] of CharacterOrder) {
+  for (let [firstCha, lastCha, startTime, endTime] of CharacterOrder) {
     let firstId = findentity(firstCha);
     let lastId = findentity(lastCha);
-    // debugger
     if (
+      time >= startTime &&
+      time <= endTime &&
       firstId !== lastId &&
       firstId !== -1 &&
       lastId !== -1 &&
@@ -358,15 +361,21 @@ function sortSingleRelationTree(target) {
   }
 }
 
-function sortRelationTreeByReference(referenceTree, rtree) {
+function sortRelationTreeByReference(referenceTree, rtree, time) {
   order = referenceTree.order;
-  sortSingleRelationTree(rtree);
+  sortSingleRelationTree(rtree, time);
   // update order after sorting
   rtree.order = getEntitiesOrder(rtree);
 }
 
 export function greedySort(data, orderInfo) {
-  CharacterOrder = orderInfo;
+  CharacterOrder = [];
+  if (orderInfo.length!==0) //CharacterOrder = [...orderInfo.name, ...order.timeSpan];
+  {
+    orderInfo.forEach(pair=>{
+      CharacterOrder.push([...pair.names,...pair.timeSpan]);
+    })
+  };
   storydata = data;
   //entity keyTimeframe timeframeTable
   sortLocationTree(data.locationTree);

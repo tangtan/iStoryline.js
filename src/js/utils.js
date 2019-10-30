@@ -1,9 +1,23 @@
 export function logNameError(type, names=[], limits=0) {
+  if (names.length===limits) return true;
   console.error(`Invalid names in ${type}`);
+  return false;
 }
 
 export function logTimeError(type, span=[]) {
+  switch (type) {
+    case 'Bend':
+      if (span.length===1) return true;
+      break;
+    case 'Sort':
+      if (span[1]>=span[0]) return true;
+      break;
+    case 'Straighten':
+      if (span[1]>=span[0]) return true;
+      break;
+  }
   console.error(`Invalid time span in ${type}`);
+  return false;
 }
 
 export function orderModelError(type){
