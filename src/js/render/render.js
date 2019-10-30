@@ -1388,9 +1388,9 @@ function _initializeSplitMarks(storyline, characterName, relateInfo, stylishInfo
         let insTime = new Array();
         let insCnt = 0;
         for (let j = 0; j < storyline[i].length; j++) {
-            insTime[insCnt++] = _getTime(storyline, i, 0, 0, 0);
-            insTime[insCnt++] = _getTime(storyline, i, 0, storyline[i][0].length - 1, 0);
+            insTime[insCnt++] = _getTime(storyline, i, j, 0, 0);
         }
+        
         let k = 0;
         for (let j = 0; j < insCnt; j++) {
             while (k < divideMarks[i].length && divideMarks[i][k][0] < insTime[j]) {
