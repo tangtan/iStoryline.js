@@ -32,14 +32,14 @@
  */
 export class Graph {
   constructor(data) {
-    this.nodes = [];
-    this.names = [];
-    this.renderNodes = [];
-    this.smoothNodes = [];
-    this.sketchNodes = [];
     this.session = data.sessionTable;
     this.locationTree = data.locationTree;
     this.maxTimeframeTable = data.maxTimeframeTable;
+    this.names = data.entities;
+    this.nodes = data.initialNodes;
+    this.renderNodes = data.renderNodes;
+    this.smoothNodes = data.smoothNodes;
+    this.sketchNodes = data.sketchNodes;
   }
 
   update(graph) {

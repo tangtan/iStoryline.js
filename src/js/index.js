@@ -13,12 +13,10 @@ export default class iStoryline extends CharacterStore {
    * Construct the iStoryline generator for a story.
    * Once the story changed, the generator should be re-constructed.
    *
-   * @param {String} fileSrc
-   * - "./data/JurassicPark.xml"
    * @param {Array} pipeline
    * - ['GreedyOrder', 'GreedyAlign', 'GreedyCompact', 'Render', 'FreeTransform']
    */
-  constructor(fileSrc = "", pipeline = []) {
+  constructor(pipeline = []) {
     super();
     // Pipeline configuration
     this.orderModule = pipeline[0] || "GreedyOrder";
@@ -28,11 +26,17 @@ export default class iStoryline extends CharacterStore {
     this.transformModule = pipeline[4] || "FreeTransform";
     // Constraints for opimization models
     this.ctrInfo = new CtrInfo();
-    this.fileSrc = fileSrc;
   }
 
-  async ready() {
-    await this.readXMLFile(this.fileSrc);
+  /**
+   * Generate storyline visualizations from the input file.
+   *
+   * @param {String} fileSrc
+   * - "./data/JurassicPark.xml"
+   */
+  async readFile(fileSrc) {
+    await this.readXMLFile(fileSrc);
+    return this._layout();
   }
 
   /**
@@ -50,38 +54,37 @@ export default class iStoryline extends CharacterStore {
       /*[1,5],[2,5],[3,9]*/
     ]
   ) {
-    let data = this.data;
-    let graph = new Graph(data);
+    let story = this.data;
     let constraints = this.ctrInfo.ctrs;
-    let sortedSequence = storyOrder(
-      this.orderModule, 
-      data, 
+    storyOrder(
+      this.orderModule,
+      story,
       constraints
     );
-    let alignedSession = storyAlign(
+    storyAlign(
       this.alignModule,
-      sortedSequence,
+      story,
       constraints
     );
-    let initialGraph = storyCompact(
+    storyCompact(
       this.compactModule,
-      alignedSession,
+      story,
       constraints,
       inSep,
       outSep
     );
-    let renderedGraph = storyRender(
+    storyRender(
       this.renderModule,
-      initialGraph,
+      story,
       constraints
     );
-    let storyGraph = storyTransform(
+    storyTransform(
       this.transformModule,
-      renderedGraph,
+      story,
       upperPath,
       lowerPath
     );
-    graph.update(storyGraph);
+    let graph = new Graph(story);
     return graph;
   }
 
