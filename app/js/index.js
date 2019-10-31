@@ -1,14 +1,18 @@
 import Snap from "snapsvg";
 import iStoryline from "../../src/js/index";
-import { scaleLinear } from "d3-scale";
+import { scaleLinear, scaleLog } from "d3-scale";
 
 async function main(url) {
   let ans = new iStoryline();
   let graph = await ans.readFile(url);
-  const sketchNodes = normalize(graph.smoothNodes);
+  const sketchNodes = normalize(graph.renderNodes);
   // const sketchNodes = normalize(graph.sketchNodes);
+  console.log(graph);
   for (let i = 0; i < sketchNodes.length; i++) {
     let nodes = sketchNodes[i];
+    // draw text labels
+    let label = drawLabel(nodes, graph.names[i]);
+    // draw graph with animations
     let storylines = drawInitial(nodes);
     let completePathStrs = nodes.map(line => genSmoothPathStr(line));
     storylines.forEach((storyline, i) => {
@@ -78,19 +82,16 @@ function normalize(nodes, x0=100, y0=100, width=1000) {
   return nodes;
 }
 
-function draw(nodes) {
-  const svg = Snap('#mySvg');
-  const storylines = nodes.map(line => {
-    const pathStr = genSmoothPathStr(line);
-    const pathSvg = svg.path(pathStr);
-    pathSvg.attr({
-      'fill': 'none',
-      'stroke': 'black',
-      'stroke-width': 1
-    });
-    return pathSvg;
+function drawLabel(nodes, name) {
+  const svg = Snap("#mySvg");
+  let labelX = nodes[0][0][0] - 4;
+  let labelY = nodes[0][0][1] + 4;
+  console.log(name, labelX, labelY);
+  const label = svg.text(labelX, labelY, name);
+  label.attr({
+    'text-anchor': "end"
   });
-  return storylines;
+  return label;
 }
 
 function drawInitial(nodes) {
@@ -98,6 +99,17 @@ function drawInitial(nodes) {
   const storylines = nodes.map(line => {
     const pathStr = genInitialPathStr(line);
     const pathSvg = svg.path(pathStr);
+    pathSvg.hover(() => {
+      pathSvg.attr({
+        stroke: 'blue',
+        "stroke-width": 4
+      });
+    }, () => {
+      pathSvg.attr({
+        stroke: 'black',
+        "stroke-width": 1
+      });
+    });
     pathSvg.attr({
       fill: "none",
       stroke: "black",
@@ -106,6 +118,10 @@ function drawInitial(nodes) {
     return pathSvg;
   });
   return storylines;
+}
+
+function genInitialPathStr(points) {
+  return `M ${points[0][0]} ${points[0][1]} `;
 }
 
 function genSmoothPathStr(points) {
@@ -128,7 +144,22 @@ function genSmoothPathStr(points) {
   return pathStr;
 }
 
-function getSmoothPathStr(points) {
+function draw(nodes) {
+  const svg = Snap("#mySvg");
+  const storylines = nodes.map(line => {
+    const pathStr = genSmoothPathStr(line);
+    const pathSvg = svg.path(pathStr);
+    pathSvg.attr({
+      fill: "none",
+      stroke: "black",
+      "stroke-width": 1
+    });
+    return pathSvg;
+  });
+  return storylines;
+}
+
+function genSimplePathStr(points) {
   let pathStr = `M ${points[0][0]} ${points[0][1]} `;
   let i, len;
   for (i = 1, len = points.length; i < len; i += 1) {
@@ -138,11 +169,7 @@ function getSmoothPathStr(points) {
   return pathStr;
 }
 
-function genInitialPathStr(points) {
-  return `M ${points[0][0]} ${points[0][1]} `;
-}
-
-// main("./data/StarWars.xml");
+main("./data/StarWars.xml");
 // main("./data/Redhat.xml");
 // main("./data/ChasingDragon.xml");
 // main("./data/Coco.xml");
@@ -159,4 +186,4 @@ function genInitialPathStr(points) {
 // main("./data/NaniaTune.xml");
 // main("./data/Naruto.xml");
 // main("./data/Suiciders.xml");
-main("./data/TrainToBusan.xml");
+// main("./data/TrainToBusan.xml");
