@@ -5,9 +5,11 @@ import { scaleLinear, scaleLog } from "d3-scale";
 async function main(url) {
   let ans = new iStoryline();
   let graph = await ans.readFile(url);
+  // graph=ans.straighten(["Red cap"],[1,100]);
+  graph=ans.bend(["Red cap"],[11]);
   const sketchNodes = normalize(graph.renderNodes);
   // const sketchNodes = normalize(graph.sketchNodes);
-  console.log(graph);
+  // console.log(graph);
   for (let i = 0; i < sketchNodes.length; i++) {
     let nodes = sketchNodes[i];
     // draw text labels
@@ -86,7 +88,7 @@ function drawLabel(nodes, name) {
   const svg = Snap("#mySvg");
   let labelX = nodes[0][0][0] - 4;
   let labelY = nodes[0][0][1] + 4;
-  console.log(name, labelX, labelY);
+  // console.log(name, labelX, labelY);
   const label = svg.text(labelX, labelY, name);
   label.attr({
     'text-anchor': "end"
@@ -169,8 +171,8 @@ function genSimplePathStr(points) {
   return pathStr;
 }
 
-main("./data/StarWars.xml");
-// main("./data/Redhat.xml");
+// main("./data/StarWars.xml");
+main("./data/Redhat.xml");
 // main("./data/ChasingDragon.xml");
 // main("./data/Coco.xml");
 // main("./data/Frozen.xml");

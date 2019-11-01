@@ -55,6 +55,12 @@ export default class iStoryline extends CharacterStore {
     ]
   ) {
     let story = this.data;
+    delete story.initialNodes;
+    delete story.sequence;
+    delete story.sketchNodes;
+    delete story.alignedSessions;
+    delete story.renderNodes;
+    delete story.smoothNodes;
     let constraints = this.ctrInfo.ctrs;
     storyOrder(
       this.orderModule,

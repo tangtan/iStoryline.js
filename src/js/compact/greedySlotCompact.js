@@ -178,12 +178,8 @@ export function greedySlotCompact(
           let range = 1;
           if (Ycoor.get(x.begin) === undefined) {
             Ycoor.set(x.begin, max + range * din);
-            node[num].push([x.begin * 50, Ycoor.get(x.begin)]);
-            node[num].push([x.end * 50 + 25, Ycoor.get(x.begin)]);
           } else {
             Ycoor.set(x.begin, Ycoor.get(x.begin) + range * din);
-            node[num].push([x.begin * 50, Ycoor.get(x.begin)]);
-            node[num].push([x.end * 50 + 25, Ycoor.get(x.begin)]);
           }
         }
       }
