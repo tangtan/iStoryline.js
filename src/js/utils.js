@@ -1,4 +1,5 @@
-export function logNameError(type, names=[], limits=0) {
+export function logNameError(type, names=[], limits=-1) {
+  if (limits === -1 && names.length > 0) return true;
   if (names.length===limits) return true;
   console.error(`Invalid names in ${type}`);
   return false;
@@ -15,6 +16,8 @@ export function logTimeError(type, span=[]) {
     case 'Straighten':
       if (span[1]>=span[0]) return true;
       break;
+    default:
+      if (span.length===2) return true;
   }
   console.error(`Invalid time span in ${type}`);
   return false;

@@ -212,7 +212,7 @@ export default class iStoryline extends CharacterStore {
    *
    * @return graph
    */
-  compact(names, span, scale = 0.5, ctrs = []) {
+  compress(names, span, scale = 0.5, ctrs = []) {
     // Update constraints
     if (ctrs.length > 0) {
       this.ctrInfo.addCtrs(ctrs);
@@ -273,7 +273,7 @@ export default class iStoryline extends CharacterStore {
    * @return graph
    */
   space(intraSep, interSep) {
-    return this._layout((inSep = intraSep), (outSep = interSep));
+    return this._layout(intraSep, interSep);
   }
 
   /**
@@ -297,7 +297,7 @@ export default class iStoryline extends CharacterStore {
     // Update constraints
     if (ctrs.length > 0) {
       this.ctrInfo.addCtrs(ctrs);
-    } else if (logNameError("Merge", names) && logTimeError("Merge", span)) {
+    } else if (logNameError("Merge", names, 2) && logTimeError("Merge", span)) {
       this.ctrInfo.addCtr({
         names: names,
         timeSpan: span,
@@ -329,7 +329,7 @@ export default class iStoryline extends CharacterStore {
     // Update constraints
     if (ctrs.length > 0) {
       this.ctrInfo.addCtrs(ctrs);
-    } else if (logNameError("Split", names) && logTimeError("Split", span)) {
+    } else if (logNameError("Split", names, 2) && logTimeError("Split", span)) {
       this.ctrInfo.addCtr({
         names: names,
         timeSpan: span,
