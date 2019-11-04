@@ -22,7 +22,7 @@ export default class iStoryline extends CharacterStore {
     this.orderModule = pipeline[0] || "GreedyOrder";
     this.alignModule = pipeline[1] || "GreedyAlign";
     this.compactModule = pipeline[2] || "GreedySlotCompact";
-    this.renderModule = pipeline[3] || "Render";
+    this.renderModule = pipeline[3] || "SketchRender";
     this.transformModule = pipeline[4] || "FreeTransform";
     // Constraints for opimization models
     this.ctrInfo = new CtrInfo();
