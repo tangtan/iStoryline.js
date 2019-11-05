@@ -6,7 +6,8 @@ async function main(url) {
   let ans = new iStoryline();
   let graph = await ans.readFile(url);
   // graph=ans.straighten(["Red cap"],[1,100]);
-  graph=ans.bend(["Red cap"],[11]);
+  // graph=ans.bend(["Red cap"],[20]);
+  graph=ans.merge(["Mother","Red cap"],[5,10]);
   const sketchNodes = normalize(graph.renderNodes);
   // const sketchNodes = normalize(graph.sketchNodes);
   // console.log(graph);
@@ -172,7 +173,7 @@ function genSimplePathStr(points) {
 }
 
 // main("./data/StarWars.xml");
-main("./data/Redhat.xml");
+main("./data/redhat.xml");
 // main("./data/ChasingDragon.xml");
 // main("./data/Coco.xml");
 // main("./data/Frozen.xml");

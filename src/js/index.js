@@ -148,6 +148,7 @@ export default class iStoryline extends CharacterStore {
     if (ctrs.length > 0) {
       this.ctrInfo.addCtrs(ctrs);
     } else if (logNameError("Bend", names, 1) && logTimeError("Bend", span)) {
+      this._addKeytimeframe(span[0]);
       this.ctrInfo.addCtr({
         names: names,
         timeSpan: span,
