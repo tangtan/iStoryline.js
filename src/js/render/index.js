@@ -1,5 +1,5 @@
-import { render } from "./render";
-import { renderModelError } from "../utils"
+import { renderModelError } from "../utils";
+import { smoothRender } from "./smoothRender";
 import { sketchRender } from "./sketchRender";
 export function storyRender(renderModule, initialGraph, constraints) {
   switch (renderModule) {
