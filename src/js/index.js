@@ -87,7 +87,6 @@ export default class iStoryline extends CharacterStore {
     let graph = new Graph(story);
     return graph;
   }
-
   /**
    * Rearrange the order of lines
    *

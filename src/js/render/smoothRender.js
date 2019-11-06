@@ -19,7 +19,7 @@ function smoothRender(initialGraph, adjustInfo, relateInfo, stylishInfo)
     let renderNodes = calculateRenderNodes(originNodes, group);
     const {smoothNodes, styleConfig} = calculateSmoothNodes(renderNodes, originNodes, group, splitMarks, groupPosition, initialGraph, relate, stylish);
     let timeline = calculateTimeline(originNodes, renderNodes);
-    let renderedGraph = {};
+    let renderedGraph = initialGraph;
     renderedGraph.nodes = extent(originNodes, deepCopy(renderNodes));
     renderedGraph.paths = extent(originNodes, deepCopy(smoothNodes));
     renderedGraph.styleConfig = deepCopy(styleConfig);

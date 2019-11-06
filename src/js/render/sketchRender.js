@@ -19,7 +19,7 @@ function sketchRender(initialGraph, adjustInfo, relateInfo, stylishInfo) {
     let renderNodes = calculateRenderNodes(originNodes, group);
     const { sketchNodes, styleConfig } = calculateSketchNodes(renderNodes, originNodes, group, splitMarks, groupPosition, initialGraph, relate, stylish);
     let timeline = calculateTimeline(originNodes, renderNodes);
-    let renderedGraph = {};
+    let renderedGraph = initialGraph;
     renderedGraph.nodes = extent(originNodes, deepCopy(renderNodes));
     renderedGraph.paths = extent(originNodes, deepCopy(sketchNodes));
     renderedGraph.styleConfig = deepCopy(styleConfig);

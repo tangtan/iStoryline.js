@@ -750,14 +750,16 @@ export function removeAngularNodes(renderNodes, group) {
 }
 export function calculateTimeline(originNodes, renderNodes) {
     let timeline = new Map();
+    let cnt = 0;
     for(let i = 0;i < originNodes.length;i ++){
         for(let j = 0;j < originNodes[i].length;j ++){
             for(let k = 0;k < originNodes[i][j].length;k ++){
+                cnt ++;
                 let time = _getTime(originNodes,i,j,k);
                 if(timeline.has(time)){
                 }
                 else{
-                    timeline.set(time, {x:renderNodes[i][j][k][0], index:k});
+                    timeline.set(time, {x:renderNodes[i][j][k][0], index:cnt});
                 }
             }
         }

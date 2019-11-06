@@ -5,7 +5,7 @@ import { scaleLinear, scaleLog } from "d3-scale";
 async function main(url) {
   let ans = new iStoryline();
   let graph = await ans.readFile(url);
-  const sketchNodes = normalize(graph.renderNodes);
+  const sketchNodes = normalize(graph.paths);
   // const sketchNodes = normalize(graph.sketchNodes);
   console.log(graph);
   for (let i = 0; i < sketchNodes.length; i++) {
