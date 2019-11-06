@@ -5,25 +5,8 @@ import { scaleLinear, scaleLog } from "d3-scale";
 async function main(url) {
   let ans = new iStoryline();
   let graph = await ans.readFile(url);
-<<<<<<< HEAD
   const sketchNodes = normalize(graph.paths);
   // const sketchNodes = normalize(graph.sketchNodes);
-=======
-  // Sort
-  // graph = ans.sort(['Red cap', 'Mother'], [1, 25]);
-  // Straighten / Bend
-  // graph = ans.straighten(['Red cap'], [1, 20]);
-  // graph = ans.bend(['Red cap'], [11]);
-  // Compress / Expand / Space
-  // graph = ans.compress(['Red cap', 'Wolf'], [10, 20]);
-  // graph = ans.space(10, 10);
-  // Merge / Split
-  graph = ans.merge(["Red cap", "Mother"], [5, 10]);
-  // graph = ans.split(['Red cap', 'Mother'], [1, 10]);
-  // Adjust
-  // graph = ans.adjust(['Red cap'], [1, 20], [[10, 200], [100, 200]]);
-  const sketchNodes = normalize(graph.renderNodes);
->>>>>>> origin/dev
   console.log(graph);
   for (let i = 0; i < sketchNodes.length; i++) {
     let nodes = sketchNodes[i];
