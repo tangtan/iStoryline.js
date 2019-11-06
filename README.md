@@ -12,7 +12,7 @@ iStoryline.js is a JavaScript library for producing storyline visualizations wit
 
 The abundant messages of the textual stories are usually hard to be received by appreciators in a short time. As a result, storyline visualizations have become prevalent recently. Many automatic methods have been developed to generate storylines. However, these methods cannot always capture the inherent features of stories (e.g., actor mode, plot evolution). Thus, iStoryline aims to provide various interactions for users to design storyline visualizations with their design talents while minimizing the design efforts through an automatic layout module.
 
-For more information, please visit https://istoryline.github.io/
+For more information, please check [our paper](http://www.tantang.org/publication/2018_infovis_istoryline/2018_infovis_istoryline.pdf) and the [supplement material](https://istoryline.github.io/).
 
 ## Installation
 
@@ -35,11 +35,24 @@ import iStoryline from "istoryline"
 let iStoryliner = new iStoryline();
 
 // generate storyline visualizations from the story script
-let storyScriptUrl = './data/JurassicPark.xml';
+let storyScriptUrl = './data/Redcap.xml';
 
 // graph can be drawed using any canvas or svg libraries
 let graph = iStoryliner.readFile(storyScriptUrl);
+
+// obtain the characters names
+console.log(graph.names);  // ['Red cap', 'Mother', 'Wolf', 'GrandMa']
+
+// obtain the paths of the characters
+console.log(graph.paths);  // [[[x1, y1], [x2, y2], ...], ...]
+
+// obtain the timeline of the layout
+console.log(graph.timeline); // [time => x, ...]
 ```
+
+### TODO
+
+- provide the drawing APIs based on [canvas](https://www.w3schools.com/html/html5_canvas.asp) or [svg](https://www.w3schools.com/html/html5_svg.asp).
 
 ## Interactive Storyline Editor
 
@@ -62,9 +75,25 @@ iStoryline.js provides a build-in editor for producing storyline visualizations.
 
 ## Reference
 
-1. **T. Tang**, S. Rubab, J. Lai, W. Cui, L. Yu, and **Y. Wu**. iStoryline: Effective Convergence to Hand-drawn Storylines. IEEE Transactions on Visualization and Computer Graphics, 25(1):769-778, 2019.
-2. S. Liu, **Y. Wu**, E. Wei, M. Liu, and Y. Liu. StoryFlow: Tracking the Evolution of Stories. IEEE Transactions on Visualization and Computer Graphics, 19(12):2436–2445, 2013.
-3. Y. Tanahashi, C. H. Hsueh, and K.L. Ma. An Efficient Framework for Generating Storyline Visualizations from Streaming Data. IEEE Transactions on Visualization and Computer Graphics, 21(6):730–742, 2015.
+1. **T. Tang**, S. Rubab, J. Lai, W. Cui, L. Yu, and **Y. Wu**. "iStoryline: Effective Convergence to Hand-drawn Storylines. IEEE Transactions on Visualization and Computer Graphics", 25(1):769-778, 2019.
+2. S. Liu, **Y. Wu**, E. Wei, M. Liu, and Y. Liu. "StoryFlow: Tracking the Evolution of Stories. IEEE Transactions on Visualization and Computer Graphics", 19(12):2436–2445, 2013.
+
+## Citation
+
+We appreciate your citation if this library contributes to your work.
+
+```bib
+@article{iStoryline2018,
+  title = {{iStoryline: Effective Convergence to Hand-drawn Storylines}},
+  author = {Tang, Tan and Rubab, Sadia and Lai, Jiewen and Cui, Weiwei and Yu, Lingyun and Wu, Yingcai},
+  journal = {IEEE Transactions on Visualization and Computer Graphics},
+  volume = {25},
+  number = {1},
+  pages = {769--778},
+  year = {2018},
+  publisher = {IEEE}
+}
+```
 
 ## License
 
