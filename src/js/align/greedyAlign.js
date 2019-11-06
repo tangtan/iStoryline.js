@@ -293,11 +293,11 @@ export function greedyAlign(sortAns, straightInfo, bendInfo) {
   }
   if (bendInfo.length>=1)
   bendInfo.forEach(pair => {
-    bendLine.push(...pair.name,...pair.timeSpan)
+    bendLine.push([...pair.names,...pair.timeSpan])
   });
-  if (straightInfo.lenghth>=1)
+  if (straightInfo.length>=1)
   straightInfo.forEach(pair=>{
-    straightenLine.push(...pair.name,...pair.timeSpan)
+    straightenLine.push([...pair.names,...pair.timeSpan])
   });
   let alignedSessions = _alignSequence(sequence);
   let chaOrder = sequence.map(timeframe => [...timeframe[1]]);
@@ -350,11 +350,11 @@ export function greedyAlign(sortAns, straightInfo, bendInfo) {
         for (let timeframe of sequence) {
           if (timeframe[0] !== time) formerSession = timeframe[1];
           else {
-            thisSession = timeframe[1].sessionOrder[sessionId];
+            thisSession = timeframe[1][sessionId];
             break;
           }
         }
-        formerSession = formerSession.sessionOrder[alignedsessionId];
+        formerSession = formerSession[alignedsessionId];
         return [formerSession, thisSession];
       }
       let [formerSession, thisSession] = timesessionId2Alignedsession(

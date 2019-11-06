@@ -5,8 +5,25 @@ import { scaleLinear, scaleLog } from "d3-scale";
 async function main(url) {
   let ans = new iStoryline();
   let graph = await ans.readFile(url);
+<<<<<<< HEAD
   const sketchNodes = normalize(graph.paths);
   // const sketchNodes = normalize(graph.sketchNodes);
+=======
+  // Sort
+  // graph = ans.sort(['Red cap', 'Mother'], [1, 25]);
+  // Straighten / Bend
+  // graph = ans.straighten(['Red cap'], [1, 20]);
+  // graph = ans.bend(['Red cap'], [11]);
+  // Compress / Expand / Space
+  // graph = ans.compress(['Red cap', 'Wolf'], [10, 20]);
+  // graph = ans.space(10, 10);
+  // Merge / Split
+  graph = ans.merge(["Red cap", "Mother"], [5, 10]);
+  // graph = ans.split(['Red cap', 'Mother'], [1, 10]);
+  // Adjust
+  // graph = ans.adjust(['Red cap'], [1, 20], [[10, 200], [100, 200]]);
+  const sketchNodes = normalize(graph.renderNodes);
+>>>>>>> origin/dev
   console.log(graph);
   for (let i = 0; i < sketchNodes.length; i++) {
     let nodes = sketchNodes[i];
@@ -26,7 +43,7 @@ async function main(url) {
   }
 }
 
-function normalize(nodes, x0=100, y0=100, width=1000) {
+function normalize(nodes, x0 = 100, y0 = 100, width = 1000) {
   const minX = Math.min(
     ...nodes.map(storyline =>
       Math.min(
@@ -86,10 +103,10 @@ function drawLabel(nodes, name) {
   const svg = Snap("#mySvg");
   let labelX = nodes[0][0][0] - 4;
   let labelY = nodes[0][0][1] + 4;
-  console.log(name, labelX, labelY);
+  // console.log(name, labelX, labelY);
   const label = svg.text(labelX, labelY, name);
   label.attr({
-    'text-anchor': "end"
+    "text-anchor": "end"
   });
   return label;
 }
@@ -99,17 +116,20 @@ function drawInitial(nodes) {
   const storylines = nodes.map(line => {
     const pathStr = genInitialPathStr(line);
     const pathSvg = svg.path(pathStr);
-    pathSvg.hover(() => {
-      pathSvg.attr({
-        stroke: 'blue',
-        "stroke-width": 4
-      });
-    }, () => {
-      pathSvg.attr({
-        stroke: 'black',
-        "stroke-width": 1
-      });
-    });
+    pathSvg.hover(
+      () => {
+        pathSvg.attr({
+          stroke: "blue",
+          "stroke-width": 4
+        });
+      },
+      () => {
+        pathSvg.attr({
+          stroke: "black",
+          "stroke-width": 1
+        });
+      }
+    );
     pathSvg.attr({
       fill: "none",
       stroke: "black",
@@ -134,13 +154,15 @@ function genSmoothPathStr(points) {
     const middleX = (rPoint[0] + lPoint[0]) / 2;
     pathStr += `L ${rPoint[0]} ${rPoint[1]} `;
     if (rPoint[1] !== lPoint[1]) {
-      pathStr += `C ${middleX} ${rPoint[1]} ${middleX} ${lPoint[1]} ${lPoint[0]} ${lPoint[1]} `;
+      pathStr += `C ${middleX} ${rPoint[1]} ${middleX} ${lPoint[1]} ${
+        lPoint[0]
+      } ${lPoint[1]} `;
     } else {
-      pathStr += `L ${lPoint[0]} ${lPoint[1]} `
+      pathStr += `L ${lPoint[0]} ${lPoint[1]} `;
     }
   }
-  if(i < len) pathStr += `L ${points[i][0]} ${points[i][1]}`;
-  else pathStr += `L ${points[i-1][0]} ${points[i-1][1]}`;
+  if (i < len) pathStr += `L ${points[i][0]} ${points[i][1]}`;
+  else pathStr += `L ${points[i - 1][0]} ${points[i - 1][1]}`;
   return pathStr;
 }
 
@@ -170,7 +192,7 @@ function genSimplePathStr(points) {
 }
 
 main("./data/StarWars.xml");
-// main("./data/Redhat.xml");
+// main("./data/Redcap.xml");
 // main("./data/ChasingDragon.xml");
 // main("./data/Coco.xml");
 // main("./data/Frozen.xml");
