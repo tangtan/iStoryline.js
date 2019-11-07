@@ -1,50 +1,55 @@
 {
-    "name": "iStoryline",
-    "version": "0.0.1",
-    "description": "Implementation of [iStoryline](http://www.tantang.org/publication/2018_infovis_istoryline/2018_infovis_istoryline.pdf)",
-    "keywords": [
-        "Storyline",
-        "Visualization",
-        "Narrative"
-    ],
-    "author": {
-        "name": "Tan Tang",
-        "url": "http://www.tantang.org/"
-    },
-    "main": "src/js/index.js",
-    "module": "index",
-    "jsnext:main": "index",
-    "license": "Apache-2.0",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/tangtan/istoryline"
-    },
-    "eslintConfig": {
-        "env": {
-            "browser": true
-        }
-    },
-    "scripts": {
-        "build": "babel src -d build",
-        "start": "webpack-dev-server"
-    },
-    "dependencies": {
-        "babel-core": "^6.25.0",
-        "babel-loader": "^7.1.1",
-        "babel-preset-es2015": "^6.24.1",
-        "d3-fetch": "^1.1.2",
-        "d3-scale": "^3.1.0",
-        "html-webpack-plugin": "^2.29.0",
-        "quadprog": "^1.5.1",
-        "snapsvg": "^0.5.1",
-        "webpack": "^3.3.0",
-        "webpack-dev-server": "^3.1.11"
-    },
-    "devDependencies": {
-        "babel-cli": "^6.24.1",
-        "babel-preset-env": "^1.6.0",
-        "imports-loader": "^0.8.0",
-        "roughjs": "^2.0.0",
-        "workly": "^1.0.1"
+  "name": "iStoryline",
+  "version": "0.0.1",
+  "description": "Implementation of [iStoryline](http://www.tantang.org/publication/2018_infovis_istoryline/2018_infovis_istoryline.pdf)",
+  "keywords": [
+    "Storyline",
+    "Visualization",
+    "Narrative"
+  ],
+  "author": {
+    "name": "Tan Tang",
+    "url": "http://www.tantang.org/"
+  },
+  "main": "src/js/index.js",
+  "module": "index",
+  "jsnext:main": "index",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tangtan/istoryline"
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true
     }
+  },
+  "scripts": {
+    "build": "babel src -d build",
+    "start": "webpack-dev-server"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  },
+  "dependencies": {
+    "d3-fetch": "^1.1.2",
+    "d3-scale": "^3.2.0",
+    "quadprog": "^1.5.1",
+    "snapsvg": "^0.5.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.7.0",
+    "@babel/core": "^7.7.2",
+    "babel-preset-env": "^1.7.0",
+    "html-webpack-plugin": "^3.2.0",
+    "imports-loader": "^0.8.0",
+    "prettier": "1.18.2",
+    "husky": "^3.0.9",
+    "pretty-quick": "^2.0.1",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.9.0"
+  }
 }

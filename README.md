@@ -7,8 +7,8 @@
 
 iStoryline.js is a JavaScript library for producing storyline visualizations with diverse sketchy styles. [Storyline visualization](https://xkcd.com/657/) is a fancy way to tell a story. Lines represent characters in the story. This fancy visualization naturally has some advantages in explaining the story:
 
-* The undulations of the lines can vividly represent the evolution of the plot.
-* The interval between the lines can also display the relation of the characters in a concise and quick manner. 
+- The undulations of the lines can vividly represent the evolution of the plot.
+- The interval between the lines can also display the relation of the characters in a concise and quick manner.
 
 The abundant messages of the textual stories are usually hard to be received by appreciators in a short time. As a result, storyline visualizations have become prevalent recently. Many automatic methods have been developed to generate storylines. However, these methods cannot always capture the inherent features of stories (e.g., actor mode, plot evolution). Thus, iStoryline aims to provide various interactions for users to design storyline visualizations with their design talents while minimizing the design efforts through an automatic layout module.
 
@@ -61,7 +61,7 @@ iStoryline.js provides a build-in editor for producing storyline visualizations.
 1. Install Node.js (>= 6.0)
 2. Install dependencies `npm i` or `yarn`
 
-3. Start the editor `npm start`
+3. Start the editor `npm run start`
 
 4. Please visit [localhost:8080](http://localhost:8080)
 
@@ -100,9 +100,9 @@ We appreciate your citation if this library contributes to your work.
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
-    
+
        http://www.apache.org/licenses/LICENSE-2.0
-    
+
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.

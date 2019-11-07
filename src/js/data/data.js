@@ -1,4 +1,4 @@
-import {xml} from "d3-fetch"
+import { xml } from "d3-fetch";
 
 /**
  * dealing with the I/O operations, e.g., read xml file
@@ -19,8 +19,10 @@ export class DataStore {
     this.Keytimeframe = [];
   }
 
-  addKeytimeframe(time) {
-    this.Keytimeframe.push(time);
+  _addKeytimeframe(time) {
+    if (this.data.keyTimeframe.indexOf(time) !== -1) return;
+    this.data.keyTimeframe.push(time);
+    this.data.keyTimeframe.sort((a, b) => a - b);
   }
 
   preprocessData(data) {
@@ -36,35 +38,33 @@ export class DataStore {
         }
         keyTimeframe.add(entityInfo.start);
         keyTimeframe.add(entityInfo.end);
-        timeframeTable.get(entity).push([entityInfo.start,entityInfo.end]);
+        timeframeTable.get(entity).push([entityInfo.start, entityInfo.end]);
         // if (entityInfo.end > timeframeTable.get(entity))
         //   timeframeTable.set(entity, entityInfo.end);
       });
     }
     data.entities = [...entities];
     data.keyTimeframe = [...keyTimeframe].sort((a, b) => a - b);
-    for (let [_,value] of timeframeTable)
-    {
-      let resortTable=[...value].sort((a,b)=>a[0]-b[0]);
-      let head=1;
-      let ans=[resortTable[0]];
-      for (;head<resortTable.length;head++){
-        if (resortTable[head][0]===ans[ans.length-1][1]){
-          ans[ans.length-1][1]=resortTable[head][1];
-        }
-        else {
+    for (let [_, value] of timeframeTable) {
+      let resortTable = [...value].sort((a, b) => a[0] - b[0]);
+      let head = 1;
+      let ans = [resortTable[0]];
+      for (; head < resortTable.length; head++) {
+        if (resortTable[head][0] === ans[ans.length - 1][1]) {
+          ans[ans.length - 1][1] = resortTable[head][1];
+        } else {
           ans.push(resortTable[head]);
         }
       }
-      timeframeTable.set(_,ans);
+      timeframeTable.set(_, ans);
     }
     data.timeframeTable = timeframeTable;
   }
 
   async readXMLFile(fileSrc) {
-    let xmldata= await xml(fileSrc);
+    let xmldata = await xml(fileSrc);
     let locationTree = {},
-    sessionTable = new Map();
+      sessionTable = new Map();
     let story = xmldata.querySelector("Story");
     let characters = story.querySelector("Characters");
     sessionTable = this.constructSessionTable(characters);
