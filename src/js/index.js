@@ -22,7 +22,7 @@ export default class iStoryline extends CharacterStore {
     this.orderModule = pipeline[0] || "GreedyOrder";
     this.alignModule = pipeline[1] || "GreedyAlign";
     this.compactModule = pipeline[2] || "GreedySlotCompact";
-    this.renderModule = pipeline[3] || "SketchRender";
+    this.renderModule = pipeline[3] || "SmoothRender";
     this.transformModule = pipeline[4] || "FreeTransform";
     // Constraints for opimization models
     this.ctrInfo = new CtrInfo();
@@ -62,34 +62,11 @@ export default class iStoryline extends CharacterStore {
     delete story.renderNodes;
     delete story.smoothNodes;
     let constraints = this.ctrInfo.ctrs;
-    storyOrder(
-      this.orderModule,
-      story,
-      constraints
-    );
-    storyAlign(
-      this.alignModule,
-      story,
-      constraints
-    );
-    storyCompact(
-      this.compactModule,
-      story,
-      constraints,
-      inSep,
-      outSep
-    );
-    storyRender(
-      this.renderModule,
-      story,
-      constraints
-    );
-    storyTransform(
-      this.transformModule,
-      story,
-      upperPath,
-      lowerPath
-    );
+    storyOrder(this.orderModule, story, constraints);
+    storyAlign(this.alignModule, story, constraints);
+    storyCompact(this.compactModule, story, constraints, inSep, outSep);
+    storyRender(this.renderModule, story, constraints);
+    storyTransform(this.transformModule, story, upperPath, lowerPath);
     let graph = new Graph(story);
     return graph;
   }

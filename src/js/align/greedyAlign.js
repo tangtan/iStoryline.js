@@ -285,20 +285,19 @@ function _getAlignedSessionPairs(pathTable) {
 export function greedyAlign(sortAns, straightInfo, bendInfo) {
   let data = sortAns;
   let sequence = sortAns.sequence;
-  bendLine=[];
-  straightenLine=[];
-  for (let [_,order] of sequence)
-  {
+  bendLine = [];
+  straightenLine = [];
+  for (let [_, order] of sequence) {
     order.unshift(undefined);
   }
-  if (bendInfo.length>=1)
-  bendInfo.forEach(pair => {
-    bendLine.push([...pair.names,...pair.timeSpan])
-  });
-  if (straightInfo.length>=1)
-  straightInfo.forEach(pair=>{
-    straightenLine.push([...pair.names,...pair.timeSpan])
-  });
+  if (bendInfo.length >= 1)
+    bendInfo.forEach(pair => {
+      bendLine.push([...pair.names, ...pair.timeSpan]);
+    });
+  if (straightInfo.length >= 1)
+    straightInfo.forEach(pair => {
+      straightenLine.push([...pair.names, ...pair.timeSpan]);
+    });
   let alignedSessions = _alignSequence(sequence);
   let chaOrder = sequence.map(timeframe => [...timeframe[1]]);
 
@@ -400,8 +399,7 @@ export function greedyAlign(sortAns, straightInfo, bendInfo) {
       }
     }
   }
-  for (let [_,order] of sequence)
-  {
+  for (let [_, order] of sequence) {
     order.shift();
   }
   //在sequence中找到straightchaName，对应得alignSessions，再调换角色
@@ -411,5 +409,3 @@ export function greedyAlign(sortAns, straightInfo, bendInfo) {
   greedyAlignAns.alignedSessions = alignedSessions;
   return greedyAlignAns;
 }
-
-export { storyAlign };

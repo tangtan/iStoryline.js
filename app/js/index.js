@@ -14,7 +14,7 @@ async function main(url) {
     let label = drawLabel(nodes, graph.names[i]);
     // draw graph with animations
     let storylines = drawInitial(nodes);
-    let completePathStrs = nodes.map(line => genSmoothPathStr(line));
+    let completePathStrs = nodes.map(line => genSimplePathStr(line));
     storylines.forEach((storyline, i) => {
       storyline.animate(
         {
