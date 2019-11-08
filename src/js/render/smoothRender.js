@@ -1,4 +1,10 @@
-import { calculateOriginNodes, extent, linkNodes } from "./baseRender";
+import {
+  calculateOriginNodes,
+  extent,
+  linkNodes,
+  normalize,
+  simplifyPaths
+} from "./baseRender";
 import { initializeGroup } from "./baseRender";
 import { judgeStylishAndRelate } from "./baseRender";
 import { initializeSplitMarks } from "./baseRender";
@@ -9,7 +15,14 @@ import { calculateTimeline } from "./baseRender";
 import { removeAngularNodes } from "./baseRender";
 import { calculateStyles } from "./baseRender";
 import { deepCopy } from "./baseRender";
-function smoothRender(initialGraph, adjustInfo, relateInfo, stylishInfo) {
+
+function smoothRender(
+  initialGraph,
+  adjustInfo,
+  relateInfo,
+  stylishInfo,
+  scaleInfo
+) {
   let originNodes = calculateOriginNodes(
     initialGraph.initialNodes,
     initialGraph.timeframeTable,
@@ -34,12 +47,35 @@ function smoothRender(initialGraph, adjustInfo, relateInfo, stylishInfo) {
     relate,
     stylish
   );
-  let timeline = calculateTimeline(originNodes, renderNodes);
+  let extentNodes = extent(originNodes, deepCopy(renderNodes));
+  let extentPaths = extent(originNodes, deepCopy(smoothNodes));
+  extentPaths = simplifyPaths(extentPaths, 25);
   let renderedGraph = initialGraph;
-  renderedGraph.nodes = extent(originNodes, deepCopy(renderNodes));
-  renderedGraph.paths = extent(originNodes, deepCopy(smoothNodes));
+  const x0 = scaleInfo.length > 0 ? scaleInfo[0].param.x0 || 0 : 0;
+  const y0 = scaleInfo.length > 0 ? scaleInfo[0].param.y0 || 0 : 0;
+  const width = scaleInfo.length > 0 ? scaleInfo[0].param.width || 1000 : 1000;
+  const height = scaleInfo.length > 0 ? scaleInfo[0].param.height || 372 : 372;
+  const reserveRatio =
+    scaleInfo.length > 0 ? scaleInfo[0].param.reserveRatio || false : false;
+  renderedGraph.nodes = normalize(
+    extentNodes,
+    x0,
+    y0,
+    width,
+    height,
+    reserveRatio
+  );
+  renderedGraph.paths = normalize(
+    extentPaths,
+    x0,
+    y0,
+    width,
+    height,
+    reserveRatio
+  );
   renderedGraph.styleConfig = deepCopy(styleConfig);
-  renderedGraph.timeline = timeline;
+  // TODO: inconsistent timeline
+  renderedGraph.timeline = calculateTimeline(originNodes, renderNodes);
   return renderedGraph;
 }
 function calculateSmoothNodes(

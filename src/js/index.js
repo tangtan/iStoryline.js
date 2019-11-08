@@ -44,16 +44,7 @@ export default class iStoryline extends CharacterStore {
    *
    * @return graph
    */
-  _layout(
-    inSep = 1000,
-    outSep = 10,
-    upperPath = [
-      /*[1,1],[2,3],[3,4]*/
-    ],
-    lowerPath = [
-      /*[1,5],[2,5],[3,9]*/
-    ]
-  ) {
+  _layout() {
     let story = this.data;
     delete story.initialNodes;
     delete story.sequence;
@@ -64,9 +55,9 @@ export default class iStoryline extends CharacterStore {
     let constraints = this.ctrInfo.ctrs;
     storyOrder(this.orderModule, story, constraints);
     storyAlign(this.alignModule, story, constraints);
-    storyCompact(this.compactModule, story, constraints, inSep, outSep);
+    storyCompact(this.compactModule, story, constraints);
     storyRender(this.renderModule, story, constraints);
-    storyTransform(this.transformModule, story, upperPath, lowerPath);
+    storyTransform(this.transformModule, story, constraints);
     let graph = new Graph(story);
     return graph;
   }
@@ -194,13 +185,13 @@ export default class iStoryline extends CharacterStore {
     if (ctrs.length > 0) {
       this.ctrInfo.addCtrs(ctrs);
     } else if (
-      logNameError("Compact", names) &&
-      logTimeError("Compact", span)
+      logNameError("Compress", names) &&
+      logTimeError("Compress", span)
     ) {
       this.ctrInfo.addCtr({
         names: names,
         timeSpan: span,
-        style: "Compact",
+        style: "Compress",
         param: { scale: scale }
       });
     }
@@ -250,7 +241,16 @@ export default class iStoryline extends CharacterStore {
    * @return graph
    */
   space(intraSep, interSep) {
-    return this._layout(intraSep, interSep);
+    this.ctrInfo.updateCtr({
+      names: [],
+      timeSpan: [],
+      style: "Scale",
+      param: {
+        intraSep: intraSep,
+        interSep: interSep
+      }
+    });
+    return this._layout();
   }
 
   /**
@@ -413,7 +413,7 @@ export default class iStoryline extends CharacterStore {
       logNameError("Stylish", names, 2) &&
       logTimeError("Stylish", span)
     ) {
-      this.stylishInfo.push({
+      this.ctrInfo.addCtr({
         names: names,
         timeSpan: span,
         style: style,
@@ -434,21 +434,43 @@ export default class iStoryline extends CharacterStore {
    *
    * @return graph
    */
-  reshape(upperPath, lowerPath) {
-    return this._layout((upperPath = upperPath), (lowerPath = lowerPath));
+  reshape(upperPath = [], lowerPath = []) {
+    this.ctrInfo.updateCtr({
+      names: [],
+      timeSpan: [],
+      style: "Reshape",
+      param: {
+        upperPath: upperPath,
+        lowerPath: lowerPath
+      }
+    });
+    return this._layout();
   }
 
   /**
    * Change the size of storyline visualization
    *
+   * @param {Number} x0
+   * @param {Number} y0
    * @param {Number} width
    * @param {Number} height
    * @param {Boolean} reserveRatio
    *
    * @return graph
    */
-  scale(width, height, reserveRatio = false) {
-    // TODO
+  scale(x0, y0, width, height, reserveRatio) {
+    this.ctrInfo.updateCtr({
+      names: [],
+      timeSpan: [],
+      style: "Scale",
+      param: {
+        x0: x0 || 0,
+        y0: y0 || 0,
+        width: width || 1000,
+        height: height || 372,
+        reserveRatio: reserveRatio || false
+      }
+    });
     return this._layout();
   }
 }

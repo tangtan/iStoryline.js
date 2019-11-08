@@ -1,3 +1,6 @@
+import { scaleLinear } from "d3-scale";
+import simplify from "simplify-js";
+
 function _checkAngle(
   storyline,
   storylineID,
@@ -1336,4 +1339,86 @@ function _forRelateTurn(tmpSketchNodes, rate, stdY, HEIGHT) {
     SAMPLERATE
   );
   return { aNodes, bNodes };
+}
+
+export function normalize(
+  nodes,
+  x0 = 0,
+  y0 = 0,
+  width = 1000,
+  height = 372,
+  reserveRatio = true,
+  thres = 0.15,
+  idealRatio = 0.372
+) {
+  const minX = Math.min(
+    ...nodes.map(storyline =>
+      Math.min(
+        ...storyline.map(storysegment =>
+          Math.min(...storysegment.map(storynode => storynode[0]))
+        )
+      )
+    )
+  );
+  const maxX = Math.max(
+    ...nodes.map(storyline =>
+      Math.min(
+        ...storyline.map(storysegment =>
+          Math.max(...storysegment.map(storynode => storynode[0]))
+        )
+      )
+    )
+  );
+  const minY = Math.min(
+    ...nodes.map(storyline =>
+      Math.min(
+        ...storyline.map(storysegment =>
+          Math.min(...storysegment.map(storynode => storynode[1]))
+        )
+      )
+    )
+  );
+  const maxY = Math.max(
+    ...nodes.map(storyline =>
+      Math.min(
+        ...storyline.map(storysegment =>
+          Math.max(...storysegment.map(storynode => storynode[1]))
+        )
+      )
+    )
+  );
+  let ratio = (maxY - minY) / (maxX - minX);
+  ratio = ratio < thres ? idealRatio : ratio;
+  const xScale = scaleLinear()
+    .domain([minX, maxX])
+    .range([x0, x0 + width]);
+  const yScale = scaleLinear()
+    .domain([minY, maxY])
+    .range([y0, reserveRatio ? y0 + width * ratio : y0 + height]);
+  nodes.forEach(storyline => {
+    storyline.forEach(storysegment => {
+      storysegment.forEach(storynode => {
+        storynode[0] = xScale(storynode[0]);
+        storynode[1] = yScale(storynode[1]);
+      });
+    });
+  });
+  return nodes;
+}
+
+export function simplifyPaths(nodes, tolerance = 5, highQuality = false) {
+  let _nodes = [];
+  nodes.forEach(storyLine => {
+    let _storyLine = [];
+    storyLine.forEach(storySegment => {
+      const points = storySegment.map(node => {
+        return { x: node[0], y: node[1] };
+      });
+      const simpliedPoints = simplify(points, tolerance, highQuality);
+      const simpliedNodes = simpliedPoints.map(point => [point.x, point.y]);
+      _storyLine.push(simpliedNodes);
+    });
+    _nodes.push(_storyLine);
+  });
+  return _nodes;
 }

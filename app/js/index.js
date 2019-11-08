@@ -1,17 +1,16 @@
 import Snap from "snapsvg";
 import iStoryline from "../../src/js/index";
-import { scaleLinear, scaleLog } from "d3-scale";
 
 async function main(url) {
   let ans = new iStoryline();
   let graph = await ans.readFile(url);
-  const sketchNodes = normalize(graph.paths);
-  // const sketchNodes = normalize(graph.sketchNodes);
+  graph = ans.scale(100, 100, 800, 500, true);
+  const sketchNodes = graph.paths;
   console.log(graph);
   for (let i = 0; i < sketchNodes.length; i++) {
     let nodes = sketchNodes[i];
     // draw text labels
-    let label = drawLabel(nodes, graph.names[i]);
+    drawLabel(nodes, graph.names[i]);
     // draw graph with animations
     let storylines = drawInitial(nodes);
     let completePathStrs = nodes.map(line => genSimplePathStr(line));
@@ -24,62 +23,6 @@ async function main(url) {
       );
     });
   }
-}
-
-function normalize(nodes, x0 = 100, y0 = 100, width = 1000) {
-  const minX = Math.min(
-    ...nodes.map(storyline =>
-      Math.min(
-        ...storyline.map(storysegment =>
-          Math.min(...storysegment.map(storynode => storynode[0]))
-        )
-      )
-    )
-  );
-  const maxX = Math.max(
-    ...nodes.map(storyline =>
-      Math.min(
-        ...storyline.map(storysegment =>
-          Math.max(...storysegment.map(storynode => storynode[0]))
-        )
-      )
-    )
-  );
-  const minY = Math.min(
-    ...nodes.map(storyline =>
-      Math.min(
-        ...storyline.map(storysegment =>
-          Math.min(...storysegment.map(storynode => storynode[1]))
-        )
-      )
-    )
-  );
-  const maxY = Math.max(
-    ...nodes.map(storyline =>
-      Math.min(
-        ...storyline.map(storysegment =>
-          Math.max(...storysegment.map(storynode => storynode[1]))
-        )
-      )
-    )
-  );
-  let ratio = (maxY - minY) / (maxX - minX);
-  ratio = ratio < 0.15 ? 0.372 : ratio;
-  const xScale = scaleLinear()
-    .domain([minX, maxX])
-    .range([x0, x0 + width]);
-  const yScale = scaleLinear()
-    .domain([minY, maxY])
-    .range([y0, y0 + width * ratio]);
-  nodes.forEach(storyline => {
-    storyline.forEach(storysegment => {
-      storysegment.forEach(storynode => {
-        storynode[0] = xScale(storynode[0]);
-        storynode[1] = yScale(storynode[1]);
-      });
-    });
-  });
-  return nodes;
 }
 
 function drawLabel(nodes, name) {
@@ -174,18 +117,17 @@ function genSimplePathStr(points) {
   return pathStr;
 }
 
-main("./data/StarWars.xml");
+// main("./data/StarWars.xml");
 // main("./data/Redcap.xml");
 // main("./data/ChasingDragon.xml");
 // main("./data/Coco.xml");
 // main("./data/Frozen.xml");
 // main("./data/Guowuguan.xml");
-// main("./data/InceptionTune.xml");
+main("./data/InceptionTune.xml");
 // main("./data/JurassicParkTune.xml");
 // main("./data/KingLearTune.xml");
 // main("./data/LetBulletFlyTune.xml");
 // main("./data/MatrixTune.xml");
-// main("./data/MatrixHand.xml");
 // main("./data/Moon.xml");
 // main("./data/Minions.xml");
 // main("./data/NaniaTune.xml");
