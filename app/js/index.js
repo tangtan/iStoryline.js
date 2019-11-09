@@ -1,6 +1,5 @@
 import Snap from "snapsvg";
 import iStoryline from "../../src/js/index";
-import { scaleLinear, scaleLog } from "d3-scale";
 
 async function main(url) {
   let ans = new iStoryline();
@@ -8,18 +7,20 @@ async function main(url) {
   // graph=ans.straighten(["Red cap"],[1,100]);
   // graph=ans.bend(["Red cap"],[20]);
   // graph=ans.merge(["Mother","Red cap"],[5,10]);
-  debugger;
-  graph=ans.expand(["Mother","Red cap"],[5,10],10);
-  const sketchNodes = normalize(graph.renderNodes);
+  // graph=ans.expand(["Mother","Red cap"],[5,10],10);
+  // const sketchNodes = normalize(graph.renderNodes);
   // const sketchNodes = normalize(graph.sketchNodes);
   // console.log(graph);
+  graph = ans.scale(100, 100, 800, 500, true);
+  const sketchNodes = graph.paths;
+  console.log(graph);
   for (let i = 0; i < sketchNodes.length; i++) {
     let nodes = sketchNodes[i];
     // draw text labels
-    let label = drawLabel(nodes, graph.names[i]);
+    drawLabel(nodes, graph.names[i]);
     // draw graph with animations
     let storylines = drawInitial(nodes);
-    let completePathStrs = nodes.map(line => genSmoothPathStr(line));
+    let completePathStrs = nodes.map(line => genSimplePathStr(line));
     storylines.forEach((storyline, i) => {
       storyline.animate(
         {
@@ -31,62 +32,6 @@ async function main(url) {
   }
 }
 
-function normalize(nodes, x0=100, y0=100, width=1000) {
-  const minX = Math.min(
-    ...nodes.map(storyline =>
-      Math.min(
-        ...storyline.map(storysegment =>
-          Math.min(...storysegment.map(storynode => storynode[0]))
-        )
-      )
-    )
-  );
-  const maxX = Math.max(
-    ...nodes.map(storyline =>
-      Math.min(
-        ...storyline.map(storysegment =>
-          Math.max(...storysegment.map(storynode => storynode[0]))
-        )
-      )
-    )
-  );
-  const minY = Math.min(
-    ...nodes.map(storyline =>
-      Math.min(
-        ...storyline.map(storysegment =>
-          Math.min(...storysegment.map(storynode => storynode[1]))
-        )
-      )
-    )
-  );
-  const maxY = Math.max(
-    ...nodes.map(storyline =>
-      Math.min(
-        ...storyline.map(storysegment =>
-          Math.max(...storysegment.map(storynode => storynode[1]))
-        )
-      )
-    )
-  );
-  let ratio = (maxY - minY) / (maxX - minX);
-  ratio = ratio < 0.15 ? 0.372 : ratio;
-  const xScale = scaleLinear()
-    .domain([minX, maxX])
-    .range([x0, x0 + width]);
-  const yScale = scaleLinear()
-    .domain([minY, maxY])
-    .range([y0, y0 + width * ratio]);
-  nodes.forEach(storyline => {
-    storyline.forEach(storysegment => {
-      storysegment.forEach(storynode => {
-        storynode[0] = xScale(storynode[0]);
-        storynode[1] = yScale(storynode[1]);
-      });
-    });
-  });
-  return nodes;
-}
-
 function drawLabel(nodes, name) {
   const svg = Snap("#mySvg");
   let labelX = nodes[0][0][0] - 4;
@@ -94,7 +39,7 @@ function drawLabel(nodes, name) {
   // console.log(name, labelX, labelY);
   const label = svg.text(labelX, labelY, name);
   label.attr({
-    'text-anchor': "end"
+    "text-anchor": "end"
   });
   return label;
 }
@@ -104,17 +49,20 @@ function drawInitial(nodes) {
   const storylines = nodes.map(line => {
     const pathStr = genInitialPathStr(line);
     const pathSvg = svg.path(pathStr);
-    pathSvg.hover(() => {
-      pathSvg.attr({
-        stroke: 'blue',
-        "stroke-width": 4
-      });
-    }, () => {
-      pathSvg.attr({
-        stroke: 'black',
-        "stroke-width": 1
-      });
-    });
+    pathSvg.hover(
+      () => {
+        pathSvg.attr({
+          stroke: "blue",
+          "stroke-width": 4
+        });
+      },
+      () => {
+        pathSvg.attr({
+          stroke: "black",
+          "stroke-width": 1
+        });
+      }
+    );
     pathSvg.attr({
       fill: "none",
       stroke: "black",
@@ -139,13 +87,15 @@ function genSmoothPathStr(points) {
     const middleX = (rPoint[0] + lPoint[0]) / 2;
     pathStr += `L ${rPoint[0]} ${rPoint[1]} `;
     if (rPoint[1] !== lPoint[1]) {
-      pathStr += `C ${middleX} ${rPoint[1]} ${middleX} ${lPoint[1]} ${lPoint[0]} ${lPoint[1]} `;
+      pathStr += `C ${middleX} ${rPoint[1]} ${middleX} ${lPoint[1]} ${
+        lPoint[0]
+      } ${lPoint[1]} `;
     } else {
-      pathStr += `L ${lPoint[0]} ${lPoint[1]} `
+      pathStr += `L ${lPoint[0]} ${lPoint[1]} `;
     }
   }
-  if(i < len) pathStr += `L ${points[i][0]} ${points[i][1]}`;
-  else pathStr += `L ${points[i-1][0]} ${points[i-1][1]}`;
+  if (i < len) pathStr += `L ${points[i][0]} ${points[i][1]}`;
+  else pathStr += `L ${points[i - 1][0]} ${points[i - 1][1]}`;
   return pathStr;
 }
 
@@ -185,7 +135,6 @@ main("./data/redhat.xml");
 // main("./data/KingLearTune.xml");
 // main("./data/LetBulletFlyTune.xml");
 // main("./data/MatrixTune.xml");
-// main("./data/MatrixHand.xml");
 // main("./data/Moon.xml");
 // main("./data/Minions.xml");
 // main("./data/NaniaTune.xml");
