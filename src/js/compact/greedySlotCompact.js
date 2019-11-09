@@ -184,18 +184,7 @@ export function greedySlotCompact(
             Ycoor.set(x.begin, max + range * din); //加入一个节点
             if (mergePair !== undefined) {
               if (mergePair[0][0] === name) {
-<<<<<<< HEAD
-                if (mergePair.length===3) mergePair[3]=new Map();
-                mergePair[3].set(x.begin,max + range * din); //merge的第一个的坐标
-                node[num].push([x.begin * 50, Ycoor.get(x.begin)]);
-                node[num].push([x.end * 50 + 25, Ycoor.get(x.begin)]);
-              } else { //merge后面的
-                node[num].push([x.begin * 50, mergePair[3].get(x.begin)]);
-                node[num].push([x.end * 50 + 25, mergePair[3].get(x.begin)]);
-              }
-            } else {//正常的
-=======
-                mergePair[3] = new Map();
+                if (mergePair.length === 3) mergePair[3] = new Map();
                 mergePair[3].set(x.begin, max + range * din); //merge的第一个的坐标
                 node[num].push([x.begin * 50, Ycoor.get(x.begin)]);
                 node[num].push([x.end * 50 + 25, Ycoor.get(x.begin)]);
@@ -206,7 +195,6 @@ export function greedySlotCompact(
               }
             } else {
               //正常的
->>>>>>> dev
               node[num].push([x.begin * 50, Ycoor.get(x.begin)]);
               node[num].push([x.end * 50 + 25, Ycoor.get(x.begin)]);
             }
@@ -214,20 +202,8 @@ export function greedySlotCompact(
             //已经有了节点的基础，向上累加
             Ycoor.set(x.begin, Ycoor.get(x.begin) + range * din);
             if (mergePair !== undefined)
-<<<<<<< HEAD
-              if (mergePair[0][0]===name){
-                if (mergePair.length===3) mergePair[3]=new Map();
-                mergePair[3].set(x.begin,Ycoor.get(x.begin));
-                node[num].push([x.begin * 50, Ycoor.get(x.begin)]);
-                node[num].push([x.end * 50 + 25, Ycoor.get(x.begin)]);
-              }else{
-                node[num].push([x.begin * 50, mergePair[3].get(x.begin)]);
-                node[num].push([x.end * 50 + 25, mergePair[3].get(x.begin)]);
-              }
-            else{
-=======
               if (mergePair[0][0] === name) {
-                mergePair[3] = new Map();
+                if (mergePair.length === 3) mergePair[3] = new Map();
                 mergePair[3].set(x.begin, Ycoor.get(x.begin));
                 node[num].push([x.begin * 50, Ycoor.get(x.begin)]);
                 node[num].push([x.end * 50 + 25, Ycoor.get(x.begin)]);
@@ -236,7 +212,6 @@ export function greedySlotCompact(
                 node[num].push([x.end * 50 + 25, mergePair[3].get(x.begin)]);
               }
             else {
->>>>>>> dev
               node[num].push([x.begin * 50, Ycoor.get(x.begin)]);
               node[num].push([x.end * 50 + 25, Ycoor.get(x.begin)]);
             }

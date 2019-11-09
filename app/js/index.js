@@ -125,7 +125,7 @@ function genSimplePathStr(points) {
 }
 
 // main("./data/StarWars.xml");
-main("./data/redhat.xml");
+main("./data/Redcap.xml");
 // main("./data/ChasingDragon.xml");
 // main("./data/Coco.xml");
 // main("./data/Frozen.xml");

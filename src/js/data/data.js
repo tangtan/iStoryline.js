@@ -20,18 +20,10 @@ export class DataStore {
   }
 
   _addKeytimeframe(time) {
-<<<<<<< HEAD
-    if (this.data.keyTimeframe.indexOf(time)!==-1) return;
-    this.data.keyTimeframe.push(time);
-    this.data.keyTimeframe.sort((a,b)=>(a-b));
-=======
     if (this.data.keyTimeframe.indexOf(time) !== -1) return;
     this.data.keyTimeframe.push(time);
     this.data.keyTimeframe.sort((a, b) => a - b);
->>>>>>> dev
   }
-
-
 
   preprocessData(data) {
     let entities = new Set(),
