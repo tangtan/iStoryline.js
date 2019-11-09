@@ -7,7 +7,9 @@ async function main(url) {
   let graph = await ans.readFile(url);
   // graph=ans.straighten(["Red cap"],[1,100]);
   // graph=ans.bend(["Red cap"],[20]);
-  graph=ans.merge(["Mother","Red cap"],[5,10]);
+  // graph=ans.merge(["Mother","Red cap"],[5,10]);
+  debugger;
+  graph=ans.expand(["Mother","Red cap"],[5,10],10);
   const sketchNodes = normalize(graph.renderNodes);
   // const sketchNodes = normalize(graph.sketchNodes);
   // console.log(graph);

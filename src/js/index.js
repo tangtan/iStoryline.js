@@ -254,7 +254,7 @@ export default class iStoryline extends CharacterStore {
     // Update constraints
     if (ctrs.length > 0) {
       this.ctrInfo.addCtrs(ctrs);
-    } else if (logNameError("Extend", names) && logTimeError("Extend", span)) {
+    } else if (logNameError("Expand", names) && logTimeError("Expand", span)) {
       this.ctrInfo.addCtr({
         names: names,
         timeSpan: span,

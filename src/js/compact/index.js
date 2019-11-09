@@ -15,7 +15,7 @@ export function storyCompact(
       return greedySlotCompact(
         alignedSession,
         constraints.filter(ctrs => ctrs.style === "Compact"),
-        constraints.filter(ctrs => ctrs.style === "Extend"),
+        constraints.filter(ctrs => ctrs.style === "Expand"),
         constraints.filter(ctrs => ctrs.style === "Merge"),
         constraints.filter(ctrs => ctrs.style === "Split"),
         inSep,
@@ -25,7 +25,7 @@ export function storyCompact(
       return opCompact(
         alignedSession,
         constraints.filter(ctrs => ctrs.style === "Compact"),
-        constraints.filter(ctrs => ctrs.style === "Extend"),
+        constraints.filter(ctrs => ctrs.style === "Expand"),
         constraints.filter(ctrs => ctrs.style === "Merge"),
         constraints.filter(ctrs => ctrs.style === "Split"),
         inSep,
@@ -35,7 +35,7 @@ export function storyCompact(
       return opSlotCompact(
         alignedSession,
         constraints.filter(ctrs => ctrs.style === "Compact"),
-        constraints.filter(ctrs => ctrs.style === "Extend"),
+        constraints.filter(ctrs => ctrs.style === "Expand"),
         constraints.filter(ctrs => ctrs.style === "Merge"),
         constraints.filter(ctrs => ctrs.style === "Split"),
         inSep,
