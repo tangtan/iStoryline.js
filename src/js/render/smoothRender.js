@@ -74,8 +74,7 @@ function smoothRender(
     reserveRatio
   );
   renderedGraph.styleConfig = deepCopy(styleConfig);
-  // TODO: inconsistent timeline
-  renderedGraph.timeline = calculateTimeline(originNodes, renderNodes);
+  renderedGraph.timeline = calculateTimeline(originNodes);
   return renderedGraph;
 }
 function calculateSmoothNodes(

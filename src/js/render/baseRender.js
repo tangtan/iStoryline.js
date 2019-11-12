@@ -921,18 +921,15 @@ export function removeAngularNodes(renderNodes, group) {
   }
   return tmpSmoothNodes;
 }
-export function calculateTimeline(originNodes, renderNodes) {
-  let timeline = new Map();
-  let cnt = 0;
+export function calculateTimeline(originNodes) {
+  let timeline = new Array();
   for (let i = 0; i < originNodes.length; i++) {
+    timeline[i] = new Array();
     for (let j = 0; j < originNodes[i].length; j++) {
+      timeline[i][j] = new Array();
       for (let k = 0; k < originNodes[i][j].length; k++) {
-        cnt++;
         let time = _getTime(originNodes, i, j, k);
-        if (timeline.has(time)) {
-        } else {
-          timeline.set(time, { x: renderNodes[i][j][k][0], index: cnt });
-        }
+        timeline[i][j][k] = time;
       }
     }
   }
