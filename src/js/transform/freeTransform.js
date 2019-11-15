@@ -61,15 +61,18 @@ function transform(controlNodes, nodes) {
     x.forEach(y => {
       // if (y[0] > maxx) maxx = y[0];
       // if (y[1] > maxy) maxy = y[1];
-     let yx=y.map(_=>_[0]);
-     maxx=Math.max(maxx,...yx);
-     let yy=y.map(_=>_[1]);
-     maxy=Math.max(maxy,...yy);
+      let yx = y.map(_ => _[0]);
+      maxx = Math.max(maxx, ...yx);
+      let yy = y.map(_ => _[1]);
+      maxy = Math.max(maxy, ...yy);
     });
   });
   nodes.forEach(x => {
     x.forEach(node => {
-      node.forEach(point=>{point[0]/=maxx;point[1]/=maxy;});
+      node.forEach(point => {
+        point[0] /= maxx;
+        point[1] /= maxy;
+      });
       // node[0] /= maxx;
       // node[1] /= maxy;
     });
@@ -98,13 +101,13 @@ function transform(controlNodes, nodes) {
 }
 
 function freeTransform(renderedGraph, upperPath, lowerPath) {
-  let nodes = renderedGraph.renderNodes;
+  // let nodes = renderedGraph.renderNodes;
   if (upperPath.length < 2 && lowerPath.length < 2) return renderedGraph;
   let controlNodes = [upperPath, lowerPath];
   // transform(controlNodes,renderedGraph.nodes);
-  transform(controlNodes, renderedGraph.renderNodes);
-  transform(controlNodes, renderedGraph.sketchNodes);
-  transform(controlNodes, renderedGraph.smoothNodes);
+  // transform(controlNodes, renderedGraph.renderNodes);
+  // transform(controlNodes, renderedGraph.sketchNodes);
+  transform(controlNodes, renderedGraph.paths);
   return renderedGraph;
 }
 

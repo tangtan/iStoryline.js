@@ -8,6 +8,11 @@ async function main(url) {
   // graph=ans.bend(["Red cap"],[20]);
   // graph=ans.merge(["Mother","Red cap"],[5,10]);
   // graph=ans.expand(["Mother","Red cap"],[5,10],10);
+  graph = await ans.reshape(
+    [[0, 1], [100, 2], [300, 4]],
+    [[400, 5], [500, 7], [600, 10]]
+  );
+  // graph= await ans.reshape([],[],3,);
   // const sketchNodes = normalize(graph.renderNodes);
   // const sketchNodes = normalize(graph.sketchNodes);
   // console.log(graph);

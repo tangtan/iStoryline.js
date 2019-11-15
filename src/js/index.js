@@ -24,6 +24,7 @@ export default class iStoryline extends CharacterStore {
     this.compactModule = pipeline[2] || "GreedySlotCompact";
     this.renderModule = pipeline[3] || "SmoothRender";
     this.transformModule = pipeline[4] || "FreeTransform";
+    // this.transformModule = pipeline[4] || "CircleTransform";
     // Constraints for opimization models
     this.ctrInfo = new CtrInfo();
   }
@@ -428,20 +429,33 @@ export default class iStoryline extends CharacterStore {
    *
    * @param {Point[]} upperPath
    * @param {Point[]} lowerPath
+   * @param {Number} Radius
+   * @param {Number} radius
+   * @param {Number} range
+   * -----
    *
    * @example
    * - points: [[x1, y1], [x2, y2], ...]
    *
    * @return graph
    */
-  reshape(upperPath = [], lowerPath = []) {
+  reshape(
+    upperPath = [],
+    lowerPath = [],
+    range = 2.16,
+    radius = 100,
+    Radius = 200
+  ) {
     this.ctrInfo.updateCtr({
       names: [],
       timeSpan: [],
       style: "Reshape",
       param: {
         upperPath: upperPath,
-        lowerPath: lowerPath
+        lowerPath: lowerPath,
+        radius: radius,
+        Radius: Radius,
+        range: range
       }
     });
     return this._layout();
