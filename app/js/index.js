@@ -1,5 +1,6 @@
 import Snap from "snapsvg";
 import iStoryline from "../../src/js/index";
+import { hitTest } from "../../test/hit.test";
 
 async function main(url) {
   let ans = new iStoryline();
@@ -17,6 +18,7 @@ async function main(url) {
   // const sketchNodes = normalize(graph.sketchNodes);
   // console.log(graph);
   graph = ans.scale(100, 100, 800, 500, true);
+  // hitTest(graph, 100, 100, 800, 500);
   const sketchNodes = graph.paths;
   console.log(graph);
   for (let i = 0; i < sketchNodes.length; i++) {
@@ -129,8 +131,8 @@ function genSimplePathStr(points) {
   return pathStr;
 }
 
-// main("./data/StarWars.xml");
-main("./data/Redcap.xml");
+main("./data/StarWars.xml");
+// main("./data/Redcap.xml");
 // main("./data/ChasingDragon.xml");
 // main("./data/Coco.xml");
 // main("./data/Frozen.xml");

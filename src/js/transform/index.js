@@ -8,8 +8,8 @@ export function storyTransform(transformModule, renderedGraph, constraints) {
   switch (transformModule) {
     case "CircleTransform":
       transformFunc = circleTransform;
-      let R = reshapeInfo.length > 0 ? reshapeInfo[0].param.Radius : 2000;
-      let r = reshapeInfo.length > 0 ? reshapeInfo[0].param.radius : 100;
+      let R = reshapeInfo.length > 0 ? reshapeInfo[0].param.outerRadius : 2000;
+      let r = reshapeInfo.length > 0 ? reshapeInfo[0].param.innerRadius : 100;
       let range = reshapeInfo.length > 0 ? reshapeInfo[0].param.range : 2.16;
       return transformFunc(renderedGraph, R, r, range);
     case "FreeTransform":

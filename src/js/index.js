@@ -23,8 +23,7 @@ export default class iStoryline extends CharacterStore {
     this.alignModule = pipeline[1] || "GreedyAlign";
     this.compactModule = pipeline[2] || "GreedySlotCompact";
     this.renderModule = pipeline[3] || "SmoothRender";
-    this.transformModule = pipeline[4] || "FreeTransform";
-    // this.transformModule = pipeline[4] || "CircleTransform";
+    this.transformModule = pipeline[4] || "CircleTransform";
     // Constraints for opimization models
     this.ctrInfo = new CtrInfo();
   }
@@ -429,8 +428,8 @@ export default class iStoryline extends CharacterStore {
    *
    * @param {Point[]} upperPath
    * @param {Point[]} lowerPath
-   * @param {Number} Radius
-   * @param {Number} radius
+   * @param {Number} innerRadius
+   * @param {Number} outerRadius
    * @param {Number} range
    * -----
    *
@@ -443,8 +442,8 @@ export default class iStoryline extends CharacterStore {
     upperPath = [],
     lowerPath = [],
     range = 2.16,
-    radius = 100,
-    Radius = 200
+    innerRadius = 100,
+    outerRadius = 200
   ) {
     this.ctrInfo.updateCtr({
       names: [],
@@ -453,8 +452,8 @@ export default class iStoryline extends CharacterStore {
       param: {
         upperPath: upperPath,
         lowerPath: lowerPath,
-        radius: radius,
-        Radius: Radius,
+        innerRadius: innerRadius,
+        outerRadius: outerRadius,
         range: range
       }
     });
