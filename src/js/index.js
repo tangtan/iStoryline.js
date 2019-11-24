@@ -23,7 +23,7 @@ export default class iStoryline extends CharacterStore {
     this.alignModule = pipeline[1] || "GreedyAlign";
     this.compactModule = pipeline[2] || "GreedySlotCompact";
     this.renderModule = pipeline[3] || "SmoothRender";
-    this.transformModule = pipeline[4] || "CircleTransform";
+    this.transformModule = pipeline[4] || "FreeTransform";
     // Constraints for opimization models
     this.ctrInfo = new CtrInfo();
   }
@@ -340,7 +340,7 @@ export default class iStoryline extends CharacterStore {
     // Update constraints
     if (ctrs.length > 0) {
       this.ctrInfo.addCtrs(ctrs);
-    } else if (logNameError("Split", names) && logTimeError("Split", span)) {
+    } else if (logNameError("Adjust", names) && logTimeError("Adjust", span)) {
       this.ctrInfo.addCtr({
         names: names,
         timeSpan: span,

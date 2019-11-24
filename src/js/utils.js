@@ -1,20 +1,13 @@
-export function logNameError(type, names = [], limits = 0) {
+export function logNameError(type, names, limits = 0) {
   switch (type) {
-    case "Compact":
-      if (names.length >= 2) return true;
-      break;
+    case "Compress":
     case "Expand":
-      if (names.length >= 2) return true;
-      break;
     case "Merge":
-      if (names.length >= 2) return true;
-      break;
     case "Split":
       if (names.length >= 2) return true;
-      break;
   }
   if (names.length === limits) return true;
-  console.error(`Invalid names in ${type}`);
+  console.error(`Invalid names in ${type}: `, names);
   return false;
 }
 
@@ -22,39 +15,14 @@ export function logTimeError(type, span = []) {
   switch (type) {
     case "Bend":
       if (span.length === 1) return true;
-      break;
-    case "Sort":
+    case "Space":
+    case "Scale":
+    case "Reshape":
+      return true;
+    default:
       if (span[1] >= span[0]) return true;
-      break;
-    case "Straighten":
-      if (span[1] >= span[0]) return true;
-      break;
-    case "Compact":
-      if (span[1] >= span[0]) return true;
-      break;
-    case "Merge":
-      if (span[1] >= span[0]) return true;
-      break;
-    case "Split":
-      if (span[1] >= span[0]) return true;
-      break;
-    case "Expand":
-      if (span[1] >= span[0]) return true;
-      break;
-    case "Compact":
-      if (span[1] >= span[0]) return true;
-      break;
-    case "Merge":
-      if (span[1] >= span[0]) return true;
-      break;
-    case "Split":
-      if (span[1] >= span[0]) return true;
-      break;
-    case "Expand":
-      if (span[1] >= span[0]) return true;
-      break;
   }
-  console.error(`Invalid time span in ${type}`);
+  console.error(`Invalid time span in ${type}: `, span);
   return false;
 }
 
