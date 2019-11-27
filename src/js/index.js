@@ -19,9 +19,9 @@ export default class iStoryline extends CharacterStore {
   constructor(pipeline = []) {
     super();
     // Pipeline configuration
-    this.orderModule = pipeline[0] || "GreedyOrder";
-    this.alignModule = pipeline[1] || "GreedyAlign";
-    this.compactModule = pipeline[2] || "GreedySlotCompact";
+    this.orderModule = pipeline[0] || "LocationOrder";
+    this.alignModule = pipeline[1] || "LocationAlign";
+    this.compactModule = pipeline[2] || "LocationCompact";
     this.renderModule = pipeline[3] || "SmoothRender";
     this.transformModule = pipeline[4] || "FreeTransform";
     // Constraints for opimization models
