@@ -221,7 +221,7 @@ export default class iStoryline extends CharacterStore {
     // Update constraints
     if (ctrs.length > 0) {
       this.ctrInfo.addCtrs(ctrs);
-    } else if (logNameError("Extend", names) && logTimeError("Extend", span)) {
+    } else if (logNameError("Expand", names) && logTimeError("Expand", span)) {
       this.ctrInfo.addCtr({
         names: names,
         timeSpan: span,
@@ -340,7 +340,7 @@ export default class iStoryline extends CharacterStore {
     // Update constraints
     if (ctrs.length > 0) {
       this.ctrInfo.addCtrs(ctrs);
-    } else if (logNameError("Split", names) && logTimeError("Split", span)) {
+    } else if (logNameError("Adjust", names) && logTimeError("Adjust", span)) {
       this.ctrInfo.addCtr({
         names: names,
         timeSpan: span,
@@ -428,20 +428,33 @@ export default class iStoryline extends CharacterStore {
    *
    * @param {Point[]} upperPath
    * @param {Point[]} lowerPath
+   * @param {Number} innerRadius
+   * @param {Number} outerRadius
+   * @param {Number} range
+   * -----
    *
    * @example
    * - points: [[x1, y1], [x2, y2], ...]
    *
    * @return graph
    */
-  reshape(upperPath = [], lowerPath = []) {
+  reshape(
+    upperPath = [],
+    lowerPath = [],
+    range = 2.16,
+    innerRadius = 100,
+    outerRadius = 200
+  ) {
     this.ctrInfo.updateCtr({
       names: [],
       timeSpan: [],
       style: "Reshape",
       param: {
         upperPath: upperPath,
-        lowerPath: lowerPath
+        lowerPath: lowerPath,
+        innerRadius: innerRadius,
+        outerRadius: outerRadius,
+        range: range
       }
     });
     return this._layout();

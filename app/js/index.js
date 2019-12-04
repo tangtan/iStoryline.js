@@ -1,10 +1,24 @@
 import Snap from "snapsvg";
 import iStoryline from "../../src/js/index";
+import { hitTest } from "../../test/hit.test";
 
 async function main(url) {
   let ans = new iStoryline();
   let graph = await ans.readFile(url);
-  graph = ans.scale(100, 100, 800, 500, true);
+  // graph=ans.straighten(["Red cap"],[1,100]);
+  // graph=ans.bend(["Red cap"],[20]);
+  // graph=ans.merge(["Mother","Red cap"],[5,10]);
+  // graph=ans.expand(["Mother","Red cap"],[5,10],10);
+  // graph = await ans.reshape(
+  //   [[0, 1], [100, 2], [300, 4]],
+  //   [[400, 5], [500, 7], [600, 10]]
+  // );
+  // graph= await ans.reshape([],[],3,);
+  // const sketchNodes = normalize(graph.renderNodes);
+  // const sketchNodes = normalize(graph.sketchNodes);
+  // console.log(graph);
+  // graph = ans.scale(100, 100, 800, 500, true);
+  // hitTest(graph, 100, 100, 800, 500);
   const sketchNodes = graph.paths;
   console.log(graph);
   for (let i = 0; i < sketchNodes.length; i++) {
@@ -117,13 +131,13 @@ function genSimplePathStr(points) {
   return pathStr;
 }
 
-// main("./data/StarWars.xml");
+main("./data/StarWars.xml");
 // main("./data/Redcap.xml");
 // main("./data/ChasingDragon.xml");
 // main("./data/Coco.xml");
 // main("./data/Frozen.xml");
 // main("./data/Guowuguan.xml");
-main("./data/InceptionTune.xml");
+// main("./data/InceptionTune.xml");
 // main("./data/JurassicParkTune.xml");
 // main("./data/KingLearTune.xml");
 // main("./data/LetBulletFlyTune.xml");

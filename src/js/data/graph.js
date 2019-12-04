@@ -41,6 +41,10 @@ export class Graph {
     this.timeline = data.timeline;
   }
 
+  get nodes() {
+    return this._nodes;
+  }
+
   /**
    * Get the x pos of the specified render node.
    *
@@ -259,7 +263,7 @@ export class Graph {
     let retI = this.getStorylineID(x, y);
     let retJ = this.getStorySegmentID(x, y);
     let retK = this.getStoryNodeID(x, y);
-    return this._nodes[retI][retJ][retK];
+    return this._nodes[Number(retI)][Number(retJ)][Number(retK)];
   }
 
   /**
@@ -273,7 +277,7 @@ export class Graph {
   getStorySegment(x, y) {
     let retI = this.getStorylineID(x, y);
     let retJ = this.getStorySegmentID(x, y);
-    return this._nodes[retI][retJ];
+    return this._nodes[Number(retI)][Number(retJ)];
   }
 
   /**
@@ -291,64 +295,6 @@ export class Graph {
       let tmpStorylineID = this.getStorylineID(x, y);
       return this._nodes[Number(tmpStorylineID)];
     }
-  }
-
-  /**
-   * Get the smooth storyline according to the given position.
-   *
-   * @param {Number} x
-   * @param {Number} y
-   *
-   * @return storyline
-   */
-  getStorylineSmooth(x, y) {
-    let retI = 0;
-    let minDis = 1e9;
-    for (let i = 0; i < this.smoothNodes.length; i++) {
-      for (let j = 0; j < this.smoothNodes[i].length; j++) {
-        for (let k = 0; k < this.smoothNodes[i][j].length; k++) {
-          let graphX = this.smoothNodes[i][j][k][0];
-          let graphY = this.smoothNodes[i][j][k][1];
-          if (
-            (graphX - x) * (graphX - x) + (graphY - y) * (graphY - y) <
-            minDis
-          ) {
-            minDis = (graphX - x) * (graphX - x) + (graphY - y) * (graphY - y);
-            retI = i;
-          }
-        }
-      }
-    }
-    return this.smoothNodes[retI];
-  }
-
-  /**
-   * Get the sketch storyline according to the given position.
-   *
-   * @param {Number} x
-   * @param {Number} y
-   *
-   * @return storyline
-   */
-  getStorylineSketch(x, y) {
-    let retI = 0;
-    let minDis = 1e9;
-    for (let i = 0; i < this.sketchNodes.length; i++) {
-      for (let j = 0; j < this.sketchNodes[i].length; j++) {
-        for (let k = 0; k < this.sketchNodes[i][j].length; k++) {
-          let graphX = this.sketchNodes[i][j][k][0];
-          let graphY = this.sketchNodes[i][j][k][1];
-          if (
-            (graphX - x) * (graphX - x) + (graphY - y) * (graphY - y) <
-            minDis
-          ) {
-            minDis = (graphX - x) * (graphX - x) + (graphY - y) * (graphY - y);
-            retI = i;
-          }
-        }
-      }
-    }
-    return this.sketchNodes[retI];
   }
 
   /**
@@ -395,43 +341,6 @@ export class Graph {
     }
     return ret;
   }
-
-  changeFour2Three(tot) {
-    let cnt = 0;
-    let tmpI = 0;
-    let tmpJ = 0;
-    for (let i = 0; i < this._nodes.length; i++) {
-      for (let j = 0; j < this._nodes[i].length; j++) {
-        cnt++;
-        if (cnt === tot) {
-          tmpI = i;
-          tmpJ = j;
-        }
-      }
-    }
-    return { tmpI, tmpJ };
-  }
-
-  changeThree2Four(tot) {
-    let cnt = 0;
-    let tmpI = 0;
-    let tmpJ = 0;
-    let tmpK = 0;
-    for (let i = 0; i < this._nodes.length; i++) {
-      for (let j = 0; j < this._nodes[i].length; j++) {
-        for (let k = 0; k < this._nodes[i][j].length; k++) {
-          cnt++;
-          if (cnt === tot) {
-            tmpI = i;
-            tmpJ = j;
-            tmpK = k;
-          }
-        }
-      }
-    }
-    return { tmpI, tmpJ, tmpK };
-  }
-
   /**
    * Get the time according to the given position.
    *
@@ -441,15 +350,10 @@ export class Graph {
    * @return time
    */
   getStoryTime(x, y) {
-    let min = 1e9;
-    let time;
-    for (let item of this.timeline.keys()) {
-      if (Math.abs(x - this.timeline.get(item)) < min) {
-        min = Math.abs(x - this.timeline.get(item));
-        time = item;
-      }
-    }
-    return time;
+    let tmpI = this.getStorylineID(x, y);
+    let tmpJ = this.getStorySegmentID(x, y);
+    let tmpK = this.getStoryNodeID(x, y);
+    return this.timeline[Number(tmpI)][Number(tmpJ)][Number(tmpK)];
   }
 
   /**
@@ -461,29 +365,30 @@ export class Graph {
    * @return timeSpan
    */
   getStoryTimeSpan(x, y) {
-    let tmpI = this.getStorylineID(x, y);
-    let tmpJ = this.getStorySegmentID(x, y);
-    let tmpK = this.getStoryNodeID(x, y);
+    let tmpI = Number(this.getStorylineID(x, y));
+    let tmpJ = Number(this.getStorySegmentID(x, y));
+    let tmpK = Number(this.getStoryNodeID(x, y));
     let ret = Array();
     if (tmpK & 1) {
       ret[0] = this.getStoryTime(
-        this.nodes[tmpI][tmpJ][tmpK - 1][0],
-        this.nodes[tmpI][tmpJ][tmpK - 1][1]
+        this._nodes[tmpI][tmpJ][tmpK - 1][0],
+        this._nodes[tmpI][tmpJ][tmpK - 1][1]
       );
       ret[1] = this.getStoryTime(
-        this.nodes[tmpI][tmpJ][tmpK][0],
-        this.nodes[tmpI][tmpJ][tmpK][1]
+        this._nodes[tmpI][tmpJ][tmpK][0],
+        this._nodes[tmpI][tmpJ][tmpK][1]
       );
     } else {
       ret[0] = this.getStoryTime(
-        this.nodes[tmpI][tmpJ][tmpK][0],
-        this.nodes[tmpI][tmpJ][tmpK][1]
+        this._nodes[tmpI][tmpJ][tmpK][0],
+        this._nodes[tmpI][tmpJ][tmpK][1]
       );
       ret[1] = this.getStoryTime(
-        this.nodes[tmpI][tmpJ][tmpK + 1][0],
-        this.nodes[tmpI][tmpJ][tmpK + 1][1]
+        this._nodes[tmpI][tmpJ][tmpK + 1][0],
+        this._nodes[tmpI][tmpJ][tmpK + 1][1]
       );
     }
+    // let leftTime = this.getStoryTime(x, y);
     return ret;
   }
 
@@ -561,9 +466,7 @@ export class Graph {
    */
   getSessionID(x, y) {
     let tmp = this._session;
-    let index = this.getStorylineIndex(x, y);
     let name = this.getStorylineName(x, y);
-    const { tmpI, tmpJ } = this.changeFour2Three(index);
     let timeSpan = this.getStoryTimeSpan(x, y);
     for (let [key, value] of tmp) {
       for (let i = 0; i < value.length; i++) {
