@@ -30,6 +30,7 @@ function _calculateAlignedSessions(
     for (let j = 0; j < _order.length; j++) {
       _tmpLines[j] = 0;
     }
+    if (_sequence[i] === undefined) continue;
     for (let j = 0; j < _sequence[i][1].length; j++) {
       let _id = _sequence[i][1][j][0];
       let _location = _sessionToLocation.get(_id);
@@ -48,6 +49,7 @@ function _calculateAlignedSessions(
   }
   for (let i = 0; i < _sequence.length; i++) {
     _ret[i] = new Array();
+    if (_sequence[i] === undefined) continue;
     _ret[i][0] = _sequence[i][0];
     _ret[i][1] = new Map();
     for (let j = 0; j < _sequence[i][1].length; j++) {

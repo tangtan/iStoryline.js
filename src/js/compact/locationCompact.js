@@ -29,6 +29,7 @@ function _calculateInitialNodes(
     _ret[i] = new Array();
   }
   for (let i = 0; i < _sequence.length; i++) {
+    if (_sequence[i] === undefined) continue;
     for (let j = 0; j < _sequence[i][1].length; j++) {
       for (let k = 0; k < _sequence[i][1][j][1].length; k++) {
         let _entity = _sequence[i][1][j][1][k];

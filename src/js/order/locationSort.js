@@ -29,6 +29,7 @@ export function locationSort(data, orderInfo) {
 }
 function _sortSequence(_sequence, _sessionToLocation, _locationIndex, _order) {
   for (let i = 0; i < _sequence.length; i++) {
+    if (_sequence[i] === undefined) continue;
     for (let j = 0; j < _sequence[i][1].length; j++) {
       let rec = j;
       for (let k = j + 1; k < _sequence[i][1].length; k++) {
@@ -141,6 +142,7 @@ function _getSessionToLocation(_locationTree) {
   _queue[++_tail] = _locationTree;
   while (_head ^ _tail) {
     ++_head;
+    if (_head == 1) _queue[_head].name = "default";
     _locationIndex.set(_queue[_head].name, _head);
     for (let i = 0; i < _queue[_head].children.length; i++) {
       _queue[++_tail] = _queue[_head].children[i];

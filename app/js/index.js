@@ -5,20 +5,6 @@ import { hitTest } from "../../test/hit.test";
 async function main(url) {
   let ans = new iStoryline();
   let graph = await ans.readFile(url);
-  // graph=ans.straighten(["Red cap"],[1,100]);
-  // graph=ans.bend(["Red cap"],[20]);
-  // graph=ans.merge(["Mother","Red cap"],[5,10]);
-  // graph=ans.expand(["Mother","Red cap"],[5,10],10);
-  // graph = await ans.reshape(
-  //   [[0, 1], [100, 2], [300, 4]],
-  //   [[400, 5], [500, 7], [600, 10]]
-  // );
-  // graph= await ans.reshape([],[],3,);
-  // const sketchNodes = normalize(graph.renderNodes);
-  // const sketchNodes = normalize(graph.sketchNodes);
-  // console.log(graph);
-  // graph = ans.scale(100, 100, 800, 500, true);
-  // hitTest(graph, 100, 100, 800, 500);
   const sketchNodes = graph.paths;
   console.log(graph);
   for (let i = 0; i < sketchNodes.length; i++) {
@@ -43,7 +29,6 @@ function drawLabel(nodes, name) {
   const svg = Snap("#mySvg");
   let labelX = nodes[0][0][0] - 4;
   let labelY = nodes[0][0][1] + 4;
-  // console.log(name, labelX, labelY);
   const label = svg.text(labelX, labelY, name);
   label.attr({
     "text-anchor": "end"
@@ -90,7 +75,6 @@ function genSmoothPathStr(points) {
   for (i = 1, len = points.length; i < len - 1; i += 2) {
     const rPoint = points[i];
     const lPoint = points[i + 1];
-    // console.log(i, rPoint, lPoint, points.length);
     const middleX = (rPoint[0] + lPoint[0]) / 2;
     pathStr += `L ${rPoint[0]} ${rPoint[1]} `;
     if (rPoint[1] !== lPoint[1]) {
