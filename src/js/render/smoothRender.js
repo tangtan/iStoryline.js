@@ -53,7 +53,7 @@ function smoothRender(
   let renderedGraph = initialGraph;
   const x0 = scaleInfo.length > 0 ? scaleInfo[0].param.x0 || 0 : 0;
   const y0 = scaleInfo.length > 0 ? scaleInfo[0].param.y0 || 0 : 0;
-  const width = scaleInfo.length > 0 ? scaleInfo[0].param.width || 1000 : 1000;
+  const width = scaleInfo.length > 0 ? scaleInfo[0].param.width || 2000 : 2000;
   const height = scaleInfo.length > 0 ? scaleInfo[0].param.height || 372 : 372;
   const reserveRatio =
     scaleInfo.length > 0 ? scaleInfo[0].param.reserveRatio || false : false;
@@ -106,7 +106,7 @@ function calculateSmoothNodes(
         } else {
           let SAMPLERATE = Math.floor(
             _getLength(tmpSmoothNodes[i][j][k], tmpSmoothNodes[i][j][k + 1]) /
-              1000
+              10
           );
           if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
           let aimNodes = linkNodes(
@@ -124,7 +124,7 @@ function calculateSmoothNodes(
   smoothNodes = calculateStyledNodes(smoothNodes, ret[1], groupPosition);
   let styleConfig = calculateStyles(
     ret[2],
-    initialGraph.names,
+    initialGraph.entities,
     relate,
     stylish
   );
