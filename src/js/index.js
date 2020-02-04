@@ -19,9 +19,9 @@ export default class iStoryline extends CharacterStore {
   constructor(pipeline = []) {
     super();
     // Pipeline configuration
-    this.orderModule = pipeline[0] || "LocationOrder";
-    this.alignModule = pipeline[1] || "LocationAlign";
-    this.compactModule = pipeline[2] || "LocationCompact";
+    this.orderModule = pipeline[0] || "GreedyOrder";
+    this.alignModule = pipeline[1] || "GreedyAlign";
+    this.compactModule = pipeline[2] || "GreedySlotCompact";
     this.renderModule = pipeline[3] || "SmoothRender";
     this.transformModule = pipeline[4] || "FreeTransform";
     // Constraints for opimization models
@@ -221,7 +221,7 @@ export default class iStoryline extends CharacterStore {
     // Update constraints
     if (ctrs.length > 0) {
       this.ctrInfo.addCtrs(ctrs);
-    } else if (logNameError("Expand", names) && logTimeError("Expand", span)) {
+    } else if (logNameError("Extend", names) && logTimeError("Extend", span)) {
       this.ctrInfo.addCtr({
         names: names,
         timeSpan: span,
@@ -340,7 +340,7 @@ export default class iStoryline extends CharacterStore {
     // Update constraints
     if (ctrs.length > 0) {
       this.ctrInfo.addCtrs(ctrs);
-    } else if (logNameError("Adjust", names) && logTimeError("Adjust", span)) {
+    } else if (logNameError("Split", names) && logTimeError("Split", span)) {
       this.ctrInfo.addCtr({
         names: names,
         timeSpan: span,
@@ -428,33 +428,20 @@ export default class iStoryline extends CharacterStore {
    *
    * @param {Point[]} upperPath
    * @param {Point[]} lowerPath
-   * @param {Number} innerRadius
-   * @param {Number} outerRadius
-   * @param {Number} range
-   * -----
    *
    * @example
    * - points: [[x1, y1], [x2, y2], ...]
    *
    * @return graph
    */
-  reshape(
-    upperPath = [],
-    lowerPath = [],
-    range = 2.16,
-    innerRadius = 100,
-    outerRadius = 200
-  ) {
+  reshape(upperPath = [], lowerPath = []) {
     this.ctrInfo.updateCtr({
       names: [],
       timeSpan: [],
       style: "Reshape",
       param: {
         upperPath: upperPath,
-        lowerPath: lowerPath,
-        innerRadius: innerRadius,
-        outerRadius: outerRadius,
-        range: range
+        lowerPath: lowerPath
       }
     });
     return this._layout();

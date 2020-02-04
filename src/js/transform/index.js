@@ -8,17 +8,14 @@ export function storyTransform(transformModule, renderedGraph, constraints) {
   switch (transformModule) {
     case "CircleTransform":
       transformFunc = circleTransform;
-      let R = reshapeInfo.length > 0 ? reshapeInfo[0].param.outerRadius : 2000;
-      let r = reshapeInfo.length > 0 ? reshapeInfo[0].param.innerRadius : 100;
-      let range = reshapeInfo.length > 0 ? reshapeInfo[0].param.range : 2.16;
-      return transformFunc(renderedGraph, R, r, range);
+      break;
     case "FreeTransform":
-      let upperPath =
-        reshapeInfo.length > 0 ? reshapeInfo[0].param.upperPath : [];
-      let lowerPath =
-        reshapeInfo.length > 0 ? reshapeInfo[0].param.lowerPath : [];
-      return transformFunc(renderedGraph, upperPath, lowerPath);
+      transformFunc = freeTransform;
+      break;
     default:
       transformModelError(transformModule);
   }
+  let upperPath = reshapeInfo.length > 0 ? reshapeInfo[0].param.upperPath : [];
+  let lowerPath = reshapeInfo.length > 0 ? reshapeInfo[0].param.lowerPath : [];
+  return transformFunc(renderedGraph, upperPath, lowerPath);
 }

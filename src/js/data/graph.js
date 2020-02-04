@@ -40,11 +40,24 @@ export class Graph {
     this.paths = data.paths;
     this.timeline = data.timeline;
   }
-
-  get nodes() {
-    return this._nodes;
-  }
-
+  // get names() {
+  //   return this.names;
+  // }
+  // get paths() {
+  //   return this.paths;
+  // }
+  // get timeline() {
+  //   return this.timeline;
+  // }
+  // set names() {
+  //   this.names;
+  // }
+  // set paths() {
+  //   this.paths;
+  // }
+  // set timeline() {
+  //   this.timeline;
+  // }
   /**
    * Get the x pos of the specified render node.
    *
@@ -388,7 +401,6 @@ export class Graph {
         this._nodes[tmpI][tmpJ][tmpK + 1][1]
       );
     }
-    // let leftTime = this.getStoryTime(x, y);
     return ret;
   }
 

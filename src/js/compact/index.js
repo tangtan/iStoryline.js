@@ -1,7 +1,6 @@
 import { greedySlotCompact } from "./greedySlotCompact";
 import { opCompact } from "./opCompact";
 import { opSlotCompact } from "./opSlotCompact";
-import { locationCompact } from "./locationCompact";
 import { compactModelError } from "../utils";
 
 export function storyCompact(compactModule, alignedSession, constraints) {
@@ -20,9 +19,6 @@ export function storyCompact(compactModule, alignedSession, constraints) {
       break;
     case "OpSlotCompact":
       compactFunc = opSlotCompact;
-      break;
-    case "LocationCompact":
-      compactFunc = locationCompact;
       break;
     default:
       compactModelError(compactModule);

@@ -184,7 +184,7 @@ export function greedySlotCompact(
             Ycoor.set(x.begin, max + range * din); //加入一个节点
             if (mergePair !== undefined) {
               if (mergePair[0][0] === name) {
-                if (mergePair.length === 3) mergePair[3] = new Map();
+                mergePair[3] = new Map();
                 mergePair[3].set(x.begin, max + range * din); //merge的第一个的坐标
                 node[num].push([x.begin * 50, Ycoor.get(x.begin)]);
                 node[num].push([x.end * 50 + 25, Ycoor.get(x.begin)]);
@@ -203,7 +203,7 @@ export function greedySlotCompact(
             Ycoor.set(x.begin, Ycoor.get(x.begin) + range * din);
             if (mergePair !== undefined)
               if (mergePair[0][0] === name) {
-                if (mergePair.length === 3) mergePair[3] = new Map();
+                mergePair[3] = new Map();
                 mergePair[3].set(x.begin, Ycoor.get(x.begin));
                 node[num].push([x.begin * 50, Ycoor.get(x.begin)]);
                 node[num].push([x.end * 50 + 25, Ycoor.get(x.begin)]);

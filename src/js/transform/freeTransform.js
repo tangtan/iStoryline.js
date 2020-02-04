@@ -101,13 +101,13 @@ function transform(controlNodes, nodes) {
 }
 
 function freeTransform(renderedGraph, upperPath, lowerPath) {
-  // let nodes = renderedGraph.renderNodes;
+  let nodes = renderedGraph.renderNodes;
   if (upperPath.length < 2 && lowerPath.length < 2) return renderedGraph;
   let controlNodes = [upperPath, lowerPath];
   // transform(controlNodes,renderedGraph.nodes);
-  // transform(controlNodes, renderedGraph.renderNodes);
-  // transform(controlNodes, renderedGraph.sketchNodes);
-  transform(controlNodes, renderedGraph.paths);
+  transform(controlNodes, renderedGraph.renderNodes);
+  transform(controlNodes, renderedGraph.sketchNodes);
+  transform(controlNodes, renderedGraph.smoothNodes);
   return renderedGraph;
 }
 
