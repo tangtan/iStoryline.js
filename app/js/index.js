@@ -5,64 +5,6 @@ import { storyRender } from "../../src/js/render";
 function main(url) {
   post(url);
 }
-function translateGraph(rawData, timeShift = 50) {
-  let initialGraph = {};
-  const array = rawData.data.array;
-  const perm = rawData.data.perm;
-  const sessionTable = rawData.data.sessionTable;
-
-  let ptCnt = 0;
-  let segCnt = 0;
-  let flag = 0;
-  let nodes = new Array();
-  let names = new Array();
-  let times = new Array();
-  for (let i = 0; i < array.length; i++) {
-    nodes[i] = new Array();
-    names[i] = array[i].name;
-    times[i] = new Array();
-    ptCnt = 0;
-    segCnt = -1;
-    for (let j = 0; j < array[i].points.length; j++) {
-      if (perm[i][j] == -1) {
-        continue;
-      }
-      if (j == 0 || perm[i][j - 1] == -1) {
-        segCnt++;
-        times[i][segCnt] = new Array();
-        times[i][segCnt][0] = translateXtoTime(array[i].points[j].item1, j);
-      }
-      if (j + 1 >= array[i].points.length || perm[i][j + 1] == -1) {
-        times[i][segCnt][1] = translateXtoTime(array[i].points[j].item2, j);
-      }
-      nodes[i][ptCnt] = new Array();
-      nodes[i][ptCnt][0] =
-        translateXtoTime(array[i].points[j].item1, j) * timeShift;
-      nodes[i][ptCnt][1] = array[i].points[j].item3 * 100;
-      ptCnt++;
-      nodes[i][ptCnt] = new Array();
-      nodes[i][ptCnt][0] =
-        translateXtoTime(array[i].points[j].item2, j) * timeShift -
-        timeShift / 2;
-      nodes[i][ptCnt][1] = array[i].points[j].item3 * 100;
-      ptCnt++;
-    }
-  }
-  initialGraph.initialNodes = nodes;
-  initialGraph.timeframeTable = new Map();
-  for (let i = 0; i < array.length; i++) {
-    initialGraph.timeframeTable.set(names[i], times[i]);
-  }
-  initialGraph.entities = names;
-  return initialGraph;
-}
-function translateXtoTime(x, j, timeRange = 10, xShift = 7) {
-  return x / timeRange - j * xShift;
-}
-function translateConstrains(rawData) {
-  let constrains = null;
-  return constrains;
-}
 function post(url) {
   let tmpAjax = null;
   let tmpString = "";
@@ -105,52 +47,12 @@ function post(url) {
   };
 }
 function drawGraph(rawData) {
-  let initialGraph = translateGraph(rawData);
-  let constrains = [];
-  const graph = storyRender("SmoothRender", initialGraph, constrains);
+  const graph = storyRender("SmoothRender", rawData);
   const nodes = graph.paths;
   for (let i = 0; i < nodes.length; i++) {
     let tmpNodes = nodes[i];
     // draw text labels
     drawLabel(tmpNodes, graph.entities[i]);
-    // draw graph with animations
-    let storylines = drawInitial(tmpNodes);
-    let completePathStrs = tmpNodes.map(line => genSimplePathStr(line));
-    storylines.forEach((storyline, i) => {
-      storyline.animate(
-        {
-          d: completePathStrs[i]
-        },
-        1000
-      );
-    });
-  }
-}
-function drawUpdateNodes(rawData) {
-  let graph = JSON.parse(rawData);
-  let nodes = new Array();
-  const array = graph.data.array;
-  let cnt = 0;
-  for (let i = 0; i < array.length; i++) {
-    nodes[i] = new Array();
-    nodes[i][0] = new Array();
-    cnt = 0;
-    for (let j = 0; j < array[i].points.length; j++) {
-      if (graph.data.perm[i][j] == -1) continue;
-      nodes[i][0][cnt] = new Array();
-      nodes[i][0][cnt][0] = array[i].points[j].item1 + 1000;
-      nodes[i][0][cnt][1] = array[i].points[j].item3 + 1000;
-      cnt++;
-      nodes[i][0][cnt] = new Array();
-      nodes[i][0][cnt][0] = array[i].points[j].item2 + 1000;
-      nodes[i][0][cnt][1] = array[i].points[j].item3 + 1000;
-      cnt++;
-    }
-  }
-  for (let i = 0; i < nodes.length; i++) {
-    let tmpNodes = nodes[i];
-    // draw text labels
-    drawLabel(tmpNodes, graph.data.array[i].name);
     // draw graph with animations
     let storylines = drawInitial(tmpNodes);
     let completePathStrs = tmpNodes.map(line => genSimplePathStr(line));
