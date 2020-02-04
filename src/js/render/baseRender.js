@@ -142,7 +142,7 @@ function _getNxtK(tmpSketchNodes, k) {
   nxtK--;
   return nxtK;
 }
-function _getNxtPos(group, i, j, storyline, SPACELENGTH = 20) {
+function _getNxtPos(group, i, j, storyline, SPACELENGTH = 50) {
   let slt = j + 1;
   let tot = group[i][1].length;
   let storylineID = group[i][1][j][0];
@@ -183,7 +183,7 @@ function _getOptLen(storyline, storylineID, segmentID, storyNodeID) {
   let nxtID = storyNodeID + 1;
   let Y = Math.abs(nowSeg[nxtID][1] - nowSeg[nowID][1]);
   let X = Math.abs(nowSeg[nxtID][0] - nowSeg[nowID][0]);
-  let aimX = Math.round(Y / 1500) * 25 - X;
+  let aimX = Math.round(Y / 1000) * 25 - X;
   return aimX;
 }
 function _getStorylineID(characterName, name) {
@@ -488,7 +488,29 @@ export function deepCopy(tmp) {
     return tmp;
   }
 }
-export function initializeGroup(storyline, LINESPACE = 4000) {
+function _checkGroup(
+  finK,
+  k,
+  head,
+  tail,
+  turningType,
+  storyline,
+  list,
+  LINESPACE = 4000
+) {
+  if (finK >= tail) return false;
+  if (turningType[finK - head] != turningType[k - head]) return false;
+  if (
+    Math.abs(
+      storyline[list[finK][0]][list[finK][1]][list[finK][2]][1] -
+        storyline[list[finK - 1][0]][list[finK - 1][1]][list[finK - 1][2]][1]
+    ) > LINESPACE
+  ) {
+    return false;
+  }
+  return true;
+}
+export function initializeGroup(storyline) {
   let group = new Array();
   let tot = 0;
   let storylineID = storyline.length;
@@ -563,16 +585,10 @@ export function initializeGroup(storyline, LINESPACE = 4000) {
               continue;
             }
             while (
-              finK < tail &&
-              turningType[finK - head] === turningType[k - head] &&
-              Math.abs(
-                storyline[list[finK][0]][list[finK][1]][list[finK][2]][1] -
-                  storyline[list[finK - 1][0]][list[finK - 1][1]][
-                    list[finK - 1][2]
-                  ][1]
-              ) <= LINESPACE
-            )
+              _checkGroup(finK, k, head, tail, turningType, storyline, list)
+            ) {
               finK++;
+            }
             group[tot] = new Array();
             group[tot][0] = new Array();
             group[tot][0][0] = firX;
@@ -1111,7 +1127,7 @@ export function calculateStyles(segmentTime, characterName, relate, stylish) {
   }
   return styleConfig;
 }
-export function linkNodes(nodes, type = 0, SAMPLERATE = 20, style = 0) {
+export function linkNodes(nodes, type = 0, SAMPLERATE = 50, style = 0) {
   let aimNodes = new Array();
   if (style === 0) {
     let p = new Array();

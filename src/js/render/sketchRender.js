@@ -53,7 +53,7 @@ function sketchRender(
   let renderedGraph = initialGraph;
   const x0 = scaleInfo.length > 0 ? scaleInfo[0].param.x0 || 0 : 0;
   const y0 = scaleInfo.length > 0 ? scaleInfo[0].param.y0 || 0 : 0;
-  const width = scaleInfo.length > 0 ? scaleInfo[0].param.width || 1000 : 1000;
+  const width = scaleInfo.length > 0 ? scaleInfo[0].param.width || 2000 : 2000;
   const height = scaleInfo.length > 0 ? scaleInfo[0].param.height || 372 : 372;
   const reserveRatio =
     scaleInfo.length > 0 ? scaleInfo[0].param.reserveRatio || false : false;
@@ -114,7 +114,7 @@ function calculateSketchNodes(
             ctrl[0][1] = 0;
             let SAMPLERATE = Math.floor(
               _getLength(tmpSketchNodes[i][j][k], tmpSketchNodes[i][j][k + 1]) /
-                1000
+                800
             );
             if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
             tmpAimNodes = linkNodes(
@@ -131,7 +131,7 @@ function calculateSketchNodes(
           }
           for (let z = 0; z < tmpAimNodes.length - 1; z++) {
             let SAMPLERATE = Math.floor(
-              _getLength(tmpAimNodes[z], tmpAimNodes[z + 1]) / 1000
+              _getLength(tmpAimNodes[z], tmpAimNodes[z + 1]) / 800
             );
             if (SAMPLERATE < 20) SAMPLERATE = 20;
             if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
@@ -162,7 +162,7 @@ function calculateSketchNodes(
   sketchNodes = calculateStyledNodes(sketchNodes, ret[1], groupPosition);
   let styleConfig = calculateStyles(
     ret[2],
-    initialGraph.names,
+    initialGraph.entities,
     relate,
     stylish
   );
@@ -173,9 +173,9 @@ function shake(
   a,
   b,
   type = 1,
-  distanceRate = 0.25,
-  SHAKEY = 300,
-  SHAKEX = 0.5
+  distanceRate = 0.2,
+  SHAKEY = 500,
+  SHAKEX = 1
 ) {
   if (a[1] === b[1]) {
     let length = b[0] - a[0];

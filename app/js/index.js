@@ -1,19 +1,121 @@
 import Snap from "snapsvg";
 import iStoryline from "../../src/js/index";
+import { storyRender } from "../../src/js/render";
 
-async function main(url) {
-  let ans = new iStoryline();
-  let graph = await ans.readFile(url);
-  graph = ans.scale(100, 100, 800, 500, true);
-  const sketchNodes = graph.paths;
-  console.log(graph);
-  for (let i = 0; i < sketchNodes.length; i++) {
-    let nodes = sketchNodes[i];
+function main(url) {
+  post(url);
+}
+function translateGraph(rawData, timeShift = 50) {
+  let initialGraph = {};
+  const array = rawData.data.array;
+  const perm = rawData.data.perm;
+  const sessionTable = rawData.data.sessionTable;
+
+  let ptCnt = 0;
+  let segCnt = 0;
+  let flag = 0;
+  let nodes = new Array();
+  let names = new Array();
+  let times = new Array();
+  for (let i = 0; i < array.length; i++) {
+    nodes[i] = new Array();
+    names[i] = array[i].name;
+    times[i] = new Array();
+    ptCnt = 0;
+    segCnt = -1;
+    for (let j = 0; j < array[i].points.length; j++) {
+      if (perm[i][j] == -1) {
+        continue;
+      }
+      if (j == 0 || perm[i][j - 1] == -1) {
+        segCnt++;
+        times[i][segCnt] = new Array();
+        times[i][segCnt][0] = translateXtoTime(array[i].points[j].item1, j);
+      }
+      if (j + 1 >= array[i].points.length || perm[i][j + 1] == -1) {
+        times[i][segCnt][1] = translateXtoTime(array[i].points[j].item2, j);
+      }
+      nodes[i][ptCnt] = new Array();
+      nodes[i][ptCnt][0] =
+        translateXtoTime(array[i].points[j].item1, j) * timeShift;
+      nodes[i][ptCnt][1] = array[i].points[j].item3 * 100;
+      ptCnt++;
+      nodes[i][ptCnt] = new Array();
+      nodes[i][ptCnt][0] =
+        translateXtoTime(array[i].points[j].item2, j) * timeShift -
+        timeShift / 2;
+      nodes[i][ptCnt][1] = array[i].points[j].item3 * 100;
+      ptCnt++;
+    }
+  }
+  initialGraph.initialNodes = nodes;
+  initialGraph.timeframeTable = new Map();
+  for (let i = 0; i < array.length; i++) {
+    initialGraph.timeframeTable.set(names[i], times[i]);
+  }
+  initialGraph.entities = names;
+  return initialGraph;
+}
+function translateXtoTime(x, j, timeRange = 10, xShift = 7) {
+  return x / timeRange - j * xShift;
+}
+function translateConstrains(rawData) {
+  let constrains = null;
+  return constrains;
+}
+function post(url) {
+  let tmpAjax = null;
+  let tmpString = "";
+  let config = {
+    id: url,
+    sessionInnerGap: 18,
+    sessionOuterGap: 54,
+    sessionInnerGaps: [],
+    sessionOuterGaps: [],
+    majorCharacters: [],
+    orders: [],
+    groupIds: [],
+    selectedSessions: [],
+    orderTable: [],
+    sessionBreaks: []
+  };
+  config = (function(data) {
+    for (let key in data) {
+      tmpString += key + "=" + data[key] + "&";
+    }
+    return tmpString;
+  })(config);
+  try {
+    tmpAjax = new XMLHttpRequest();
+  } catch (error) {
+    tmpAjax = new ActiveXObject("Microsoft.XMLHTTP");
+  }
+  tmpAjax.open("post", "http://localhost:5050/api/update", true);
+  tmpAjax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  tmpAjax.send(config);
+  tmpAjax.onreadystatechange = function() {
+    if (tmpAjax.readyState == 4) {
+      try {
+        let rawData = JSON.parse(tmpAjax.responseText);
+        drawGraph(rawData);
+      } catch (error) {
+        alert("Error!");
+      }
+    }
+  };
+}
+function drawGraph(rawData) {
+  let initialGraph = translateGraph(rawData);
+  let constrains = [];
+  const graph = storyRender("SmoothRender", initialGraph, constrains);
+  const nodes = graph.paths;
+  for (let i = 0; i < nodes.length; i++) {
+    let tmpNodes = nodes[i];
     // draw text labels
-    drawLabel(nodes, graph.names[i]);
+    drawLabel(tmpNodes, graph.entities[i]);
     // draw graph with animations
-    let storylines = drawInitial(nodes);
-    let completePathStrs = nodes.map(line => genSimplePathStr(line));
+    let storylines = drawInitial(tmpNodes);
+    let completePathStrs = tmpNodes.map(line => genSimplePathStr(line));
     storylines.forEach((storyline, i) => {
       storyline.animate(
         {
@@ -24,12 +126,48 @@ async function main(url) {
     });
   }
 }
-
+function drawUpdateNodes(rawData) {
+  let graph = JSON.parse(rawData);
+  let nodes = new Array();
+  const array = graph.data.array;
+  let cnt = 0;
+  for (let i = 0; i < array.length; i++) {
+    nodes[i] = new Array();
+    nodes[i][0] = new Array();
+    cnt = 0;
+    for (let j = 0; j < array[i].points.length; j++) {
+      if (graph.data.perm[i][j] == -1) continue;
+      nodes[i][0][cnt] = new Array();
+      nodes[i][0][cnt][0] = array[i].points[j].item1 + 1000;
+      nodes[i][0][cnt][1] = array[i].points[j].item3 + 1000;
+      cnt++;
+      nodes[i][0][cnt] = new Array();
+      nodes[i][0][cnt][0] = array[i].points[j].item2 + 1000;
+      nodes[i][0][cnt][1] = array[i].points[j].item3 + 1000;
+      cnt++;
+    }
+  }
+  for (let i = 0; i < nodes.length; i++) {
+    let tmpNodes = nodes[i];
+    // draw text labels
+    drawLabel(tmpNodes, graph.data.array[i].name);
+    // draw graph with animations
+    let storylines = drawInitial(tmpNodes);
+    let completePathStrs = tmpNodes.map(line => genSimplePathStr(line));
+    storylines.forEach((storyline, i) => {
+      storyline.animate(
+        {
+          d: completePathStrs[i]
+        },
+        1000
+      );
+    });
+  }
+}
 function drawLabel(nodes, name) {
   const svg = Snap("#mySvg");
-  let labelX = nodes[0][0][0] - 4;
+  let labelX = nodes[0][0][0] + 20;
   let labelY = nodes[0][0][1] + 4;
-  // console.log(name, labelX, labelY);
   const label = svg.text(labelX, labelY, name);
   label.attr({
     "text-anchor": "end"
@@ -76,7 +214,6 @@ function genSmoothPathStr(points) {
   for (i = 1, len = points.length; i < len - 1; i += 2) {
     const rPoint = points[i];
     const lPoint = points[i + 1];
-    // console.log(i, rPoint, lPoint, points.length);
     const middleX = (rPoint[0] + lPoint[0]) / 2;
     pathStr += `L ${rPoint[0]} ${rPoint[1]} `;
     if (rPoint[1] !== lPoint[1]) {
@@ -116,21 +253,22 @@ function genSimplePathStr(points) {
   }
   return pathStr;
 }
-
-// main("./data/StarWars.xml");
-// main("./data/Redcap.xml");
-// main("./data/ChasingDragon.xml");
-// main("./data/Coco.xml");
-// main("./data/Frozen.xml");
-// main("./data/Guowuguan.xml");
-main("./data/InceptionTune.xml");
-// main("./data/JurassicParkTune.xml");
-// main("./data/KingLearTune.xml");
-// main("./data/LetBulletFlyTune.xml");
-// main("./data/MatrixTune.xml");
-// main("./data/Moon.xml");
-// main("./data/Minions.xml");
-// main("./data/NaniaTune.xml");
-// main("./data/Naruto.xml");
-// main("./data/Suiciders.xml");
-// main("./data/TrainToBusan.xml");
+let path =
+  "C:\\E\\study\\research\\20200131\\StoryFlowServer\\deploy\\uploadFiles\\";
+// main(path + "StarWars.xml");
+// main(path + "Redcap.xml");
+// main(path + "ChasingDragon.xml");
+// main(path + "Coco.xml");
+// main(path + "Frozen.xml");
+// main(path + "Guowuguan.xml");
+main(path + "inceptionTune.xml");
+// main(path + "JurassicParkTune.xml");
+// main(path + "KingLearTune.xml");
+// main(path + "LetBulletFlyTune.xml");
+// main(path + "MatrixTune.xml");
+// main(path + "Moon.xml");
+// main(path + "Minions.xml");
+// main(path + "NaniaTune.xml");
+// main(path + "Naruto.xml");
+// main(path + "Suiciders.xml");
+// main(path + "TrainToBusan.xml");
