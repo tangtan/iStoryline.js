@@ -65,3 +65,5 @@ export function renderModelError(type) {
 export function transformModelError(type) {
   console.error(`Invalid transform type in ${type}`);
 }
+
+export function convertDataToStory(params) {}

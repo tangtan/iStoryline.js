@@ -39,6 +39,12 @@ export default class iStoryline extends CharacterStore {
     return this._layout();
   }
 
+  genStoryFlowLayout(response) {
+    // convert response to story
+    // render story
+    // return new Graph(story)
+  }
+
   /**
    * Generate storyline visualization
    *
