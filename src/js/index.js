@@ -6,7 +6,12 @@ import { storyRender } from "./render/index";
 import { storyTransform } from "./transform/index";
 import { CtrInfo } from "./data/constraint";
 import { Graph } from "./data/graph";
-import { logNameError, logTimeError } from "./utils";
+import {
+  logNameError,
+  logTimeError,
+  convertDataToStory,
+  convertDataToConstraints
+} from "./utils";
 
 export default class iStoryline extends CharacterStore {
   /**
@@ -19,11 +24,11 @@ export default class iStoryline extends CharacterStore {
   constructor(pipeline = []) {
     super();
     // Pipeline configuration
-    this.orderModule = pipeline[0] || "GreedyOrder";
-    this.alignModule = pipeline[1] || "GreedyAlign";
-    this.compactModule = pipeline[2] || "GreedySlotCompact";
+    this.orderModule = pipeline[0] || "Null";
+    this.alignModule = pipeline[1] || "Null";
+    this.compactModule = pipeline[2] || "Null";
     this.renderModule = pipeline[3] || "SmoothRender";
-    this.transformModule = pipeline[4] || "FreeTransform";
+    this.transformModule = pipeline[4] || "Null";
     // Constraints for opimization models
     this.ctrInfo = new CtrInfo();
   }
@@ -39,12 +44,24 @@ export default class iStoryline extends CharacterStore {
     return this._layout();
   }
 
+  _layout(rawData) {
+    let story = convertDataToStory(rawData);
+    let constraints = [];
+    console.log(story);
+    storyOrder(this.orderModule, story, constraints);
+    storyAlign(this.alignModule, story, constraints);
+    storyCompact(this.compactModule, story, constraints);
+    storyRender(this.renderModule, story, constraints);
+    storyTransform(this.transformModule, story, constraints);
+    let graph = new Graph(story);
+    return graph;
+  }
   /**
    * Generate storyline visualization
    *
    * @return graph
    */
-  _layout() {
+  __layout() {
     let story = this.data;
     delete story.initialNodes;
     delete story.sequence;

@@ -1,6 +1,7 @@
 import Snap from "snapsvg";
 import iStoryline from "../../src/js/index";
 import { storyRender } from "../../src/js/render";
+import { convertDataToConstraints } from "../../src/js/utils";
 
 function main(url) {
   post(url);
@@ -47,12 +48,14 @@ function post(url) {
   };
 }
 function drawGraph(rawData) {
-  const graph = storyRender("SmoothRender", rawData);
+  let ans = new iStoryline();
+  let graph = ans._layout(rawData);
+  //const graph = ("SmoothRender", rawData);
   const nodes = graph.paths;
   for (let i = 0; i < nodes.length; i++) {
     let tmpNodes = nodes[i];
     // draw text labels
-    drawLabel(tmpNodes, graph.entities[i]);
+    drawLabel(tmpNodes, graph.names[i]);
     // draw graph with animations
     let storylines = drawInitial(tmpNodes);
     let completePathStrs = tmpNodes.map(line => genSimplePathStr(line));
@@ -157,13 +160,13 @@ function genSimplePathStr(points) {
 }
 let path =
   "C:\\E\\study\\research\\20200131\\StoryFlowServer\\deploy\\uploadFiles\\";
-// main(path + "StarWars.xml");
+main(path + "StarWars.xml");
 // main(path + "Redcap.xml");
 // main(path + "ChasingDragon.xml");
 // main(path + "Coco.xml");
 // main(path + "Frozen.xml");
 // main(path + "Guowuguan.xml");
-main(path + "inceptionTune.xml");
+// main(path + "inceptionTune.xml");
 // main(path + "JurassicParkTune.xml");
 // main(path + "KingLearTune.xml");
 // main(path + "LetBulletFlyTune.xml");
