@@ -1,6 +1,7 @@
 import Snap from "snapsvg";
 import iStoryline from "../../src/js/index";
 import { storyRender } from "../../src/js/render";
+import { convertDataToConstraints } from "../../src/js/utils";
 
 function main(url) {
   post(url);
@@ -47,12 +48,14 @@ function post(url) {
   };
 }
 function drawGraph(rawData) {
-  const graph = storyRender("SmoothRender", rawData);
+  let ans = new iStoryline();
+  let graph = ans._layout(rawData);
+  //const graph = ("SmoothRender", rawData);
   const nodes = graph.paths;
   for (let i = 0; i < nodes.length; i++) {
     let tmpNodes = nodes[i];
     // draw text labels
-    drawLabel(tmpNodes, graph.entities[i]);
+    drawLabel(tmpNodes, graph.names[i]);
     // draw graph with animations
     let storylines = drawInitial(tmpNodes);
     let completePathStrs = tmpNodes.map(line => genSimplePathStr(line));

@@ -21,10 +21,13 @@ export function storyCompact(compactModule, alignedSession, constraints) {
       compactFunc = opSlotCompact;
       break;
     default:
-      compactModelError(compactModule);
+      compactFunc = compactModelError;
   }
   const din = spaceInfo.length > 0 ? spaceInfo[0].param.intraSep : 1000;
   const dout = spaceInfo.length > 0 ? spaceInfo[0].param.interSep : 10;
+  if (compactFunc === compactModelError) {
+    return compactFunc(compactModule);
+  }
   return compactFunc(
     alignedSession,
     compressInfo,
