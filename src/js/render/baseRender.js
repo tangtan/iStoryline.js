@@ -197,6 +197,7 @@ function _getStorylineID(characterName, name) {
 }
 function _getStoryNodeY(storyline, storylineID, time) {
   let x = time * 50;
+  let ret = -1;
   for (let i = 0; i < storyline[storylineID].length; i++) {
     let L = 0,
       R = storyline[storylineID][i].length - 1,
@@ -318,6 +319,11 @@ function _sortByY(list, storyline) {
 function _sortNumber(a, b) {
   return a - b;
 }
+function _getSmoothPos(storyNodeNew, storyNodeOld, time) {
+  let tmpX = storyNodeNew[0] - storyNodeOld[0] + time * 50;
+  let tmpY = storyNodeNew[1];
+  return { tmpX, tmpY };
+}
 function _cutString(originString, groupPosition) {
   let i = 0,
     j = 0;
@@ -335,6 +341,7 @@ function _cutString(originString, groupPosition) {
   }
   for (; originString[i] === "_"; i++);
   tmpA[0] = originString[i];
+  i++;
   for (; originString[i] === "_"; i++);
   tmpB[0] = originString[i];
   let posY = new Number();
@@ -359,13 +366,11 @@ function _calculateMarks(storyline, characterName, relate, stylish) {
     if (stylish !== undefined) {
       for (let i = 0; i < stylish.length; i++) {
         let storylineID = _getStorylineID(characterName, stylish[i][0]);
-        tmpDivideMarks[storylineID][divideCnts[storylineID]] = new Array();
         tmpDivideMarks[storylineID][divideCnts[storylineID]] = [
           stylish[i][1],
           stylish[i][3]
         ];
         divideCnts[storylineID]++;
-        tmpDivideMarks[storylineID][divideCnts[storylineID]] = new Array();
         tmpDivideMarks[storylineID][divideCnts[storylineID]] = [
           stylish[i][2],
           "Normal"
@@ -396,14 +401,12 @@ function _calculateMarks(storyline, characterName, relate, stylish) {
               num++;
             }
           }
-          tmpDivideMarks[storylineID][divideCnts[storylineID]] = new Array();
           tmpDivideMarks[storylineID][divideCnts[storylineID]] = [
             relate[i][1],
             relate[i][3] + "_" + String(i) + "_" + String(num)
           ];
           divideCnts[storylineID]++;
-          tmpDivideMarks[storylineID][divideCnts[storylineID]] = new Array();
-          tmpDivideMarks[storylineID][divideCnts[storylineID]][0] = [
+          tmpDivideMarks[storylineID][divideCnts[storylineID]] = [
             relate[i][2],
             "Normal"
           ];
@@ -782,7 +785,6 @@ export function calculateSplitNodes(tmpSmoothNodes, splitMarks, originNodes) {
               originNodes[i][j][k],
               splitMarks[i][ptOfSplit][0]
             );
-            splitNodes[i][cntSegments][cntNodes] = new Array();
             splitNodes[i][cntSegments][cntNodes] = [tmpX, tmpY];
             ++cntSegments;
             splitNodes[i][cntSegments] = new Array();
@@ -829,26 +831,27 @@ export function calculateStyledNodes(smoothNodes, sketchStyles, groupPosition) {
         styledNodes[i][j] = deepCopy(tmpSketchNodes[i][j]);
       } else {
         if (sketchStyles[i][j] === "Wave") {
-          aimNodes = _styleWave(tmpSketchNodes);
+          aimNodes = _styleWave(tmpSketchNodes[i][j]);
         } else if (sketchStyles[i][j] === "Zigzag") {
-          aimNodes = _styleZigzag(tmpSketchNodes);
+          aimNodes = _styleZigzag(tmpSketchNodes[i][j]);
         } else if (sketchStyles[i][j] === "Bump") {
-          aimNodes = _styleBump(tmpSketchNodes);
+          aimNodes = _styleBump(tmpSketchNodes[i][j]);
         } else if (sketchStyles[i][j] === "Dash") {
-          aimNodes = _styleDash(tmpSketchNodes);
+          aimNodes = _styleDash(tmpSketchNodes[i][j]);
         } else {
           const { styleOption, stdY, cntNum } = _cutString(
             sketchStyles[i][j],
             groupPosition
           );
           if (styleOption === "Collide") {
-            aimNodes = _relateCollide(tmpSketchNodes, stdY, cntNum);
+            aimNodes = _relateCollide(tmpSketchNodes[i][j], stdY, cntNum);
           } else if (styleOption === "Knot") {
-            aimNodes = _relateKnot(tmpSketchNodes);
+            aimNodes = _relateKnot(tmpSketchNodes[i][j], stdY);
           } else if (styleOption === "Twine") {
-            aimNodes = _relateTwine(tmpSketchNodes);
+            aimNodes = _relateTwine(tmpSketchNodes[i][j], stdY, cntNum);
           }
         }
+        //debugger;
         styledNodes[i][j] = deepCopy(aimNodes);
       }
     }
@@ -958,7 +961,37 @@ export function calBezier(p, t, d) {
   ret += p[3][d] * t * t * t;
   return ret;
 }
-export function judgeStylishAndRelate(relateInfo, stylishInfo) {
+function _covertRawRelateInfo(rawRelateInfo) {
+  let relateInfo = [];
+  let cnt = 0;
+  for (let i = 0; i < rawRelateInfo.length; i++) {
+    relateInfo[cnt] = [];
+    relateInfo[cnt][0] = deepCopy(rawRelateInfo[i].names);
+    relateInfo[cnt][1] = rawRelateInfo[i].timespan[0];
+    relateInfo[cnt][2] = rawRelateInfo[i].timespan[1];
+    relateInfo[cnt][3] = rawRelateInfo[i].style;
+    cnt++;
+  }
+  return relateInfo;
+}
+function _covertRawStylishInfo(rawStylishInfo) {
+  let stylishInfo = [];
+  let cnt = 0;
+  for (let i = 0; i < rawStylishInfo.length; i++) {
+    for (let j = 0; j < rawStylishInfo[i].names.length; j++) {
+      stylishInfo[cnt] = [];
+      stylishInfo[cnt][0] = rawStylishInfo[i].names[j];
+      stylishInfo[cnt][1] = rawStylishInfo[i].timespan[0];
+      stylishInfo[cnt][2] = rawStylishInfo[i].timespan[1];
+      stylishInfo[cnt][3] = rawStylishInfo[i].style;
+      cnt++;
+    }
+  }
+  return stylishInfo;
+}
+export function judgeStylishAndRelate(rawRelateInfo, rawStylishInfo) {
+  let relateInfo = _covertRawRelateInfo(rawRelateInfo);
+  let stylishInfo = _covertRawStylishInfo(rawStylishInfo);
   let stylish = new Array();
   let relate = new Array();
   let tmp = new Array();
@@ -1050,33 +1083,33 @@ export function initializeSplitMarks(
     for (let j = 0; j < storyline[i].length; j++) {
       insTime[insCnt++] = _getTime(storyline, i, j, 0, 0);
     }
-
     let k = 0;
     for (let j = 0; j < insCnt; j++) {
       while (k < divideMarks[i].length && divideMarks[i][k][0] < insTime[j]) {
-        splitMarks[i][cnt] = new Array();
         splitMarks[i][cnt] = [divideMarks[i][k][0], divideMarks[i][k][1]];
         cnt++;
         k++;
       }
       if (k < divideMarks[i].length && divideMarks[i][k][0] === insTime[j]) {
-        splitMarks[i][cnt] = new Array();
         splitMarks[i][cnt] = [divideMarks[i][k][0], divideMarks[i][k][1]];
         cnt++;
         k++;
         continue;
       }
       if (k >= divideMarks[i].length || divideMarks[i][k][0] > insTime[j]) {
-        splitMarks[i][cnt] = new Array();
         splitMarks[i][cnt] = [insTime[j], "Normal"];
         cnt++;
       }
       if (k < divideMarks[i].length) {
-        splitMarks[i][cnt] = new Array();
         splitMarks[i][cnt] = [divideMarks[i][k][0], divideMarks[i][k][1]];
         cnt++;
         k++;
       }
+    }
+    while (k < divideMarks[i].length) {
+      splitMarks[i][cnt] = [divideMarks[i][k][0], divideMarks[i][k][1]];
+      cnt++;
+      k++;
     }
   }
   return { splitMarks, groupPosition };
@@ -1182,6 +1215,7 @@ function _styleWave(tmpSketchNodes, WAVEHEIGHT = 600, PI = 3.14) {
       k = nxtK;
     }
   }
+  return styledNodes;
 }
 function _styleZigzag(tmpSketchNodes, ZIGHEIGHT = 500) {
   let styledNodes = [];
@@ -1206,6 +1240,7 @@ function _styleZigzag(tmpSketchNodes, ZIGHEIGHT = 500) {
       k = nxtK;
     }
   }
+  return styledNodes;
 }
 function _styleBump(tmpSketchNodes, BUMPHEIGHT = 500) {
   let styledNodes = [];
@@ -1246,6 +1281,7 @@ function _styleBump(tmpSketchNodes, BUMPHEIGHT = 500) {
       k = nxtK;
     }
   }
+  return styledNodes;
 }
 function _styleDash(tmpSketchNodes) {
   let styledNodes = [];
@@ -1267,6 +1303,7 @@ function _styleDash(tmpSketchNodes) {
       k = nxtK;
     }
   }
+  return styledNodes;
 }
 function _relateCollide(tmpSketchNodes, stdY, cntNum, COLLIDEHEIGHT = 250) {
   const { aNodes, bNodes } = _forRelateTurn(
@@ -1278,26 +1315,26 @@ function _relateCollide(tmpSketchNodes, stdY, cntNum, COLLIDEHEIGHT = 250) {
   let aimNodes = new Array();
   let cnt = 0;
   for (let z = 0; z < aNodes.length; z++) {
-    aimNodes[cnt++] = deepCopy(aNodes);
+    aimNodes[cnt++] = deepCopy(aNodes[z]);
   }
   for (let z = 0; z < bNodes.length; z++) {
-    aimNodes[cnt++] = deepCopy(bNodes);
+    aimNodes[cnt++] = deepCopy(bNodes[z]);
   }
   return aimNodes;
 }
 function _relateKnot(tmpSketchNodes, stdY, KNOTHEIGHT = 2000) {
   const { aNodes, bNodes } = _forRelateTurn(tmpSketchNodes, 0.4, stdY, 0);
-  let SAMPLERATE = Math.ceil(midLength / 40);
   let aimNodes = new Array();
   let midLength =
     0.2 * (tmpSketchNodes[tmpSketchNodes.length - 1][0] - tmpSketchNodes[0][0]);
+  let SAMPLERATE = Math.ceil(midLength / 40);
   let cnt = 0;
   for (let i = 0; i < aNodes.length; i++) {
     aimNodes[cnt++] = deepCopy(aNodes[i]);
   }
   for (let i = 0; i <= SAMPLERATE; i++) {
     aimNodes[cnt] = new Array();
-    aimNodes[cnt][0] = Math.random() * midLength + staX;
+    aimNodes[cnt][0] = Math.random() * midLength + aNodes[aNodes.length - 1][0];
     aimNodes[cnt][1] =
       Math.random() * KNOTHEIGHT * (Math.random > 0.5 ? 1 : -1) + stdY;
     cnt++;
@@ -1307,7 +1344,13 @@ function _relateKnot(tmpSketchNodes, stdY, KNOTHEIGHT = 2000) {
   }
   return aimNodes;
 }
-function _relateTwine(tmpSketchNodes, TWINEHEIGHT = 500, PI = 3.14) {
+function _relateTwine(
+  tmpSketchNodes,
+  stdY,
+  cntNum,
+  TWINEHEIGHT = 2000,
+  PI = 3.14
+) {
   const { aNodes, bNodes } = _forRelateTurn(tmpSketchNodes, 0.2, stdY, 0);
   let aimNodes = new Array();
   let cnt = 0;
@@ -1316,12 +1359,13 @@ function _relateTwine(tmpSketchNodes, TWINEHEIGHT = 500, PI = 3.14) {
   }
   let midLength =
     (tmpSketchNodes[tmpSketchNodes.length - 1][0] - tmpSketchNodes[0][0]) * 0.6;
-  let WAVERATE = Math.ceil(midLength / 100);
-  let SAMPLERATE = Math.ceil(midLength / 8);
+  let WAVERATE = Math.ceil(midLength / 500);
+  let SAMPLERATE = Math.ceil(midLength / 10);
   if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
   for (let i = 0; i <= SAMPLERATE; i++) {
     aimNodes[cnt] = new Array();
-    aimNodes[cnt][0] = staX + (midLength * i) / SAMPLERATE;
+    aimNodes[cnt][0] =
+      aNodes[aNodes.length - 1][0] + (midLength * i) / SAMPLERATE;
     aimNodes[cnt][1] =
       (cntNum & 1 ? -1 : 1) *
         Math.sin((i * WAVERATE * PI) / SAMPLERATE) *
@@ -1342,7 +1386,7 @@ function _forRelateTurn(tmpSketchNodes, rate, stdY, HEIGHT) {
   let SAMPLERATE = Math.ceil((0.2 * tmpLength) / 8);
   if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
   let aNodes = linkNodes(
-    [tmpSketchNodes[0], [[staX, stdY + HEIGHT]]],
+    [tmpSketchNodes[0], [staX, stdY + HEIGHT]],
     0,
     SAMPLERATE
   );

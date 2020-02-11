@@ -44,10 +44,9 @@ export default class iStoryline extends CharacterStore {
     return this._layout();
   }
 
-  _layout(rawData) {
+  _layout(rawData, storyProtoc) {
     let story = convertDataToStory(rawData);
-    let constraints = [];
-    console.log(story);
+    let constraints = convertDataToConstraints(rawData, storyProtoc, story);
     storyOrder(this.orderModule, story, constraints);
     storyAlign(this.alignModule, story, constraints);
     storyCompact(this.compactModule, story, constraints);

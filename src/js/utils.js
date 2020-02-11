@@ -142,8 +142,76 @@ export function convertDataToStory(data, timeShift = 50) {
   );
   return initialGraph;
 }
-export function convertDataToConstraints(data) {
+export function convertDataToConstraints(data, protocol, story) {
   let constraints = [];
+  let stylishInfo = protocol.stylishInfo;
+  let relateInfo = protocol.relateInfo;
+  let array = data.data.array;
+  if (stylishInfo) {
+    for (let i = 0; i < stylishInfo.length; i++) {
+      let tmp = {};
+      tmp.names = [];
+      for (let j = 0; j < stylishInfo[i].names.length; j++) {
+        tmp.names.push(array[Number(stylishInfo[i].names[j])].name);
+      }
+      tmp.timespan = [
+        translateXtoTime(
+          array[Number(stylishInfo[i].names[0])].points[
+            Number(stylishInfo[i].timespan[0])
+          ].item1,
+          Number(stylishInfo[i].timespan[0])
+        ),
+        translateXtoTime(
+          array[Number(stylishInfo[i].names[0])].points[
+            Number(stylishInfo[i].timespan[1])
+          ].item2,
+          Number(stylishInfo[i].timespan[1])
+        )
+      ];
+      let lifespans = story.timeframeTable.get(tmp.names[0]);
+      let startTime = lifespans[0][0];
+      let endTime = lifespans[lifespans.length - 1][1];
+      tmp.timespan[0] = Math.max(tmp.timespan[0], startTime);
+      tmp.timespan[1] = Math.min(tmp.timespan[1], endTime);
+      tmp.style = stylishInfo[i].style;
+      constraints.push(tmp);
+    }
+  }
+  if (relateInfo) {
+    for (let i = 0; i < relateInfo.length; i++) {
+      let tmp = {};
+      tmp.names = [];
+      let startTime = 0,
+        endTime = 1e9;
+      for (let j = 0; j < relateInfo[i].names.length; j++) {
+        tmp.names.push(array[Number(relateInfo[i].names[j])].name);
+        let lifespans = story.timeframeTable.get(tmp.names[j]);
+        startTime = Math.max(startTime, lifespans[0][0]);
+        endTime = Math.min(endTime, lifespans[lifespans.length - 1][1]);
+      }
+      tmp.timespan = [
+        translateXtoTime(
+          array[Number(relateInfo[i].names[0])].points[
+            Number(relateInfo[i].timespan[0])
+          ].item1,
+          Number(relateInfo[i].timespan[0])
+        ),
+        translateXtoTime(
+          array[Number(relateInfo[i].names[0])].points[
+            Number(relateInfo[i].timespan[1])
+          ].item2,
+          Number(relateInfo[i].timespan[1])
+        )
+      ];
+      tmp.timespan[0] = Math.max(tmp.timespan[0], startTime);
+      tmp.timespan[1] = Math.min(tmp.timespan[1], endTime);
+      tmp.style = relateInfo[i].style;
+      constraints.push(tmp);
+    }
+  }
+  // for(let i = 0;i < relateInfo.length;i ++){
+  //   let tmp = [];
+  // }
   return constraints;
 }
 export function deepCopy(tmp) {

@@ -49,7 +49,16 @@ function post(url) {
 }
 function drawGraph(rawData) {
   let ans = new iStoryline();
-  let graph = ans._layout(rawData);
+  let protoc = {};
+  protoc.stylishInfo = [];
+  protoc.relateInfo = [];
+  protoc.stylishInfo.push({ names: [10], timespan: [23, 24], style: "Bump" });
+  // protoc.stylishInfo.push({'names':[3],'timespan':[6,9],'style':'Wave'});
+  // protoc.stylishInfo.push({'names':[8],'timespan':[10,12],'style':'Bump'});
+  // protoc.relateInfo.push({'names':[0,2],'timespan':[0,3],'style':'Collide'});
+  // protoc.relateInfo.push({'names':[7,10],'timespan':[28,30],'style':'Knot'});
+  // protoc.relateInfo.push({'names':[11,14],'timespan':[34,36],'style':'Twine'});
+  let graph = ans._layout(rawData, protoc);
   //const graph = ("SmoothRender", rawData);
   const nodes = graph.paths;
   for (let i = 0; i < nodes.length; i++) {
