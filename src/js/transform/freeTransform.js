@@ -61,15 +61,18 @@ function transform(controlNodes, nodes) {
     x.forEach(y => {
       // if (y[0] > maxx) maxx = y[0];
       // if (y[1] > maxy) maxy = y[1];
-     let yx=y.map(_=>_[0]);
-     maxx=Math.max(maxx,...yx);
-     let yy=y.map(_=>_[1]);
-     maxy=Math.max(maxy,...yy);
+      let yx = y.map(_ => _[0]);
+      maxx = Math.max(maxx, ...yx);
+      let yy = y.map(_ => _[1]);
+      maxy = Math.max(maxy, ...yy);
     });
   });
   nodes.forEach(x => {
     x.forEach(node => {
-      node.forEach(point=>{point[0]/=maxx;point[1]/=maxy;});
+      node.forEach(point => {
+        point[0] /= maxx;
+        point[1] /= maxy;
+      });
       // node[0] /= maxx;
       // node[1] /= maxy;
     });
