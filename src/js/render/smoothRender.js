@@ -26,7 +26,8 @@ function smoothRender(
   let originNodes = calculateOriginNodes(
     initialGraph.initialNodes,
     initialGraph.timeframeTable,
-    initialGraph.entities
+    initialGraph.entities,
+    initialGraph.keyTimeframe
   );
   let group = initializeGroup(originNodes);
   const { relate, stylish } = judgeStylishAndRelate(relateInfo, stylishInfo);
@@ -94,32 +95,32 @@ function calculateSmoothNodes(
   let cntNodes = 0;
   for (let i = 0; i < tmpSmoothNodes.length; i++) {
     smoothNodes[i] = new Array();
-    for (let j = 0; j < tmpSmoothNodes[i].length; j++) {
+    for (let j = 0; j < tmpSmoothNodes[i].length - 1; j++) {
       cntNodes = 0;
       smoothNodes[i][j] = new Array();
       for (let k = 0; k < tmpSmoothNodes[i][j].length; k++) {
-        if (
-          k + 1 === tmpSmoothNodes[i][j].length ||
-          tmpSmoothNodes[i][j][k][1] === tmpSmoothNodes[i][j][k + 1][1]
-        ) {
-          smoothNodes[i][j][cntNodes++] = deepCopy(tmpSmoothNodes[i][j][k]);
-        } else {
-          let SAMPLERATE = Math.floor(
-            _getLength(tmpSmoothNodes[i][j][k], tmpSmoothNodes[i][j][k + 1]) /
-              10
-          );
-          if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
-          let aimNodes = linkNodes(
-            [tmpSmoothNodes[i][j][k], tmpSmoothNodes[i][j][k + 1]],
-            0,
-            SAMPLERATE
-          );
-          for (let z = 0; z < aimNodes.length; z++) {
-            smoothNodes[i][j][cntNodes++] = deepCopy(aimNodes[z]);
-          }
+        smoothNodes[i][j][cntNodes++] = deepCopy(tmpSmoothNodes[i][j][k]);
+      }
+      if (tmpSmoothNodes[i][j][1][1] === tmpSmoothNodes[i][j + 1][0][1]) {
+        smoothNodes[i][j][cntNodes++] = deepCopy(tmpSmoothNodes[i][j + 1][0]);
+      } else {
+        let SAMPLERATE = Math.floor(
+          _getLength(tmpSmoothNodes[i][j][1], tmpSmoothNodes[i][j + 1][0]) / 10
+        );
+        if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
+        let aimNodes = linkNodes(
+          [tmpSmoothNodes[i][j][1], tmpSmoothNodes[i][j + 1][0]],
+          0,
+          SAMPLERATE
+        );
+        for (let z = 0; z < aimNodes.length; z++) {
+          smoothNodes[i][j][cntNodes++] = deepCopy(aimNodes[z]);
         }
       }
     }
+    smoothNodes[i][tmpSmoothNodes[i].length - 1] = deepCopy(
+      tmpSmoothNodes[i][tmpSmoothNodes[i].length - 1]
+    );
   }
   smoothNodes = calculateStyledNodes(smoothNodes, ret[1], groupPosition);
   let styleConfig = calculateStyles(

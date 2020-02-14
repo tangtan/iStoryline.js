@@ -143,10 +143,17 @@ export function convertDataToStory(data, timeShift = 50) {
   return initialGraph;
 }
 export function convertDataToConstraints(data, protocol, story) {
+  //样式优先级：1、relate>stylish 2、新加入的 > 旧加入的
   let constraints = [];
-  let stylishInfo = protocol.stylishInfo;
-  let relateInfo = protocol.relateInfo;
+  let tmpStylishInfo = protocol.stylishInfo;
+  let tmpRelateInfo = protocol.relateInfo;
   let array = data.data.array;
+  const { relateInfo, stylishInfo } = deleteDuplicatedStyles(
+    tmpStylishInfo,
+    tmpRelateInfo,
+    story,
+    array
+  );
   if (stylishInfo) {
     for (let i = 0; i < stylishInfo.length; i++) {
       let tmp = {};
@@ -174,7 +181,7 @@ export function convertDataToConstraints(data, protocol, story) {
       tmp.timespan[0] = Math.max(tmp.timespan[0], startTime);
       tmp.timespan[1] = Math.min(tmp.timespan[1], endTime);
       tmp.style = stylishInfo[i].style;
-      constraints.push(tmp);
+      if (tmp.timespan[0] < tmp.timespan[1]) constraints.push(tmp);
     }
   }
   if (relateInfo) {
@@ -206,13 +213,106 @@ export function convertDataToConstraints(data, protocol, story) {
       tmp.timespan[0] = Math.max(tmp.timespan[0], startTime);
       tmp.timespan[1] = Math.min(tmp.timespan[1], endTime);
       tmp.style = relateInfo[i].style;
-      constraints.push(tmp);
+      if (tmp.timespan[0] < tmp.timespan[1]) constraints.push(tmp);
     }
   }
-  // for(let i = 0;i < relateInfo.length;i ++){
-  //   let tmp = [];
-  // }
   return constraints;
+}
+function deleteDuplicatedStyles(tmpStylishInfo, tmpRelateInfo, story, array) {
+  let relateInfo = [];
+  let stylishInfo = [];
+  if (tmpRelateInfo) {
+    for (let i = tmpRelateInfo.length - 1; i >= 0; i--) {
+      //尾部的样式是最新添加的样式 应该允许覆盖此前的
+      let l = tmpRelateInfo[i].timespan[0];
+      let r = tmpRelateInfo[i].timespan[1];
+      for (let j = 0; j < relateInfo.length; j++) {
+        let flag = 0;
+        for (let k = 0; k < relateInfo[j].names.length; k++) {
+          for (let z = 0; z < tmpRelateInfo[i].names.length; z++) {
+            if (relateInfo[j].names[k] === tmpRelateInfo[i].names[z]) {
+              flag = 1;
+            }
+          }
+        }
+        if (flag) {
+          if (
+            l >= relateInfo[j].timespan[0] &&
+            l <= relateInfo[j].timespan[1]
+          ) {
+            l = Math.max(l, relateInfo[j].timespan[1] + 1);
+          }
+          if (
+            r >= relateInfo[j].timespan[0] &&
+            r <= relateInfo[j].timespan[1]
+          ) {
+            r = Math.min(r, relateInfo[j].timespan[0] - 1);
+          }
+        }
+      }
+      if (l <= r) {
+        relateInfo.push({
+          names: tmpRelateInfo[i].names,
+          timespan: [l, r],
+          style: tmpRelateInfo[i].style
+        });
+      }
+    }
+  }
+  if (tmpStylishInfo) {
+    for (let i = tmpStylishInfo.length - 1; i >= 0; i--) {
+      let l = tmpStylishInfo[i].timespan[0];
+      let r = tmpStylishInfo[i].timespan[1];
+      for (let j = 0; j < relateInfo.length; j++) {
+        let flag = 0;
+        for (let k = 0; k < relateInfo[j].names.length; k++) {
+          for (let z = 0; z < tmpRelateInfo[i].names.length; z++) {
+            if (relateInfo[j].names[k] === tmpRelateInfo[i].names[z]) {
+              flag = 1;
+            }
+          }
+        }
+        if (flag) {
+          if (
+            l >= relateInfo[j].timespan[0] &&
+            l <= relateInfo[j].timespan[1]
+          ) {
+            l = Math.max(l, relateInfo[j].timespan[1] + 1);
+          }
+          if (
+            r >= relateInfo[j].timespan[0] &&
+            r <= relateInfo[j].timespan[1]
+          ) {
+            r = Math.min(r, relateInfo[j].timespan[0] - 1);
+          }
+        }
+      }
+      for (let j = 0; j < stylishInfo.length; j++) {
+        if (tmpStylishInfo[i].names[0] === stylishInfo[j].names[0]) {
+          if (
+            l >= stylishInfo[j].timespan[0] &&
+            l <= stylishInfo[j].timespan[1]
+          ) {
+            l = Math.max(l, stylishInfo[j].timespan[1] + 1);
+          }
+          if (
+            r >= stylishInfo[j].timespan[0] &&
+            r <= stylishInfo[j].timespan[1]
+          ) {
+            r = Math.min(r, stylishInfo[j].timespan[0] - 1);
+          }
+        }
+      }
+      if (l <= r) {
+        stylishInfo.push({
+          names: tmpStylishInfo[i].names,
+          timespan: [l, r],
+          style: tmpStylishInfo[i].style
+        });
+      }
+    }
+  }
+  return { stylishInfo, relateInfo };
 }
 export function deepCopy(tmp) {
   if (tmp instanceof Array) {

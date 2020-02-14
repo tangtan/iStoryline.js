@@ -52,14 +52,16 @@ function drawGraph(rawData) {
   let protoc = {};
   protoc.stylishInfo = [];
   protoc.relateInfo = [];
-  protoc.stylishInfo.push({ names: [10], timespan: [23, 24], style: "Bump" });
-  // protoc.stylishInfo.push({'names':[3],'timespan':[6,9],'style':'Wave'});
+  //protoc.stylishInfo.push({'names':[0],'timespan':[1,2],'style':'Wave'});
+  //protoc.stylishInfo.push({'names':[1],'timespan':[1,4],'style':'Zigzag'});
+  // protoc.stylishInfo.push({ names: [10], timespan: [23, 24], style: "Bump" });
   // protoc.stylishInfo.push({'names':[8],'timespan':[10,12],'style':'Bump'});
-  // protoc.relateInfo.push({'names':[0,2],'timespan':[0,3],'style':'Collide'});
-  // protoc.relateInfo.push({'names':[7,10],'timespan':[28,30],'style':'Knot'});
+  protoc.relateInfo.push({ names: [0, 1], timespan: [0, 0], style: "Collide" });
+  protoc.relateInfo.push({ names: [2, 3], timespan: [4, 4], style: "Knot" });
   // protoc.relateInfo.push({'names':[11,14],'timespan':[34,36],'style':'Twine'});
   let graph = ans._layout(rawData, protoc);
   //const graph = ("SmoothRender", rawData);
+  console.log(graph);
   const nodes = graph.paths;
   for (let i = 0; i < nodes.length; i++) {
     let tmpNodes = nodes[i];
@@ -169,8 +171,8 @@ function genSimplePathStr(points) {
 }
 let path =
   "C:\\E\\study\\research\\20200131\\StoryFlowServer\\deploy\\uploadFiles\\";
-main(path + "StarWars.xml");
-// main(path + "Redcap.xml");
+// main(path + "StarWars.xml");
+main(path + "Redcap.xml");
 // main(path + "ChasingDragon.xml");
 // main(path + "Coco.xml");
 // main(path + "Frozen.xml");
