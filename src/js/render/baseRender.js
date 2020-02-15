@@ -48,7 +48,7 @@ function _checkDivideUpdate(tmpDivideMarks, storylineID, nxt, now) {
   return false;
 }
 function _checkInSameSegment(bound, x) {
-  return x <= bound[1] && x >= bound[0];
+  return x < bound[1] && x > bound[0];
 }
 function _checkMoveRules(storyline, storylineID, segmentID, storyNodeID) {
   let nowSeg = storyline[storylineID][segmentID];
@@ -91,6 +91,7 @@ function _checkSplit(
       ret = 2;
     }
   }
+  if (storyNodeID === 1) ret = 0;
   return ret;
 }
 function _checkStyleNormal(sketchStyles, i, j) {
@@ -248,6 +249,8 @@ function _getStyleType(stylish) {
     case "Width":
       ret = 2;
       break;
+    case "Undo":
+      ret = 2;
     case "Normal":
       ret = 3;
       break;
@@ -266,33 +269,38 @@ function _getTurningType(list, k, storyline) {
   let storylineID = list[k][0];
   let segmentID = list[k][1];
   let storyNodeID = list[k][2];
-  let lasTime = storyNodeID - 1;
-  let nxtTime = storyNodeID + 1;
   let ret = 0; //normal;
-  if (
-    nxtTime < storyline[storylineID][segmentID].length &&
-    storyline[storylineID][segmentID][storyNodeID][1] >
-      storyline[storylineID][segmentID][nxtTime][1]
-  )
-    ret = 1; //leftdown to rightup low
-  if (
-    nxtTime < storyline[storylineID][segmentID].length &&
-    storyline[storylineID][segmentID][storyNodeID][1] <
-      storyline[storylineID][segmentID][nxtTime][1]
-  )
-    ret = 2; //leftup to rightdown high
-  if (
-    lasTime >= 0 &&
-    storyline[storylineID][segmentID][storyNodeID][1] <
-      storyline[storylineID][segmentID][lasTime][1]
-  )
-    ret = 3; //leftdown to rightup high
-  if (
-    lasTime >= 0 &&
-    storyline[storylineID][segmentID][storyNodeID][1] >
-      storyline[storylineID][segmentID][lasTime][1]
-  )
-    ret = 4; //leftup to rightdown low
+  if (storyNodeID === 0) {
+    // left
+    let lasTime = segmentID - 1;
+    if (
+      lasTime >= 0 &&
+      storyline[storylineID][segmentID][storyNodeID][1] <
+        storyline[storylineID][lasTime][storyNodeID ^ 1][1] //now right and on the top
+    )
+      ret = 3;
+    if (
+      lasTime >= 0 &&
+      storyline[storylineID][segmentID][storyNodeID][1] >
+        storyline[storylineID][lasTime][storyNodeID ^ 1][1] // now right and on the bottom
+    )
+      ret = 4;
+  } else {
+    //right
+    let nxtTime = segmentID + 1;
+    if (
+      nxtTime < storyline[storylineID].length &&
+      storyline[storylineID][segmentID][storyNodeID][1] >
+        storyline[storylineID][nxtTime][storyNodeID ^ 1][1]
+    )
+      ret = 1; //now left and on the bottom
+    if (
+      nxtTime < storyline[storylineID].length &&
+      storyline[storylineID][segmentID][storyNodeID][1] <
+        storyline[storylineID][nxtTime][storyNodeID ^ 1][1]
+    )
+      ret = 2; //now left and on the top
+  }
   return ret;
 }
 function _sortByY(list, storyline) {
@@ -373,7 +381,7 @@ function _calculateMarks(storyline, characterName, relate, stylish) {
         divideCnts[storylineID]++;
         tmpDivideMarks[storylineID][divideCnts[storylineID]] = [
           stylish[i][2],
-          "Normal"
+          "Undo"
         ];
         divideCnts[storylineID]++;
       }
@@ -408,7 +416,7 @@ function _calculateMarks(storyline, characterName, relate, stylish) {
           divideCnts[storylineID]++;
           tmpDivideMarks[storylineID][divideCnts[storylineID]] = [
             relate[i][2],
-            "Normal"
+            "Undo"
           ];
           divideCnts[storylineID]++;
         }
@@ -624,10 +632,29 @@ export function initializeGroup(storyline) {
   }
   return group;
 }
+function _getStorySegments(timeframeTable, _characterName, keyTimeframe) {
+  let lifeSpan = timeframeTable.get(_characterName);
+  let storySegments = [];
+  let cnt = 0;
+  for (let i = 0; i < keyTimeframe.length - 1; i++) {
+    for (let j = 0; j < lifeSpan.length; j++) {
+      if (
+        keyTimeframe[i] >= lifeSpan[j][0] &&
+        keyTimeframe[i + 1] <= lifeSpan[j][1]
+      ) {
+        storySegments[cnt] = [keyTimeframe[i], keyTimeframe[i + 1]];
+        cnt++;
+        break;
+      }
+    }
+  }
+  return storySegments;
+}
 export function calculateOriginNodes(
   initialNodes,
   timeframeTable,
   entities,
+  keyTimeframe,
   TIMEFRAMESPAN = 50
 ) {
   let originNodes = new Array();
@@ -635,25 +662,63 @@ export function calculateOriginNodes(
   let tot = 0;
   for (let i = 0; i < entities.length; i++) {
     let _characterName = entities[i];
-    let _storySegment = timeframeTable.get(_characterName);
+    let _storySegment = _getStorySegments(
+      timeframeTable,
+      _characterName,
+      keyTimeframe
+    );
     originNodes[i] = new Array();
     cnt = 0;
     for (let j = 0; j < _storySegment.length; j++) {
       tot = 0;
       originNodes[i][j] = new Array();
-      while (
-        cnt < initialNodes[i].length &&
-        _checkInSameSegment(
-          _storySegment[j],
-          Math.floor(initialNodes[i][cnt][0] / TIMEFRAMESPAN)
-        )
+      if (
+        Math.ceil(initialNodes[i][cnt][0] / TIMEFRAMESPAN) ===
+        _storySegment[j][0]
       ) {
-        originNodes[i][j][tot] = new Array();
+        //cnt = 0 必进这个函数
         originNodes[i][j][tot] = [
           initialNodes[i][cnt][0],
           initialNodes[i][cnt][1]
         ];
         cnt++;
+        tot++;
+      } else {
+        originNodes[i][j][tot] = [
+          _storySegment[j][0] * TIMEFRAMESPAN,
+          initialNodes[i][cnt - 1][1]
+        ]; //cnt 或者 cnt - 1结果不变
+        tot++;
+      }
+      while (
+        cnt < initialNodes[i].length &&
+        _checkInSameSegment(
+          _storySegment[j],
+          Math.ceil(initialNodes[i][cnt][0] / TIMEFRAMESPAN)
+        )
+      ) {
+        originNodes[i][j][tot] = [
+          initialNodes[i][cnt][0],
+          initialNodes[i][cnt][1]
+        ];
+        cnt++;
+        tot++;
+      }
+      if (
+        Math.ceil(initialNodes[i][cnt][0] / TIMEFRAMESPAN) ===
+        _storySegment[j][1]
+      ) {
+        originNodes[i][j][tot] = [
+          initialNodes[i][cnt][0],
+          initialNodes[i][cnt][1]
+        ];
+        cnt++;
+        tot++;
+      } else {
+        originNodes[i][j][tot] = [
+          _storySegment[j][1] * TIMEFRAMESPAN - TIMEFRAMESPAN * 0.5,
+          initialNodes[i][cnt - 1][1]
+        ];
         tot++;
       }
     }
@@ -765,7 +830,9 @@ export function calculateSplitNodes(tmpSmoothNodes, splitMarks, originNodes) {
           k
         );
         while (flagSplit === 1 || flagSplit === 2) {
+          //只会出现1和0了
           if (flagSplit === 1) {
+            //time = stdtime
             if (cntNodes !== 0) {
               splitNodes[i][cntSegments][cntNodes] = deepCopy(
                 tmpSmoothNodes[i][j][k]
@@ -825,17 +892,27 @@ export function calculateStyledNodes(smoothNodes, sketchStyles, groupPosition) {
   let styledNodes = new Array();
   for (let i = 0; i < tmpSketchNodes.length; i++) {
     styledNodes[i] = new Array();
+    let waveFlag = 1;
+    let zigzagFlag = 1;
+    let bumpFlag = 1;
+    let twineFlag = 1;
     for (let j = 0; j < tmpSketchNodes[i].length; j++) {
       styledNodes[i][j] = new Array();
       if (_checkStyleNormal(sketchStyles, i, j)) {
         styledNodes[i][j] = deepCopy(tmpSketchNodes[i][j]);
       } else {
         if (sketchStyles[i][j] === "Wave") {
-          aimNodes = _styleWave(tmpSketchNodes[i][j]);
+          let tmpWave = _styleWave(tmpSketchNodes[i][j], waveFlag);
+          if (tmpWave[1] & 1) waveFlag = -waveFlag;
+          aimNodes = tmpWave[0];
         } else if (sketchStyles[i][j] === "Zigzag") {
-          aimNodes = _styleZigzag(tmpSketchNodes[i][j]);
+          let tmpWave = _styleZigzag(tmpSketchNodes[i][j], zigzagFlag);
+          if (tmpWave[1] & 1) zigzagFlag = -zigzagFlag;
+          aimNodes = tmpWave[0];
         } else if (sketchStyles[i][j] === "Bump") {
-          aimNodes = _styleBump(tmpSketchNodes[i][j]);
+          let tmpWave = _styleBump(tmpSketchNodes[i][j], bumpFlag);
+          if (tmpWave[1] & 1) bumpFlag = -bumpFlag;
+          aimNodes = tmpWave[0];
         } else if (sketchStyles[i][j] === "Dash") {
           aimNodes = _styleDash(tmpSketchNodes[i][j]);
         } else {
@@ -860,16 +937,6 @@ export function calculateStyledNodes(smoothNodes, sketchStyles, groupPosition) {
 }
 export function removeAngularNodes(renderNodes, group) {
   let tmpSmoothNodes = deepCopy(renderNodes);
-  let flagChange = new Array();
-  for (let i = 0; i < renderNodes.length; i++) {
-    flagChange[i] = new Array();
-    for (let j = 0; j < renderNodes[i].length; j++) {
-      flagChange[i][j] = new Array();
-      for (let k = 0; k < renderNodes[i][j].length; k++) {
-        flagChange[i][j][k] = 0;
-      }
-    }
-  }
   for (let i = 0; i < group.length; i++) {
     let minLength = 1e9;
     let maxAngle = 0;
@@ -880,28 +947,32 @@ export function removeAngularNodes(renderNodes, group) {
       let R = group[i][1][j][2];
       let L = R;
       let nowSeg = tmpSmoothNodes[tmpI][tmpJ];
+      let nxtSeg, lasSeg;
+      if (tmpJ + 1 < tmpSmoothNodes[tmpI].length)
+        nxtSeg = tmpSmoothNodes[tmpI][tmpJ + 1];
+      if (tmpJ > 0) lasSeg = tmpSmoothNodes[tmpI][tmpJ - 1];
       if (turnType <= 2) {
-        while (L - 1 >= 0 && nowSeg[L - 1][1] === nowSeg[R][1]) L--;
+        //while (L - 1 >= 0 && nowSeg[L - 1][1] === nowSeg[R][1]) L--;
         if (nowSeg[R][0] - nowSeg[L][0] < minLength) {
           minLength = nowSeg[R][0] - nowSeg[L][0];
         }
         maxAngle = Math.max(
           maxAngle,
           Math.atan(
-            Math.abs(nowSeg[R + 1][1] - nowSeg[R][1]) -
-              Math.abs(nowSeg[R + 1][0] - nowSeg[R][0])
+            Math.abs(nxtSeg[0][1] - nowSeg[1][1]) -
+              Math.abs(nxtSeg[0][0] - nowSeg[1][0])
           )
         );
       } else {
-        while (R + 1 < nowSeg.length && nowSeg[R + 1][1] === nowSeg[L][1]) R++;
+        //while (R + 1 < nowSeg.length && nowSeg[R + 1][1] === nowSeg[L][1]) R++;
         if (nowSeg[R][0] - nowSeg[L][0] < minLength) {
           minLength = nowSeg[R][0] - nowSeg[L][0];
         }
         maxAngle = Math.max(
           maxAngle,
           Math.atan(
-            Math.abs(nowSeg[L - 1][1] - nowSeg[L][1]) -
-              Math.abs(nowSeg[L - 1][0] - nowSeg[L][0])
+            Math.abs(lasSeg[1][1] - nowSeg[0][1]) -
+              Math.abs(lasSeg[1][0] - nowSeg[0][0])
           )
         );
       }
@@ -910,7 +981,6 @@ export function removeAngularNodes(renderNodes, group) {
       let tmpI = group[i][1][j][0];
       let tmpJ = group[i][1][j][1];
       let tmpK = group[i][1][j][2];
-      flagChange[tmpI][tmpJ][tmpK] = 1;
       if (turnType <= 2) {
         while (
           tmpK > 0 &&
@@ -1084,26 +1154,36 @@ export function initializeSplitMarks(
       insTime[insCnt++] = _getTime(storyline, i, j, 0, 0);
     }
     let k = 0;
-    for (let j = 0; j < insCnt; j++) {
-      while (k < divideMarks[i].length && divideMarks[i][k][0] < insTime[j]) {
-        splitMarks[i][cnt] = [divideMarks[i][k][0], divideMarks[i][k][1]];
+    for (let j = 0; j < divideMarks[i].length; j++) {
+      while (k < insTime.length && insTime[k] < divideMarks[i][j][0]) {
+        splitMarks[i][cnt] = [insTime[k], "Normal"];
         cnt++;
         k++;
       }
-      if (k < divideMarks[i].length && divideMarks[i][k][0] === insTime[j]) {
-        splitMarks[i][cnt] = [divideMarks[i][k][0], divideMarks[i][k][1]];
+      if (divideMarks[i][j][0] === insTime[k]) {
+        splitMarks[i][cnt] = [divideMarks[i][j][0], divideMarks[i][j][1]];
         cnt++;
         k++;
-        continue;
       }
-      if (k >= divideMarks[i].length || divideMarks[i][k][0] > insTime[j]) {
-        splitMarks[i][cnt] = [insTime[j], "Normal"];
-        cnt++;
-      }
-      if (k < divideMarks[i].length) {
-        splitMarks[i][cnt] = [divideMarks[i][k][0], divideMarks[i][k][1]];
-        cnt++;
-        k++;
+    }
+    while (k < insTime.length) {
+      splitMarks[i][cnt] = [insTime[k], "Normal"];
+      cnt++;
+      k++;
+    }
+  }
+  for (let i = 0; i < storyline.length; i++) {
+    let rec = "Normal";
+    for (let j = 0; j < splitMarks[i].length; j++) {
+      if (splitMarks[i][j][1] !== "Normal" && splitMarks[i][j][1] !== "Undo") {
+        rec = splitMarks[i][j][1];
+      } else {
+        if (splitMarks[i][j][1] === "Undo") {
+          rec = "Normal";
+          splitMarks[i][j][1] = "Normal";
+        } else {
+          splitMarks[i][j][1] = rec;
+        }
       }
     }
     while (k < divideMarks[i].length) {
@@ -1192,34 +1272,38 @@ export function linkNodes(nodes, type = 0, SAMPLERATE = 50, style = 0) {
   }
   return aimNodes;
 }
-function _styleWave(tmpSketchNodes, WAVEHEIGHT = 600, PI = 3.14) {
+function _styleWave(tmpSketchNodes, flag, WAVEHEIGHT = 600, PI = 3.14) {
   let styledNodes = new Array();
   let cnt = 0;
+  let totWaveNum = 0;
   for (let k = 0; k < tmpSketchNodes.length - 1; k++) {
     if (tmpSketchNodes[k][1] !== tmpSketchNodes[k + 1][1]) {
       styledNodes[cnt++] = deepCopy(tmpSketchNodes[k]);
     } else {
       let nxtK = _getNxtK(tmpSketchNodes, k);
       let tmpLength = tmpSketchNodes[nxtK][0] - tmpSketchNodes[k][0];
-      let WAVERATE = Math.ceil(tmpLength / 80);
+      let WAVERATE = Math.ceil(tmpLength / 40);
+      totWaveNum += WAVERATE;
       let SAMPLERATE = Math.ceil(tmpLength / 5);
       for (let z = 0; z <= SAMPLERATE; z++) {
         styledNodes[cnt] = new Array();
         styledNodes[cnt][0] =
           tmpSketchNodes[k][0] + (tmpLength * z) / SAMPLERATE;
         styledNodes[cnt][1] =
-          Math.sin((z * WAVERATE * PI) / SAMPLERATE) * WAVEHEIGHT +
+          Math.sin((z * WAVERATE * PI) / SAMPLERATE) * WAVEHEIGHT * flag +
           tmpSketchNodes[k][1];
         cnt++;
       }
       k = nxtK;
     }
   }
-  return styledNodes;
+  let ret = [styledNodes, totWaveNum];
+  return ret;
 }
-function _styleZigzag(tmpSketchNodes, ZIGHEIGHT = 500) {
+function _styleZigzag(tmpSketchNodes, flag, ZIGHEIGHT = 500) {
   let styledNodes = [];
   let cnt = 0;
+  let totWaveNum = 0;
   for (let k = 0; k < tmpSketchNodes.length - 1; k++) {
     if (tmpSketchNodes[k][1] !== tmpSketchNodes[k + 1][1]) {
       styledNodes[cnt++] = deepCopy(tmpSketchNodes[k]);
@@ -1227,24 +1311,26 @@ function _styleZigzag(tmpSketchNodes, ZIGHEIGHT = 500) {
       let nxtK = _getNxtK(tmpSketchNodes, k);
       let tmpLength = tmpSketchNodes[nxtK][0] - tmpSketchNodes[k][0];
       let tmpHeight = ZIGHEIGHT;
-      let SAMPLERATE = Math.ceil(tmpLength / 50);
+      let SAMPLERATE = Math.ceil(tmpLength / 20);
+      totWaveNum += SAMPLERATE;
       styledNodes[cnt++] = deepCopy(tmpSketchNodes[k]);
       for (let z = 0; z < SAMPLERATE; z++) {
         styledNodes[cnt] = new Array();
         styledNodes[cnt][0] =
           tmpSketchNodes[k][0] + (tmpLength * (z + 0.5)) / SAMPLERATE;
-        styledNodes[cnt++][1] = tmpSketchNodes[k][1] + tmpHeight;
+        styledNodes[cnt++][1] = tmpSketchNodes[k][1] + tmpHeight * flag;
         tmpHeight = 0 - tmpHeight;
       }
       styledNodes[cnt++] = deepCopy(tmpSketchNodes[nxtK]);
       k = nxtK;
     }
   }
-  return styledNodes;
+  return [styledNodes, totWaveNum];
 }
-function _styleBump(tmpSketchNodes, BUMPHEIGHT = 500) {
+function _styleBump(tmpSketchNodes, flag, BUMPHEIGHT = 500) {
   let styledNodes = [];
   let cnt = 0;
+  let totWaveNum = 0;
   for (let k = 0; k < tmpSketchNodes.length - 1; k++) {
     if (tmpSketchNodes[k][1] !== tmpSketchNodes[k + 1][1]) {
       styledNodes[cnt++] = deepCopy(tmpSketchNodes[k]);
@@ -1252,26 +1338,27 @@ function _styleBump(tmpSketchNodes, BUMPHEIGHT = 500) {
       let nxtK = _getNxtK(tmpSketchNodes, k);
       let tmpLength = tmpSketchNodes[nxtK][0] - tmpSketchNodes[k][0];
       let tmpHeight = BUMPHEIGHT;
-      let SAMPLERATE = Math.ceil(tmpLength / 50);
+      let SAMPLERATE = Math.ceil(tmpLength / 10);
+      totWaveNum += SAMPLERATE;
       styledNodes[cnt++] = deepCopy(tmpSketchNodes[k]);
       styledNodes[cnt] = deepCopy(tmpSketchNodes[k]);
-      styledNodes[cnt++][1] += tmpHeight;
+      styledNodes[cnt++][1] += tmpHeight * flag;
       for (let z = 1; z < SAMPLERATE; z++) {
         styledNodes[cnt] = new Array();
         styledNodes[cnt][0] =
           tmpSketchNodes[k][0] + (tmpLength * z) / SAMPLERATE;
-        styledNodes[cnt][1] = tmpSketchNodes[k][1] + tmpHeight;
+        styledNodes[cnt][1] = tmpSketchNodes[k][1] + tmpHeight * flag;
         tmpHeight = 0 - tmpHeight;
         cnt++;
         styledNodes[cnt] = new Array();
         styledNodes[cnt][0] =
           tmpSketchNodes[k][0] + (tmpLength * z) / SAMPLERATE;
-        styledNodes[cnt][1] = tmpSketchNodes[k][1] + tmpHeight;
+        styledNodes[cnt][1] = tmpSketchNodes[k][1] + tmpHeight * flag;
         cnt++;
       }
       styledNodes[cnt] = new Array();
       styledNodes[cnt][0] = tmpSketchNodes[k][0] + tmpLength;
-      styledNodes[cnt][1] = tmpSketchNodes[k][1] + tmpHeight;
+      styledNodes[cnt][1] = tmpSketchNodes[k][1] + tmpHeight * flag;
       tmpHeight = 0 - tmpHeight;
       cnt++;
       styledNodes[cnt] = new Array();
@@ -1281,7 +1368,7 @@ function _styleBump(tmpSketchNodes, BUMPHEIGHT = 500) {
       k = nxtK;
     }
   }
-  return styledNodes;
+  return [styledNodes, totWaveNum];
 }
 function _styleDash(tmpSketchNodes) {
   let styledNodes = [];

@@ -404,6 +404,28 @@ export class Graph {
     }
     return ret;
   }
+  getStoryTimeSpanID(startTime, endTime) {
+    let ret = [-1, -1];
+    for (let i = 0; i < this._keyTimeframe.length - 1; i++) {
+      if (
+        startTime >= this._keyTimeframe[i] &&
+        startTime < this._keyTimeframe[i + 1]
+      ) {
+        ret[0] = i;
+        break;
+      }
+    }
+    for (let i = 0; i < this._keyTimeframe.length - 1; i++) {
+      if (
+        endTime > this._keyTimeframe[i] &&
+        endTime <= this._keyTimeframe[i + 1]
+      ) {
+        ret[1] = i;
+        break;
+      }
+    }
+    return ret;
+  }
   getStoryTimeID(time) {
     let ret = -1;
     for (let i = 0; i < this._keyTimeframe.length - 1; i++) {
@@ -412,6 +434,7 @@ export class Graph {
         break;
       }
     }
+    if (ret === -1 && time === 0) ret = 0;
     return ret;
   }
   /**
@@ -629,7 +652,7 @@ export class Graph {
    * Get the characters in a _session according to the given position.
    *
    * @param {Number} x
-   * @param {Number} y
+   * @param {Number} yf
    *
    * @return characters
    */

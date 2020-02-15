@@ -26,7 +26,8 @@ function sketchRender(
   let originNodes = calculateOriginNodes(
     initialGraph.initialNodes,
     initialGraph.timeframeTable,
-    initialGraph.entities
+    initialGraph.entities,
+    initialGraph.keyTimeframe
   );
   let group = initializeGroup(originNodes);
   const { relate, stylish } = judgeStylishAndRelate(relateInfo, stylishInfo);
