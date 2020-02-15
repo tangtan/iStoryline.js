@@ -1186,11 +1186,6 @@ export function initializeSplitMarks(
         }
       }
     }
-    while (k < divideMarks[i].length) {
-      splitMarks[i][cnt] = [divideMarks[i][k][0], divideMarks[i][k][1]];
-      cnt++;
-      k++;
-    }
   }
   return { splitMarks, groupPosition };
 }

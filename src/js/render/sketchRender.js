@@ -106,11 +106,9 @@ function calculateSketchNodes(
       for (let z = 0; z < 2; z++) {
         ctrl[z][0] = ctrl[z][1] = 0;
       }
-      for (let k = 0; k < tmpSketchNodes[i][j].length - 1; k++) {
-        if (tmpSketchNodes[i][j][k][0] === tmpSketchNodes[i][j][k + 1][0]) {
-          sketchNodes[i][j][cnt++] = deepCopy(tmpSketchNodes[i][j][k]);
-        } else {
-          let tmpAimNodes = [];
+      for (let k = 0; k < tmpSketchNodes[i][j].length; k++) {
+        let tmpAimNodes = [];
+        if (k < tmpSketchNodes[i][j].length - 1) {
           if (tmpSketchNodes[i][j][k][1] !== tmpSketchNodes[i][j][k + 1][1]) {
             ctrl[0][1] = 0;
             let SAMPLERATE = Math.floor(
@@ -130,28 +128,52 @@ function calculateSketchNodes(
               deepCopy(tmpSketchNodes[i][j][k + 1])
             ];
           }
-          for (let z = 0; z < tmpAimNodes.length - 1; z++) {
-            let SAMPLERATE = Math.floor(
-              _getLength(tmpAimNodes[z], tmpAimNodes[z + 1]) / 800
-            );
-            if (SAMPLERATE < 20) SAMPLERATE = 20;
-            if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
-            if (ctrl[0][1] === 0) {
-              shake(ctrl[0], tmpAimNodes[z], tmpAimNodes[z + 1], 0);
-              shake(ctrl[1], tmpAimNodes[z], tmpAimNodes[z + 1], 1);
+        } else {
+          if (j < tmpSketchNodes[i].length - 1) {
+            if (tmpSketchNodes[i][j][k][1] !== tmpSketchNodes[i][j + 1][0][1]) {
+              ctrl[0][1] = 0;
+              let SAMPLERATE = Math.floor(
+                _getLength(
+                  tmpSketchNodes[i][j][k],
+                  tmpSketchNodes[i][j + 1][0]
+                ) / 800
+              );
+              if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
+              tmpAimNodes = linkNodes(
+                [tmpSketchNodes[i][j][k], tmpSketchNodes[i][j + 1][0]],
+                0,
+                SAMPLERATE
+              );
             } else {
-              ctrl[0][1] = 2 * tmpAimNodes[z][1] - ctrl[1][1];
-              ctrl[0][0] = 2 * tmpAimNodes[z][0] - ctrl[1][0];
-              shake(ctrl[1], tmpAimNodes[z], tmpAimNodes[z + 1], 1);
+              ctrl[0][1] = 0;
+              tmpAimNodes = [
+                deepCopy(tmpSketchNodes[i][j][k]),
+                deepCopy(tmpSketchNodes[i][j + 1][0])
+              ];
             }
-            let aimNodes = linkNodes(
-              [tmpAimNodes[z], ctrl[0], ctrl[1], tmpAimNodes[z + 1]],
-              1,
-              SAMPLERATE
-            );
-            for (let g = 0; g < aimNodes.length - 1; g++) {
-              sketchNodes[i][j][cnt++] = deepCopy(aimNodes[g]);
-            }
+          }
+        }
+        for (let z = 0; z < tmpAimNodes.length - 1; z++) {
+          let SAMPLERATE = Math.floor(
+            _getLength(tmpAimNodes[z], tmpAimNodes[z + 1]) / 800
+          );
+          if (SAMPLERATE < 20) SAMPLERATE = 20;
+          if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
+          if (ctrl[0][1] === 0) {
+            shake(ctrl[0], tmpAimNodes[z], tmpAimNodes[z + 1], 0);
+            shake(ctrl[1], tmpAimNodes[z], tmpAimNodes[z + 1], 1);
+          } else {
+            ctrl[0][1] = 2 * tmpAimNodes[z][1] - ctrl[1][1];
+            ctrl[0][0] = 2 * tmpAimNodes[z][0] - ctrl[1][0];
+            shake(ctrl[1], tmpAimNodes[z], tmpAimNodes[z + 1], 1);
+          }
+          let aimNodes = linkNodes(
+            [tmpAimNodes[z], ctrl[0], ctrl[1], tmpAimNodes[z + 1]],
+            1,
+            SAMPLERATE
+          );
+          for (let g = 0; g < aimNodes.length - 1; g++) {
+            sketchNodes[i][j][cnt++] = deepCopy(aimNodes[g]);
           }
         }
       }

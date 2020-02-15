@@ -54,8 +54,8 @@ function drawGraph(rawData) {
   //protoc.stylishInfo.push({'names':[1],'timespan':[1,4],'style':'Zigzag'});
   // protoc.stylishInfo.push({ names: [10], timespan: [23, 24], style: "Bump" });
   // protoc.stylishInfo.push({'names':[8],'timespan':[10,12],'style':'Bump'});
-  protoc.relateInfo.push({ names: [0, 1], timespan: [0, 0], style: "Collide" });
-  protoc.relateInfo.push({ names: [2, 3], timespan: [4, 4], style: "Knot" });
+  // protoc.relateInfo.push({ names: [0, 1], timespan: [0, 0], style: "Collide" });
+  // protoc.relateInfo.push({ names: [2, 3], timespan: [4, 4], style: "Knot" });
   // protoc.relateInfo.push({'names':[11,14],'timespan':[34,36],'style':'Twine'});
   let graph = ans._layout(rawData, protoc);
   //const graph = ("SmoothRender", rawData);
@@ -168,7 +168,7 @@ function genSimplePathStr(points) {
   return pathStr;
 }
 let path =
-  "/Users/tantang/Projects/vis18/server/StorylineBackend/deploy/uploadFiles/";
+  "C:\\E\\study\\research\\20200131\\StoryFlowServer\\deploy\\uploadFiles\\";
 main(path + "StarWars.xml");
 // main(path + "Redcap.xml");
 // main(path + "ChasingDragon.xml");
