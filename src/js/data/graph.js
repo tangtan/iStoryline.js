@@ -144,26 +144,11 @@ export class Graph {
   }
 
   getPosID(storylineID, storySegmentID, time) {
-    let L = 0;
-    let R = this._nodes[Number(storylineID)][Number(storySegmentID)].length - 1;
-    let mid = 0;
-    let x = 0;
-    let y = 0;
+    let x = this.getStoryNodeX(String(0), storySegmentID, storylineID);
+    let y = this.getStoryNodeY(String(0), storySegmentID, storylineID);
+    let timeSpan = this.getStoryTimeSpan(x, y);
     let ret = -1;
-    while (L <= R) {
-      mid = (L + R) >> 1;
-      x = this.getStoryNodeX(String(mid), storySegmentID, storylineID);
-      y = this.getStoryNodeY(String(mid), storySegmentID, storylineID);
-      let t = this.getStoryTimeSpan(x, y);
-      if (t[0] <= time) {
-        if (t[1] >= time) {
-          ret = mid;
-        }
-        L = mid + 1;
-      } else {
-        R = mid - 1;
-      }
-    }
+    if (time >= timeSpan[0] && time <= timeSpan[1]) ret = 0;
     return String(ret);
   }
 
@@ -530,30 +515,40 @@ export class Graph {
     let sTime = this.getStoryTime(x0, y0);
     let eTime = this.getStoryTime(x1, y1);
     let ret = [];
-    let flag = 1;
+    let sflag = 1;
+    let eflag = 1;
     for (let [key, value] of tmp) {
-      flag = 1;
-      for (let i = 0; i < value.length && flag; i++) {
-        if (value[i].start <= sTime && eTime <= value[i].end) {
+      sflag = 1;
+      eflag = 1;
+      for (let i = 0; i < value.length && (sflag || eflag); i++) {
+        if (
+          (value[i].start >= sTime && eTime >= value[i].start) ||
+          (value[i].end >= sTime && eTime >= value[i].end)
+        ) {
           let tmpI = this.getStorylineIDByName(value[i].entity);
           for (let k = 0; k < this._nodes[tmpI].length; k++) {
-            let tmpK = this.getPosID(String(tmpI), String(k), sTime);
+            let tmpK = Number(this.getPosID(String(tmpI), String(k), sTime));
             if (
+              tmpK !== -1 &&
               this._nodes[tmpI][k][tmpK][1] >= y0 &&
               this._nodes[tmpI][k][tmpK][1] <= y1
             ) {
-              tmpK = this.getPosID(String(tmpI), String(k), eTime);
-              if (
-                this._nodes[tmpI][k][tmpK][1] >= y0 &&
-                this._nodes[tmpI][k][tmpK][1] <= y1
-              ) {
-                ret.push(String(key));
-                flag = 0;
-                break;
-              }
+              sflag = 0;
+            }
+            tmpK = Number(this.getPosID(String(tmpI), String(k), eTime));
+            if (
+              tmpK !== -1 &&
+              this._nodes[tmpI][k][tmpK][1] >= y0 &&
+              this._nodes[tmpI][k][tmpK][1] <= y1
+            ) {
+              eflag = 0;
             }
           }
         }
+      }
+      if (sflag || eflag) {
+      } else {
+        ret.push(String(key));
       }
     }
     return ret;

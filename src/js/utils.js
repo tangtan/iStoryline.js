@@ -266,8 +266,8 @@ function deleteDuplicatedStyles(tmpStylishInfo, tmpRelateInfo, story, array) {
       for (let j = 0; j < relateInfo.length; j++) {
         let flag = 0;
         for (let k = 0; k < relateInfo[j].names.length; k++) {
-          for (let z = 0; z < tmpRelateInfo[i].names.length; z++) {
-            if (relateInfo[j].names[k] === tmpRelateInfo[i].names[z]) {
+          for (let z = 0; z < tmpStylishInfo[i].names.length; z++) {
+            if (relateInfo[j].names[k] === tmpStylishInfo[i].names[z]) {
               flag = 1;
             }
           }
