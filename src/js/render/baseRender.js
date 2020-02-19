@@ -1203,13 +1203,13 @@ export function calculateStyles(segmentTime, characterName, relate, stylish) {
             segmentTime[i][j] <= relate[k][2]
           ) {
             if (styleCnt === 0) {
-              styleConfig[cnt] = new Array();
-              styleConfig[cnt][0] = characterName[i];
-              styleConfig[cnt][1] = j;
-              styleConfig[cnt][2] = new Array();
+              styleConfig[cnt] = new Object();
+              styleConfig[cnt].name = characterName[i];
+              styleConfig[cnt].segmentID = j;
+              styleConfig[cnt].styles = new Array();
               cnt++;
             }
-            styleConfig[cnt - 1][2][styleCnt] = relate[k][3];
+            styleConfig[cnt - 1].styles[styleCnt] = relate[k][3];
             styleCnt++;
           }
         }
@@ -1221,13 +1221,13 @@ export function calculateStyles(segmentTime, characterName, relate, stylish) {
           segmentTime[i][j] <= stylish[k][2]
         ) {
           if (styleCnt === 0) {
-            styleConfig[cnt] = new Array();
-            styleConfig[cnt][0] = characterName[i];
-            styleConfig[cnt][1] = j;
-            styleConfig[cnt][2] = new Array();
+            styleConfig[cnt] = new Object();
+            styleConfig[cnt].name = characterName[i];
+            styleConfig[cnt].segmentID = j;
+            styleConfig[cnt].styles = new Array();
             cnt++;
           }
-          styleConfig[cnt - 1][2][styleCnt] = stylish[k][3];
+          styleConfig[cnt - 1].styles[styleCnt] = stylish[k][3];
           styleCnt++;
         }
       }

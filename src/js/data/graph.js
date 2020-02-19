@@ -40,6 +40,7 @@ export class Graph {
     this.names = data.entities;
     this.paths = data.paths;
     this.timeline = data.timeline;
+    this.styleConfig = data.styleConfig;
   }
   // get names() {
   //   return this.names;
@@ -509,6 +510,19 @@ export class Graph {
       }
     }
   }
+  getStorySegmentIDByTime(storylineID, timespan) {
+    for (let i = 0; i < this._nodes[Number(storylineID)].length; i++) {
+      let seg = this._nodes[Number(storylineID)][i];
+      let realspan = this.getStoryTimeSpan(
+        (seg[0][0] + seg[1][0]) / 2,
+        (seg[0][1] + seg[1][1]) / 2
+      );
+      if (timespan[0] <= realspan[0] && realspan[1] <= timespan[1]) {
+        return i;
+      }
+    }
+    return -1;
+  }
   getSessions(x0, y0, x1, y1) {
     //半包括
     let tmp = this._session;
@@ -527,19 +541,15 @@ export class Graph {
         ) {
           let tmpI = this.getStorylineIDByName(value[i].entity);
           for (let k = 0; k < this._nodes[tmpI].length; k++) {
-            let tmpK = Number(this.getPosID(String(tmpI), String(k), sTime));
             if (
-              tmpK !== -1 &&
-              this._nodes[tmpI][k][tmpK][1] >= y0 &&
-              this._nodes[tmpI][k][tmpK][1] <= y1
+              this._nodes[tmpI][k][0][1] >= y0 &&
+              this._nodes[tmpI][k][0][1] <= y1
             ) {
               sflag = 0;
             }
-            tmpK = Number(this.getPosID(String(tmpI), String(k), eTime));
             if (
-              tmpK !== -1 &&
-              this._nodes[tmpI][k][tmpK][1] >= y0 &&
-              this._nodes[tmpI][k][tmpK][1] <= y1
+              this._nodes[tmpI][k][1][1] >= y0 &&
+              this._nodes[tmpI][k][1][1] <= y1
             ) {
               eflag = 0;
             }
