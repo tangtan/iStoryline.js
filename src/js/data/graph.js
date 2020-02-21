@@ -41,6 +41,7 @@ export class Graph {
     this.paths = data.paths;
     this.timeline = data.timeline;
     this.styleConfig = data.styleConfig;
+    this.scaleRate = data.scaleRate;
   }
   // get names() {
   //   return this.names;

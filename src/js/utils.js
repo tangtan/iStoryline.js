@@ -68,9 +68,9 @@ export function transformModelError(type) {
 
 export function convertDataToStory(data, timeShift = 50) {
   let initialGraph = {};
-  const array = data.data.array;
-  const perm = data.data.perm;
-  const sessionTable = data.data.sessionTable;
+  const array = data.array;
+  const perm = data.perm;
+  const sessionTable = data.sessionTable;
 
   let ptCnt = 0;
   let segCnt = 0;
@@ -147,7 +147,7 @@ export function convertDataToConstraints(data, protocol, story) {
   let constraints = [];
   let tmpStylishInfo = protocol.stylishInfo;
   let tmpRelateInfo = protocol.relateInfo;
-  let array = data.data.array;
+  let array = data.array;
   const { relateInfo, stylishInfo } = deleteDuplicatedStyles(
     tmpStylishInfo,
     tmpRelateInfo,

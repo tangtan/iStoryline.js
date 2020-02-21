@@ -15,7 +15,7 @@ import { calculateTimeline } from "./baseRender";
 import { removeAngularNodes } from "./baseRender";
 import { calculateStyles } from "./baseRender";
 import { deepCopy } from "./baseRender";
-
+import { calculateScaleRate } from "./baseRender";
 function smoothRender(
   initialGraph,
   adjustInfo,
@@ -76,6 +76,8 @@ function smoothRender(
   );
   renderedGraph.styleConfig = deepCopy(styleConfig);
   renderedGraph.timeline = calculateTimeline(originNodes);
+  renderedGraph.scaleRate =
+    calculateScaleRate(originNodes, renderedGraph.nodes) / 100;
   return renderedGraph;
 }
 function calculateSmoothNodes(

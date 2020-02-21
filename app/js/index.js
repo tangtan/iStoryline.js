@@ -57,7 +57,8 @@ function drawGraph(rawData) {
   // protoc.relateInfo.push({ names: [0, 1], timespan: [0, 0], style: "Collide" });
   // protoc.relateInfo.push({ names: [2, 3], timespan: [4, 4], style: "Knot" });
   // protoc.relateInfo.push({'names':[11,14],'timespan':[34,36],'style':'Twine'});
-  let graph = ans._layout(rawData, protoc);
+  let graph = ans._layout(rawData.data, protoc);
+  console.log(rawData.data);
   //const graph = ("SmoothRender", rawData);
   console.log(graph);
   const nodes = graph.paths;

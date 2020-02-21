@@ -1544,7 +1544,45 @@ export function normalize(
   });
   return nodes;
 }
-
+export function calculateScaleRate(originNodes, nodes) {
+  const minY = Math.min(
+    ...nodes.map(storyline =>
+      Math.min(
+        ...storyline.map(storysegment =>
+          Math.min(...storysegment.map(storynode => storynode[1]))
+        )
+      )
+    )
+  );
+  const maxY = Math.max(
+    ...nodes.map(storyline =>
+      Math.min(
+        ...storyline.map(storysegment =>
+          Math.max(...storysegment.map(storynode => storynode[1]))
+        )
+      )
+    )
+  );
+  const pminY = Math.min(
+    ...originNodes.map(storyline =>
+      Math.min(
+        ...storyline.map(storysegment =>
+          Math.min(...storysegment.map(storynode => storynode[1]))
+        )
+      )
+    )
+  );
+  const pmaxY = Math.max(
+    ...originNodes.map(storyline =>
+      Math.min(
+        ...storyline.map(storysegment =>
+          Math.max(...storysegment.map(storynode => storynode[1]))
+        )
+      )
+    )
+  );
+  return (pmaxY - pminY) / (maxY - minY);
+}
 export function simplifyPaths(nodes, tolerance = 5, highQuality = false) {
   let _nodes = [];
   nodes.forEach(storyLine => {

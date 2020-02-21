@@ -76,6 +76,8 @@ function sketchRender(
   );
   renderedGraph.styleConfig = deepCopy(styleConfig);
   renderedGraph.timeline = calculateTimeline(originNodes);
+  renderedGraph.scaleRate =
+    calculateScaleRate(originNodes, renderedGraph.nodes) / 100;
   return renderedGraph;
 }
 function calculateSketchNodes(
