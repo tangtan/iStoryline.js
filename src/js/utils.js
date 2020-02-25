@@ -251,6 +251,9 @@ function deleteDuplicatedStyles(tmpStylishInfo, tmpRelateInfo, story, array) {
         }
       }
       if (l <= r) {
+        if (tmpRelateInfo[i].style === "Knot") {
+          r = l;
+        }
         relateInfo.push({
           names: tmpRelateInfo[i].names,
           timespan: [l, r],
