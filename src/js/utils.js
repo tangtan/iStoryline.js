@@ -113,7 +113,7 @@ export function convertDataToStory(data, timeShift = 50) {
       times[i][j][0] = translateXtoTime(array[i].points[j].item1, j);
       keyTimeframe[timCnt] = times[i][j][0];
       nodes[i][ptCnt][0] = keyTimeframe[timCnt] * timeShift;
-      nodes[i][ptCnt][1] = array[i].points[j].item3 * 100;
+      nodes[i][ptCnt][1] = array[i].points[j].item3 * 5;
       ptCnt++;
       timCnt++;
 
@@ -121,7 +121,7 @@ export function convertDataToStory(data, timeShift = 50) {
       times[i][j][1] = translateXtoTime(array[i].points[j].item2, j);
       keyTimeframe[timCnt] = times[i][j][1];
       nodes[i][ptCnt][0] = keyTimeframe[timCnt] * timeShift - timeShift / 2;
-      nodes[i][ptCnt][1] = array[i].points[j].item3 * 100;
+      nodes[i][ptCnt][1] = array[i].points[j].item3 * 5;
       ptCnt++;
       timCnt++;
     }
@@ -147,6 +147,7 @@ export function convertDataToConstraints(data, protocol, story) {
   let constraints = [];
   let tmpStylishInfo = protocol.stylishInfo;
   let tmpRelateInfo = protocol.relateInfo;
+  let tmpScaleInfo = protocol.scaleInfo;
   let array = data.array;
   const { relateInfo, stylishInfo } = deleteDuplicatedStyles(
     tmpStylishInfo,
@@ -215,6 +216,9 @@ export function convertDataToConstraints(data, protocol, story) {
       tmp.style = relateInfo[i].style;
       if (tmp.timespan[0] < tmp.timespan[1]) constraints.push(tmp);
     }
+  }
+  if (tmpScaleInfo) {
+    if (tmpScaleInfo.length > 0) constraints.push(tmpScaleInfo[0]);
   }
   return constraints;
 }

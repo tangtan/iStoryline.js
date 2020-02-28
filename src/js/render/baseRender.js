@@ -1,6 +1,7 @@
 import { scaleLinear } from "d3-scale";
 import simplify from "simplify-js";
 
+let GLOBALRATE = 5;
 function _checkAngle(
   storyline,
   storylineID,
@@ -184,7 +185,7 @@ function _getOptLen(storyline, storylineID, segmentID, storyNodeID) {
   let nxtID = storyNodeID + 1;
   let Y = Math.abs(nowSeg[nxtID][1] - nowSeg[nowID][1]);
   let X = Math.abs(nowSeg[nxtID][0] - nowSeg[nowID][0]);
-  let aimX = Math.round(Y / 1000) * 25 - X;
+  let aimX = Math.round(Y / 10) * 25 - X;
   return aimX;
 }
 function _getStorylineID(characterName, name) {
@@ -525,7 +526,7 @@ function _checkGroup(
   turningType,
   storyline,
   list,
-  LINESPACE = 4000
+  LINESPACE = 40 * GLOBALRATE
 ) {
   if (finK >= tail) return false;
   if (turningType[finK - head] != turningType[k - head]) return false;
@@ -1293,6 +1294,7 @@ export function linkNodes(nodes, type = 0, SAMPLERATE = 5, style = 0) {
         p[i][1] = nodes[i][1];
       }
     }
+    if (SAMPLERATE === 0) SAMPLERATE += 1;
     for (let i = 0; i <= SAMPLERATE; i++) {
       aimNodes[i] = new Array();
       aimNodes[i][0] = calBezier(p, i / SAMPLERATE, 0);
@@ -1301,7 +1303,12 @@ export function linkNodes(nodes, type = 0, SAMPLERATE = 5, style = 0) {
   }
   return aimNodes;
 }
-function _styleWave(tmpSketchNodes, flag, WAVEHEIGHT = 600, PI = 3.14) {
+function _styleWave(
+  tmpSketchNodes,
+  flag,
+  WAVEHEIGHT = 6 * GLOBALRATE,
+  PI = 3.14
+) {
   let styledNodes = new Array();
   let cnt = 0;
   let totWaveNum = 0;
@@ -1315,6 +1322,7 @@ function _styleWave(tmpSketchNodes, flag, WAVEHEIGHT = 600, PI = 3.14) {
       let WAVERATE = Math.ceil(tmpLength / 50);
       totWaveNum += WAVERATE;
       let SAMPLERATE = Math.ceil(tmpLength / 2);
+      if (SAMPLERATE === 0) SAMPLERATE = 1;
       for (let z = 0; z <= SAMPLERATE; z++) {
         styledNodes[cnt] = new Array();
         styledNodes[cnt][0] =
@@ -1330,7 +1338,7 @@ function _styleWave(tmpSketchNodes, flag, WAVEHEIGHT = 600, PI = 3.14) {
   let ret = [styledNodes, totWaveNum];
   return ret;
 }
-function _styleZigzag(tmpSketchNodes, flag, ZIGHEIGHT = 500) {
+function _styleZigzag(tmpSketchNodes, flag, ZIGHEIGHT = 5 * GLOBALRATE) {
   let styledNodes = [];
   let cnt = 0;
   let totWaveNum = 0;
@@ -1358,7 +1366,7 @@ function _styleZigzag(tmpSketchNodes, flag, ZIGHEIGHT = 500) {
   }
   return [styledNodes, totWaveNum];
 }
-function _styleBump(tmpSketchNodes, flag, BUMPHEIGHT = 500) {
+function _styleBump(tmpSketchNodes, flag, BUMPHEIGHT = 5 * GLOBALRATE) {
   let styledNodes = [];
   let cnt = 0;
   let totWaveNum = 0;
@@ -1413,6 +1421,7 @@ function _styleDash(tmpSketchNodes) {
       let nxtK = _getNxtK(tmpSketchNodes, k);
       let tmpLength = tmpSketchNodes[nxtK][0] - tmpSketchNodes[k][0];
       let SAMPLERATE = Math.ceil(tmpLength / 50);
+      if (SAMPLERATE === 0) SAMPLERATE = 1;
       for (let z = 0; z <= SAMPLERATE; z++) {
         styledNodes[cnt] = new Array();
         styledNodes[cnt][0] =
@@ -1425,7 +1434,13 @@ function _styleDash(tmpSketchNodes) {
   }
   return styledNodes;
 }
-function _relateCollide(tmpSketchNodes, stdY, cntNum, id, COLLIDEHEIGHT = 250) {
+function _relateCollide(
+  tmpSketchNodes,
+  stdY,
+  cntNum,
+  id,
+  COLLIDEHEIGHT = 2.5 * GLOBALRATE
+) {
   const { aNodes, bNodes } = _forRelateTurn(
     tmpSketchNodes,
     0.2,
@@ -1473,7 +1488,7 @@ function _relateCollide(tmpSketchNodes, stdY, cntNum, id, COLLIDEHEIGHT = 250) {
   }
   return aimNodes;
 }
-function _relateKnot(tmpSketchNodes, stdY, KNOTHEIGHT = 2000) {
+function _relateKnot(tmpSketchNodes, stdY, KNOTHEIGHT = 2 * GLOBALRATE) {
   const { aNodes, bNodes } = _forRelateTurn(tmpSketchNodes, 0.4, stdY, 0);
   let aimNodes = new Array();
   let cnt = 0;
@@ -1484,7 +1499,7 @@ function _relateKnot(tmpSketchNodes, stdY, KNOTHEIGHT = 2000) {
   let midLength =
     0.2 * (tmpSketchNodes[tmpSketchNodes.length - 1][0] - tmpSketchNodes[0][0]);
   let SAMPLERATE = Math.ceil(midLength / 40);
-
+  if (SAMPLERATE === 0) SAMPLERATE = 1;
   for (let i = 0; i <= SAMPLERATE; i++) {
     aimNodes[cnt] = new Array();
     aimNodes[cnt][0] = Math.random() * midLength + aNodes[aNodes.length - 1][0];
@@ -1503,7 +1518,7 @@ function _relateTwine(
   cntNum,
   id,
   flag,
-  TWINEHEIGHT = 2000,
+  TWINEHEIGHT = 20 * GLOBALRATE,
   PI = 3.14
 ) {
   const { aNodes, bNodes } = _forRelateTurn(tmpSketchNodes, 0.2, stdY, 0);
@@ -1647,7 +1662,7 @@ export function normalize(
   );
   const maxX = Math.max(
     ...nodes.map(storyline =>
-      Math.min(
+      Math.max(
         ...storyline.map(storysegment =>
           Math.max(...storysegment.map(storynode => storynode[0]))
         )
@@ -1665,7 +1680,7 @@ export function normalize(
   );
   const maxY = Math.max(
     ...nodes.map(storyline =>
-      Math.min(
+      Math.max(
         ...storyline.map(storysegment =>
           Math.max(...storysegment.map(storynode => storynode[1]))
         )

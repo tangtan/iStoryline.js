@@ -15,7 +15,7 @@ import { calculateTimeline } from "./baseRender";
 import { removeAngularNodes } from "./baseRender";
 import { calculateStyles } from "./baseRender";
 import { deepCopy } from "./baseRender";
-
+import { calculateScaleRate } from "./baseRender";
 function sketchRender(
   initialGraph,
   adjustInfo,
@@ -50,12 +50,14 @@ function sketchRender(
   );
   let extentNodes = extent(originNodes, deepCopy(renderNodes));
   let extentPaths = extent(originNodes, deepCopy(sketchNodes));
-  extentPaths = simplifyPaths(extentPaths, 50);
+  extentPaths = simplifyPaths(extentPaths, 5);
   let renderedGraph = initialGraph;
-  const x0 = scaleInfo.length > 0 ? scaleInfo[0].param.x0 || 0 : 0;
-  const y0 = scaleInfo.length > 0 ? scaleInfo[0].param.y0 || 0 : 0;
   const width = scaleInfo.length > 0 ? scaleInfo[0].param.width || 1000 : 1000;
   const height = scaleInfo.length > 0 ? scaleInfo[0].param.height || 372 : 372;
+  let stdX = (1900 - width) / 2;
+  let stdY = (1000 - height) / 2;
+  const x0 = scaleInfo.length > 0 ? scaleInfo[0].param.x0 || stdX : stdX;
+  const y0 = scaleInfo.length > 0 ? scaleInfo[0].param.y0 || stdY : stdY;
   const reserveRatio =
     scaleInfo.length > 0 ? scaleInfo[0].param.reserveRatio || false : false;
   renderedGraph.nodes = normalize(
@@ -77,7 +79,7 @@ function sketchRender(
   renderedGraph.styleConfig = deepCopy(styleConfig);
   renderedGraph.timeline = calculateTimeline(originNodes);
   renderedGraph.scaleRate =
-    calculateScaleRate(originNodes, renderedGraph.nodes) / 100;
+    calculateScaleRate(originNodes, renderedGraph.nodes) / 5;
   return renderedGraph;
 }
 function calculateSketchNodes(
@@ -115,7 +117,7 @@ function calculateSketchNodes(
             ctrl[0][1] = 0;
             let SAMPLERATE = Math.floor(
               _getLength(tmpSketchNodes[i][j][k], tmpSketchNodes[i][j][k + 1]) /
-                800
+                8
             );
             if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
             tmpAimNodes = linkNodes(
@@ -138,7 +140,7 @@ function calculateSketchNodes(
                 _getLength(
                   tmpSketchNodes[i][j][k],
                   tmpSketchNodes[i][j + 1][0]
-                ) / 800
+                ) / 8
               );
               if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
               tmpAimNodes = linkNodes(
@@ -157,9 +159,8 @@ function calculateSketchNodes(
         }
         for (let z = 0; z < tmpAimNodes.length - 1; z++) {
           let SAMPLERATE = Math.floor(
-            _getLength(tmpAimNodes[z], tmpAimNodes[z + 1]) / 800
+            _getLength(tmpAimNodes[z], tmpAimNodes[z + 1]) / 8
           );
-          if (SAMPLERATE < 20) SAMPLERATE = 20;
           if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
           if (ctrl[0][1] === 0) {
             shake(ctrl[0], tmpAimNodes[z], tmpAimNodes[z + 1], 0);
@@ -193,15 +194,7 @@ function calculateSketchNodes(
   );
   return { sketchNodes, styleConfig };
 }
-function shake(
-  p,
-  a,
-  b,
-  type = 1,
-  distanceRate = 0.2,
-  SHAKEY = 500,
-  SHAKEX = 1
-) {
+function shake(p, a, b, type = 1, distanceRate = 0.2, SHAKEY = 5, SHAKEX = 1) {
   if (a[1] === b[1]) {
     let length = b[0] - a[0];
     p[0] = a[0] + (type * 0.5 + distanceRate) * length;

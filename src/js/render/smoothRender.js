@@ -52,12 +52,15 @@ function smoothRender(
   let extentPaths = extent(originNodes, deepCopy(smoothNodes));
   extentPaths = simplifyPaths(extentPaths, 5);
   let renderedGraph = initialGraph;
-  const x0 = scaleInfo.length > 0 ? scaleInfo[0].param.x0 || 0 : 0;
-  const y0 = scaleInfo.length > 0 ? scaleInfo[0].param.y0 || 0 : 0;
   const width = scaleInfo.length > 0 ? scaleInfo[0].param.width || 1000 : 1000;
   const height = scaleInfo.length > 0 ? scaleInfo[0].param.height || 372 : 372;
   const reserveRatio =
     scaleInfo.length > 0 ? scaleInfo[0].param.reserveRatio || false : false;
+  let stdX = (1900 - width) / 2;
+  let stdY = (1000 - height) / 2;
+  const x0 = scaleInfo.length > 0 ? scaleInfo[0].param.x0 || stdX : stdX;
+  const y0 = scaleInfo.length > 0 ? scaleInfo[0].param.y0 || stdY : stdY;
+
   renderedGraph.nodes = normalize(
     extentNodes,
     x0,
@@ -77,7 +80,7 @@ function smoothRender(
   renderedGraph.styleConfig = deepCopy(styleConfig);
   renderedGraph.timeline = calculateTimeline(originNodes);
   renderedGraph.scaleRate =
-    calculateScaleRate(originNodes, renderedGraph.nodes) / 100;
+    calculateScaleRate(originNodes, renderedGraph.nodes) / 5;
   return renderedGraph;
 }
 function calculateSmoothNodes(
@@ -117,8 +120,7 @@ function calculateSmoothNodes(
           smoothNodes[i][j][cntNodes - 1][0] =
             (tmpSmoothNodes[i][j][1][0] + tmpSmoothNodes[i][j][0][0]) / 2;
         let SAMPLERATE = Math.floor(
-          _getLength(tmpSmoothNodes[i][j][1], tmpSmoothNodes[i][j + 1][0]) /
-            1000
+          _getLength(tmpSmoothNodes[i][j][1], tmpSmoothNodes[i][j + 1][0]) / 10
         );
         if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
         let aimNodes = linkNodes(
