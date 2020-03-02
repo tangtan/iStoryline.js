@@ -214,6 +214,15 @@ export function convertDataToConstraints(data, protocol, story) {
       tmp.timespan[0] = Math.max(tmp.timespan[0], startTime);
       tmp.timespan[1] = Math.min(tmp.timespan[1], endTime);
       tmp.style = relateInfo[i].style;
+      tmp.stdY =
+        ((array[Number(relateInfo[i].names[0])].points[
+          Number(relateInfo[i].timespan[0])
+        ].item3 +
+          array[Number(relateInfo[i].names[1])].points[
+            Number(relateInfo[i].timespan[0])
+          ].item3) /
+          2) *
+        5;
       if (tmp.timespan[0] < tmp.timespan[1]) constraints.push(tmp);
     }
   }

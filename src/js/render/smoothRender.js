@@ -28,7 +28,7 @@ function smoothRender(
     initialGraph.timeframeTable,
     initialGraph.entities,
     initialGraph.keyTimeframe
-  );
+  ); //不同segment之间时间相连但x不相连
   let group = initializeGroup(originNodes);
   const { relate, stylish } = judgeStylishAndRelate(relateInfo, stylishInfo);
   const { splitMarks, groupPosition } = initializeSplitMarks(
@@ -38,6 +38,7 @@ function smoothRender(
     stylish
   );
   let renderNodes = calculateRenderNodes(originNodes, group);
+  //同group之间互相错开 时间相连但x不相连 一个Segment里面只有两个点
   const { smoothNodes, styleConfig } = calculateSmoothNodes(
     renderNodes,
     originNodes,
@@ -97,64 +98,77 @@ function calculateSmoothNodes(
   let ret = calculateSplitNodes(tmpNodes, splitMarks, originNodes);
   let tmpSmoothNodes = ret[0];
   let smoothNodes = new Array();
-  let cntNodes = 0;
-  let recLast = 0;
   for (let i = 0; i < tmpSmoothNodes.length; i++) {
     smoothNodes[i] = new Array();
-    recLast = 0;
     for (let j = 0; j < tmpSmoothNodes[i].length - 1; j++) {
-      cntNodes = 0;
-      smoothNodes[i][j] = new Array();
+      if (smoothNodes[i][j] === undefined) smoothNodes[i][j] = [];
       for (let k = 0; k < tmpSmoothNodes[i][j].length; k++) {
-        smoothNodes[i][j][cntNodes++] = deepCopy(tmpSmoothNodes[i][j][k]);
-        if (recLast) {
-          smoothNodes[i][j][cntNodes - 1][0] =
-            (tmpSmoothNodes[i][j][1][0] + tmpSmoothNodes[i][j][0][0]) / 2;
-        }
+        smoothNodes[i][j].push(deepCopy(tmpSmoothNodes[i][j][k]));
       }
       if (tmpSmoothNodes[i][j][1][1] === tmpSmoothNodes[i][j + 1][0][1]) {
-        smoothNodes[i][j][cntNodes++] = deepCopy(tmpSmoothNodes[i][j + 1][0]);
-        recLast = 0;
+        smoothNodes[i][j].push([
+          (tmpSmoothNodes[i][j + 1][0][0] + tmpSmoothNodes[i][j][1][0]) / 2,
+          (tmpSmoothNodes[i][j + 1][0][1] + tmpSmoothNodes[i][j][1][1]) / 2
+        ]);
+        if (smoothNodes[i][j + 1] === undefined) smoothNodes[i][j + 1] = [];
+        smoothNodes[i][j + 1].push([
+          (tmpSmoothNodes[i][j + 1][0][0] + tmpSmoothNodes[i][j][1][0]) / 2,
+          (tmpSmoothNodes[i][j + 1][0][1] + tmpSmoothNodes[i][j][1][1]) / 2
+        ]);
       } else {
-        if (cntNodes >= 1)
-          smoothNodes[i][j][cntNodes - 1][0] =
-            (tmpSmoothNodes[i][j][1][0] + tmpSmoothNodes[i][j][0][0]) / 2;
         let SAMPLERATE = Math.floor(
           _getLength(tmpSmoothNodes[i][j][1], tmpSmoothNodes[i][j + 1][0]) / 10
         );
         if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
         let aimNodes = linkNodes(
           [
-            [
-              (tmpSmoothNodes[i][j][1][0] + tmpSmoothNodes[i][j][0][0]) / 2,
-              tmpSmoothNodes[i][j][1][1]
-            ],
-            [
-              (tmpSmoothNodes[i][j + 1][0][0] +
-                tmpSmoothNodes[i][j + 1][1][0]) /
-                2,
-              tmpSmoothNodes[i][j + 1][0][1]
-            ]
+            [tmpSmoothNodes[i][j][1][0], tmpSmoothNodes[i][j][1][1]],
+            [tmpSmoothNodes[i][j + 1][0][0], tmpSmoothNodes[i][j + 1][0][1]]
           ],
           0,
           SAMPLERATE
         );
-        recLast = 1;
-        for (let z = 0; z < aimNodes.length; z++) {
-          smoothNodes[i][j][cntNodes++] = deepCopy(aimNodes[z]);
+        let len = aimNodes.length;
+        let midL = Math.floor(len / 2);
+        let midR = Math.ceil(len / 2);
+        if (midL === midR) {
+          for (let z = 0; z < midL; z++) {
+            smoothNodes[i][j].push(deepCopy(aimNodes[z]));
+          }
+          smoothNodes[i][j].push([
+            (aimNodes[midL][0] + aimNodes[midL - 1][0]) / 2,
+            (aimNodes[midL][1] + aimNodes[midL - 1][1]) / 2
+          ]);
+          if (smoothNodes[i][j + 1] === undefined) smoothNodes[i][j + 1] = [];
+          smoothNodes[i][j + 1].push([
+            (aimNodes[midL][0] + aimNodes[midL - 1][0]) / 2,
+            (aimNodes[midL][1] + aimNodes[midL - 1][1]) / 2
+          ]);
+          for (let z = midR; z < aimNodes.length; z++) {
+            smoothNodes[i][j + 1].push(deepCopy(aimNodes[z]));
+          }
+        } else {
+          for (let z = 0; z <= midL; z++) {
+            smoothNodes[i][j].push(deepCopy(aimNodes[z]));
+          }
+          if (smoothNodes[i][j + 1] === undefined) smoothNodes[i][j + 1] = [];
+          for (let z = midL; z < aimNodes.length; z++) {
+            smoothNodes[i][j + 1].push(deepCopy(aimNodes[z]));
+          }
         }
       }
     }
-    smoothNodes[i][tmpSmoothNodes[i].length - 1] = deepCopy(
-      tmpSmoothNodes[i][tmpSmoothNodes[i].length - 1]
-    );
-    if (recLast) {
-      smoothNodes[i][tmpSmoothNodes[i].length - 1][0][0] =
-        (tmpSmoothNodes[i][tmpSmoothNodes[i].length - 1][0][0] +
-          tmpSmoothNodes[i][tmpSmoothNodes[i].length - 1][1][0]) /
-        2;
+    if (smoothNodes[i][tmpSmoothNodes[i].length - 1] === undefined)
+      smoothNodes[i][tmpSmoothNodes[i].length - 1] = [];
+    for (
+      let k = 0;
+      k < tmpSmoothNodes[i][tmpSmoothNodes[i].length - 1].length;
+      k++
+    ) {
+      smoothNodes[i][tmpSmoothNodes[i].length - 1].push(
+        deepCopy(tmpSmoothNodes[i][tmpSmoothNodes[i].length - 1][k])
+      );
     }
-    recLast = 0;
   }
   smoothNodes = calculateStyledNodes(smoothNodes, ret[1], groupPosition);
   let styleConfig = calculateStyles(

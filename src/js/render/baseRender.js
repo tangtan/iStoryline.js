@@ -144,7 +144,7 @@ function _getNxtK(tmpSketchNodes, k) {
   nxtK--;
   return nxtK;
 }
-function _getNxtPos(group, i, j, storyline, SPACELENGTH = 50) {
+function _getNxtPos(group, i, j, storyline, SPACELENGTH = 20) {
   let slt = j + 1;
   let tot = group[i][1].length;
   let storylineID = group[i][1][j][0];
@@ -418,7 +418,7 @@ function _calculateMarks(storyline, characterName, relate, stylish) {
           maxY = Math.max(maxY, storynodeY);
           minY = Math.min(minY, storynodeY);
         }
-        groupPosition[i] = (maxY + minY) * 0.5;
+        groupPosition[i] = relate[i][4];
         for (let j = 0; j < relate[i][0].length; j++) {
           let storylineID = _getStorylineID(characterName, relate[i][0][j]);
           let storynodeY = _getStoryNodeY(storyline, storylineID, relate[i][1]);
@@ -955,83 +955,42 @@ export function calculateStyledNodes(smoothNodes, sketchStyles, groupPosition) {
             aimNodes = tmpTwine[0];
           }
         }
-        //debugger;
         styledNodes[i][j] = deepCopy(aimNodes);
       }
     }
   }
   return styledNodes;
 }
-export function removeAngularNodes(renderNodes, group) {
-  let tmpSmoothNodes = deepCopy(renderNodes);
-  for (let i = 0; i < group.length; i++) {
-    let minLength = 1e9;
-    let maxAngle = 0;
-    let turnType = group[i][0][1];
-    for (let j = 0; j < group[i][1].length; j++) {
-      let tmpI = group[i][1][j][0];
-      let tmpJ = group[i][1][j][1];
-      let R = group[i][1][j][2];
-      let L = R;
-      let nowSeg = tmpSmoothNodes[tmpI][tmpJ];
-      let nxtSeg, lasSeg;
-      if (tmpJ + 1 < tmpSmoothNodes[tmpI].length)
-        nxtSeg = tmpSmoothNodes[tmpI][tmpJ + 1];
-      if (tmpJ > 0) lasSeg = tmpSmoothNodes[tmpI][tmpJ - 1];
-      if (turnType <= 2) {
-        //while (L - 1 >= 0 && nowSeg[L - 1][1] === nowSeg[R][1]) L--;
-        if (nowSeg[R][0] - nowSeg[L][0] < minLength) {
-          minLength = nowSeg[R][0] - nowSeg[L][0];
+export function removeAngularNodes(renderNodes, group, RATE = 3) {
+  let tmpSmoothNodes = [];
+  for (let i = 0; i < renderNodes.length; i++) {
+    tmpSmoothNodes[i] = [];
+    for (let j = 0; j < renderNodes[i].length; j++) {
+      tmpSmoothNodes[i][j] = [];
+      let las = j - 1,
+        nxt = j + 1;
+      let L = renderNodes[i][j][0][0],
+        R = renderNodes[i][j][1][0],
+        H = renderNodes[i][j][0][1];
+      let length = R - L;
+      let flag = 0;
+      if (las >= 0 && las < renderNodes[i].length) {
+        if (renderNodes[i][las][1][1] !== renderNodes[i][j][0][1]) {
+          tmpSmoothNodes[i][j][0] = [L + length / RATE, H];
+          flag |= 1;
         }
-        maxAngle = Math.max(
-          maxAngle,
-          Math.atan(
-            Math.abs(nxtSeg[0][1] - nowSeg[1][1]) -
-              Math.abs(nxtSeg[0][0] - nowSeg[1][0])
-          )
-        );
-      } else {
-        //while (R + 1 < nowSeg.length && nowSeg[R + 1][1] === nowSeg[L][1]) R++;
-        if (nowSeg[R][0] - nowSeg[L][0] < minLength) {
-          minLength = nowSeg[R][0] - nowSeg[L][0];
-        }
-        maxAngle = Math.max(
-          maxAngle,
-          Math.atan(
-            Math.abs(lasSeg[1][1] - nowSeg[0][1]) -
-              Math.abs(lasSeg[1][0] - nowSeg[0][0])
-          )
-        );
       }
-    }
-    for (let j = 0; j < group[i][1].length; j++) {
-      let tmpI = group[i][1][j][0];
-      let tmpJ = group[i][1][j][1];
-      let tmpK = group[i][1][j][2];
-      if (turnType <= 2) {
-        while (
-          tmpK > 0 &&
-          tmpSmoothNodes[tmpI][tmpJ][tmpK - 1][1] ===
-            tmpSmoothNodes[tmpI][tmpJ][tmpK][1] &&
-          tmpSmoothNodes[tmpI][tmpJ][tmpK - 1][0] >
-            tmpSmoothNodes[tmpI][tmpJ][tmpK][0]
-        ) {
-          tmpSmoothNodes[tmpI][tmpJ][tmpK - 1][0] =
-            tmpSmoothNodes[tmpI][tmpJ][tmpK][0];
-          tmpK--;
+      if (nxt >= 0 && nxt < renderNodes[i].length) {
+        if (renderNodes[i][nxt][0][1] !== renderNodes[i][j][1][1]) {
+          tmpSmoothNodes[i][j][1] = [R - length / RATE, H];
+          flag |= 2;
         }
-      } else {
-        while (
-          tmpK + 1 < tmpSmoothNodes[tmpI][tmpJ].length &&
-          tmpSmoothNodes[tmpI][tmpJ][tmpK + 1][1] ===
-            tmpSmoothNodes[tmpI][tmpJ][tmpK][1] &&
-          tmpSmoothNodes[tmpI][tmpJ][tmpK + 1][0] <
-            tmpSmoothNodes[tmpI][tmpJ][tmpK][0]
-        ) {
-          tmpSmoothNodes[tmpI][tmpJ][tmpK + 1][0] =
-            tmpSmoothNodes[tmpI][tmpJ][tmpK][0];
-          tmpK++;
-        }
+      }
+      if (flag === 2 || flag === 0) {
+        tmpSmoothNodes[i][j][0] = [L, H];
+      }
+      if (flag === 1 || flag === 0) {
+        tmpSmoothNodes[i][j][1] = [R, H];
       }
     }
   }
@@ -1067,6 +1026,7 @@ function _covertRawRelateInfo(rawRelateInfo) {
     relateInfo[cnt][1] = rawRelateInfo[i].timespan[0];
     relateInfo[cnt][2] = rawRelateInfo[i].timespan[1];
     relateInfo[cnt][3] = rawRelateInfo[i].style;
+    relateInfo[cnt][4] = rawRelateInfo[i].stdY;
     cnt++;
   }
   return relateInfo;
@@ -1307,22 +1267,23 @@ function _styleWave(
   tmpSketchNodes,
   flag,
   WAVEHEIGHT = 6 * GLOBALRATE,
-  PI = 3.14
+  PI = 3.14,
+  WAVESIZE = 10
 ) {
   let styledNodes = new Array();
   let cnt = 0;
   let totWaveNum = 0;
   for (let k = 0; k < tmpSketchNodes.length - 1; k++) {
-    if (tmpSketchNodes[k][1] !== tmpSketchNodes[k + 1][1]) {
+    if (Math.abs(tmpSketchNodes[k][1] - tmpSketchNodes[k + 1][1]) < 10) {
       styledNodes[cnt++] = deepCopy(tmpSketchNodes[k]);
       styledNodes[cnt++] = deepCopy(tmpSketchNodes[k + 1]);
     } else {
       let nxtK = _getNxtK(tmpSketchNodes, k);
       let tmpLength = tmpSketchNodes[nxtK][0] - tmpSketchNodes[k][0];
-      let WAVERATE = Math.ceil(tmpLength / 50);
+      let WAVERATE = Math.ceil(tmpLength / WAVESIZE);
       totWaveNum += WAVERATE;
       let SAMPLERATE = Math.ceil(tmpLength / 2);
-      if (SAMPLERATE === 0) SAMPLERATE = 1;
+      if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
       for (let z = 0; z <= SAMPLERATE; z++) {
         styledNodes[cnt] = new Array();
         styledNodes[cnt][0] =
@@ -1338,7 +1299,12 @@ function _styleWave(
   let ret = [styledNodes, totWaveNum];
   return ret;
 }
-function _styleZigzag(tmpSketchNodes, flag, ZIGHEIGHT = 5 * GLOBALRATE) {
+function _styleZigzag(
+  tmpSketchNodes,
+  flag,
+  ZIGHEIGHT = 5 * GLOBALRATE,
+  ZIGZAGSIZE = 10
+) {
   let styledNodes = [];
   let cnt = 0;
   let totWaveNum = 0;
@@ -1350,7 +1316,7 @@ function _styleZigzag(tmpSketchNodes, flag, ZIGHEIGHT = 5 * GLOBALRATE) {
       let nxtK = _getNxtK(tmpSketchNodes, k);
       let tmpLength = tmpSketchNodes[nxtK][0] - tmpSketchNodes[k][0];
       let tmpHeight = ZIGHEIGHT;
-      let SAMPLERATE = Math.ceil(tmpLength / 100);
+      let SAMPLERATE = Math.ceil(tmpLength / ZIGZAGSIZE);
       totWaveNum += SAMPLERATE;
       styledNodes[cnt++] = deepCopy(tmpSketchNodes[k]);
       for (let z = 0; z < SAMPLERATE; z++) {
@@ -1366,7 +1332,12 @@ function _styleZigzag(tmpSketchNodes, flag, ZIGHEIGHT = 5 * GLOBALRATE) {
   }
   return [styledNodes, totWaveNum];
 }
-function _styleBump(tmpSketchNodes, flag, BUMPHEIGHT = 5 * GLOBALRATE) {
+function _styleBump(
+  tmpSketchNodes,
+  flag,
+  BUMPHEIGHT = 5 * GLOBALRATE,
+  BUMPSIZE = 10
+) {
   let styledNodes = [];
   let cnt = 0;
   let totWaveNum = 0;
@@ -1378,7 +1349,7 @@ function _styleBump(tmpSketchNodes, flag, BUMPHEIGHT = 5 * GLOBALRATE) {
       let nxtK = _getNxtK(tmpSketchNodes, k);
       let tmpLength = tmpSketchNodes[nxtK][0] - tmpSketchNodes[k][0];
       let tmpHeight = BUMPHEIGHT;
-      let SAMPLERATE = Math.ceil(tmpLength / 100);
+      let SAMPLERATE = Math.ceil(tmpLength / BUMPSIZE);
       totWaveNum += SAMPLERATE;
       styledNodes[cnt++] = deepCopy(tmpSketchNodes[k]);
       styledNodes[cnt] = deepCopy(tmpSketchNodes[k]);
@@ -1421,7 +1392,7 @@ function _styleDash(tmpSketchNodes) {
       let nxtK = _getNxtK(tmpSketchNodes, k);
       let tmpLength = tmpSketchNodes[nxtK][0] - tmpSketchNodes[k][0];
       let SAMPLERATE = Math.ceil(tmpLength / 50);
-      if (SAMPLERATE === 0) SAMPLERATE = 1;
+      if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
       for (let z = 0; z <= SAMPLERATE; z++) {
         styledNodes[cnt] = new Array();
         styledNodes[cnt][0] =
@@ -1518,8 +1489,9 @@ function _relateTwine(
   cntNum,
   id,
   flag,
-  TWINEHEIGHT = 20 * GLOBALRATE,
-  PI = 3.14
+  TWINEHEIGHT = 10 * GLOBALRATE,
+  PI = 3.14,
+  WAVESIZE = 15
 ) {
   const { aNodes, bNodes } = _forRelateTurn(tmpSketchNodes, 0.2, stdY, 0);
   let aimNodes = new Array();
@@ -1533,7 +1505,7 @@ function _relateTwine(
       let midLength =
         (tmpSketchNodes[tmpSketchNodes.length - 1][0] - tmpSketchNodes[0][0]) *
         0.6;
-      let WAVERATE = Math.ceil(midLength / 100);
+      let WAVERATE = Math.ceil(midLength / WAVESIZE);
       let SAMPLERATE = Math.ceil(midLength / 10);
       if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
       waveNum += WAVERATE;
@@ -1557,7 +1529,7 @@ function _relateTwine(
       let midLength =
         (tmpSketchNodes[tmpSketchNodes.length - 1][0] - tmpSketchNodes[0][0]) *
         0.8;
-      let WAVERATE = Math.ceil(midLength / 100);
+      let WAVERATE = Math.ceil(midLength / WAVESIZE);
       let SAMPLERATE = Math.ceil(midLength / 10);
       waveNum += WAVERATE;
       if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
@@ -1583,7 +1555,7 @@ function _relateTwine(
       let midLength =
         (tmpSketchNodes[tmpSketchNodes.length - 1][0] - tmpSketchNodes[0][0]) *
         0.8;
-      let WAVERATE = Math.ceil(midLength / 100);
+      let WAVERATE = Math.ceil(midLength / WAVESIZE);
       let SAMPLERATE = Math.ceil(midLength / 10);
       waveNum += WAVERATE;
       if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
@@ -1603,7 +1575,7 @@ function _relateTwine(
   } else {
     let midLength =
       tmpSketchNodes[tmpSketchNodes.length - 1][0] - tmpSketchNodes[0][0];
-    let WAVERATE = Math.ceil(midLength / 100);
+    let WAVERATE = Math.ceil(midLength / WAVESIZE);
     let SAMPLERATE = Math.ceil(midLength / 10);
     if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
     waveNum += WAVERATE;

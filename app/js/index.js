@@ -51,12 +51,12 @@ function drawGraph(rawData) {
   protoc.stylishInfo = [];
   protoc.relateInfo = [];
   protoc.scaleInfo = [];
-  protoc.stylishInfo.push({ names: [10], timespan: [18, 33], style: "Wave" });
+  //protoc.stylishInfo.push({ names: [10], timespan: [18, 33], style: "Wave" });
   // protoc.stylishInfo.push({ names: [1], timespan: [1, 4], style: "Zigzag" });
   // protoc.stylishInfo.push({ names: [10], timespan: [23, 24], style: "Bump" });
   // protoc.stylishInfo.push({'names':[8],'timespan':[10,12],'style':'Bump'});
   // protoc.relateInfo.push({ names: [0, 1], timespan: [0, 3], style: "Knot" });
-  //protoc.relateInfo.push({ names: [2, 3], timespan: [4, 6], style: "Knot" });
+  // protoc.relateInfo.push({ names: [2, 5], timespan: [1, 1], style: "Bump"});
   // protoc.relateInfo.push({'names':[11,14],'timespan':[34,36],'style':'Twine'});
   // protoc.scaleInfo.push({style:'Scale',param:{width:1000,height:800}});
   let graph = ans._layout(rawData.data, protoc);
@@ -172,9 +172,9 @@ function genSimplePathStr(points) {
 }
 let path =
   "C:\\E\\study\\research\\20200131\\StoryFlowServer\\deploy\\uploadFiles\\";
-main(path + "StarWars.xml");
-// main(path + "Redcap.xml");
-// main(path + "ChasingDragon.xml");
+// main(path + "StarWars.xml");
+main(path + "Redcap.xml");
+//main(path + "ChasingDragon.xml");
 // main(path + "Coco.xml");
 // main(path + "Frozen.xml");
 // main(path + "Guowuguan.xml");
@@ -189,3 +189,4 @@ main(path + "StarWars.xml");
 // main(path + "Naruto.xml");
 // main(path + "Suiciders.xml");
 // main(path + "TrainToBusan.xml");
+//main(path + "CocoNew.xml");
