@@ -46,6 +46,7 @@ function post(url) {
   };
 }
 function drawGraph(rawData) {
+  //console.log(rawData);
   let ans = new iStoryline();
   let protoc = {};
   protoc.stylishInfo = [];
@@ -171,22 +172,24 @@ function genSimplePathStr(points) {
   return pathStr;
 }
 let path =
-  "C:\\E\\study\\research\\20200131\\StoryFlowServer\\deploy\\uploadFiles\\";
+  "C:\\E\\study\\research\\plotThread\\20200131\\StoryFlowServer\\deploy\\uploadFiles\\";
 // main(path + "StarWars.xml");
-main(path + "Redcap.xml");
-//main(path + "ChasingDragon.xml");
+// main(path + "Redcap.xml");
+// main(path + "ChasingDragon.xml");
 // main(path + "Coco.xml");
 // main(path + "Frozen.xml");
 // main(path + "Guowuguan.xml");
-// main(path + "inceptionTune.xml");
+// main(path + "InceptionTune.xml");
 // main(path + "JurassicParkTune.xml");
 // main(path + "KingLearTune.xml");
 // main(path + "LetBulletFlyTune.xml");
 // main(path + "MatrixTune.xml");
-// main(path + "Moon.xml");
+// main(path + "MoonAndSixpence.xml");
 // main(path + "Minions.xml");
 // main(path + "NaniaTune.xml");
 // main(path + "Naruto.xml");
 // main(path + "Suiciders.xml");
+// main(path + "Busan.xml");
 // main(path + "TrainToBusan.xml");
-//main(path + "CocoNew.xml");
+// main(path + "CocoNew.xml");
+main(path + "WuKong.xml");

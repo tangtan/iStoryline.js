@@ -23,12 +23,14 @@ function smoothRender(
   stylishInfo,
   scaleInfo
 ) {
-  let originNodes = calculateOriginNodes(
+  let tmp = calculateOriginNodes(
     initialGraph.initialNodes,
     initialGraph.timeframeTable,
     initialGraph.entities,
     initialGraph.keyTimeframe
   ); //不同segment之间时间相连但x不相连
+  let originNodes = tmp[0];
+  let linkMark = tmp[1];
   let group = initializeGroup(originNodes);
   const { relate, stylish } = judgeStylishAndRelate(relateInfo, stylishInfo);
   const { splitMarks, groupPosition } = initializeSplitMarks(
@@ -46,12 +48,13 @@ function smoothRender(
     splitMarks,
     groupPosition,
     initialGraph,
+    linkMark,
     relate,
     stylish
   );
   let extentNodes = extent(originNodes, deepCopy(renderNodes));
   let extentPaths = extent(originNodes, deepCopy(smoothNodes));
-  extentPaths = simplifyPaths(extentPaths, 5);
+  //extentPaths = simplifyPaths(extentPaths);
   let renderedGraph = initialGraph;
   const width = scaleInfo.length > 0 ? scaleInfo[0].param.width || 1000 : 1000;
   const height = scaleInfo.length > 0 ? scaleInfo[0].param.height || 372 : 372;
@@ -91,6 +94,7 @@ function calculateSmoothNodes(
   splitMarks,
   groupPosition,
   initialGraph,
+  linkMark,
   relate,
   stylish
 ) {
@@ -105,6 +109,7 @@ function calculateSmoothNodes(
       for (let k = 0; k < tmpSmoothNodes[i][j].length; k++) {
         smoothNodes[i][j].push(deepCopy(tmpSmoothNodes[i][j][k]));
       }
+      if (linkMark[i][j] !== linkMark[i][j + 1]) continue;
       if (tmpSmoothNodes[i][j][1][1] === tmpSmoothNodes[i][j + 1][0][1]) {
         smoothNodes[i][j].push([
           (tmpSmoothNodes[i][j + 1][0][0] + tmpSmoothNodes[i][j][1][0]) / 2,
@@ -117,9 +122,11 @@ function calculateSmoothNodes(
         ]);
       } else {
         let SAMPLERATE = Math.floor(
-          _getLength(tmpSmoothNodes[i][j][1], tmpSmoothNodes[i][j + 1][0]) / 10
+          _getLength(tmpSmoothNodes[i][j][1], tmpSmoothNodes[i][j + 1][0]) / 20
         );
         if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
+        // console.log(SAMPLERATE);
+        if (SAMPLERATE > 11) SAMPLERATE = 11;
         let aimNodes = linkNodes(
           [
             [tmpSmoothNodes[i][j][1][0], tmpSmoothNodes[i][j][1][1]],

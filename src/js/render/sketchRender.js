@@ -23,12 +23,14 @@ function sketchRender(
   stylishInfo,
   scaleInfo
 ) {
-  let originNodes = calculateOriginNodes(
+  let tmp = calculateOriginNodes(
     initialGraph.initialNodes,
     initialGraph.timeframeTable,
     initialGraph.entities,
     initialGraph.keyTimeframe
-  );
+  ); //不同segment之间时间相连但x不相连
+  let originNodes = tmp[0];
+  let linkMark = tmp[1];
   let group = initializeGroup(originNodes);
   const { relate, stylish } = judgeStylishAndRelate(relateInfo, stylishInfo);
   const { splitMarks, groupPosition } = initializeSplitMarks(
@@ -45,6 +47,7 @@ function sketchRender(
     splitMarks,
     groupPosition,
     initialGraph,
+    linkMark,
     relate,
     stylish
   );
@@ -89,6 +92,7 @@ function calculateSketchNodes(
   splitMarks,
   groupPosition,
   initialGraph,
+  linkMark,
   relate,
   stylish
 ) {
@@ -138,6 +142,7 @@ function calculateSketchNodes(
         }
       }
       if (j < tmpSketchNodes[i].length - 1) {
+        if (linkMark[i][j] !== linkMark[i][j + 1]) continue;
         if (tmpSketchNodes[i][j][1][1] !== tmpSketchNodes[i][j + 1][0][1]) {
           let SAMPLERATE = Math.floor(
             _getLength(tmpSketchNodes[i][j][1], tmpSketchNodes[i][j + 1][0]) /

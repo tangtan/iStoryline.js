@@ -654,7 +654,10 @@ export function initializeGroup(storyline) {
 function _getStorySegments(timeframeTable, _characterName, keyTimeframe) {
   let lifeSpan = timeframeTable.get(_characterName);
   let storySegments = [];
+  let linkMark = [];
   let cnt = 0;
+  //let lifeSpan = [];
+  let tot = 0;
   for (let i = 0; i < keyTimeframe.length - 1; i++) {
     for (let j = 0; j < lifeSpan.length; j++) {
       if (
@@ -662,12 +665,13 @@ function _getStorySegments(timeframeTable, _characterName, keyTimeframe) {
         keyTimeframe[i + 1] <= lifeSpan[j][1]
       ) {
         storySegments[cnt] = [keyTimeframe[i], keyTimeframe[i + 1]];
+        linkMark[cnt] = j;
         cnt++;
         break;
       }
     }
   }
-  return storySegments;
+  return [storySegments, linkMark];
 }
 export function calculateOriginNodes(
   initialNodes,
@@ -679,13 +683,12 @@ export function calculateOriginNodes(
   let originNodes = new Array();
   let cnt = 0;
   let tot = 0;
+  let linkMark = new Array();
   for (let i = 0; i < entities.length; i++) {
     let _characterName = entities[i];
-    let _storySegment = _getStorySegments(
-      timeframeTable,
-      _characterName,
-      keyTimeframe
-    );
+    let _tmp = _getStorySegments(timeframeTable, _characterName, keyTimeframe);
+    let _storySegment = _tmp[0];
+    linkMark[i] = _tmp[1];
     originNodes[i] = new Array();
     cnt = 0;
     for (let j = 0; j < _storySegment.length; j++) {
@@ -742,7 +745,7 @@ export function calculateOriginNodes(
       }
     }
   }
-  return originNodes;
+  return [originNodes, linkMark];
 }
 export function calculateRenderNodes(tmpStoryline, group) {
   let renderNodes = deepCopy(tmpStoryline);
