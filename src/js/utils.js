@@ -328,6 +328,7 @@ function deleteDuplicatedStyles(tmpStylishInfo, tmpRelateInfo, story, array) {
       }
     }
   }
+
   return { stylishInfo, relateInfo };
 }
 export function deepCopy(tmp) {

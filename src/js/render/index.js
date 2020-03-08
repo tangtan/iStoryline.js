@@ -6,7 +6,10 @@ export function storyRender(renderModule, initialGraph, constraints) {
   const adjustInfo = constraints.filter(ctr => ctr.style === "Adjust");
   const relateInfo = constraints.filter(
     ctr =>
-      ctr.style === "Twine" || ctr.style === "Knot" || ctr.style === "Collide"
+      ctr.style === "Twine" ||
+      ctr.style === "Knot" ||
+      ctr.style === "Collide" ||
+      ctr.style === "Merge"
   );
   const stylishInfo = constraints.filter(
     ctr =>

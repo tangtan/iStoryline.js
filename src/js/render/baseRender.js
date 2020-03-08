@@ -229,6 +229,9 @@ function _getStyleType(stylish) {
     case "Knot":
       ret = 0;
       break;
+    case "Merge":
+      ret = 0;
+      break;
     case "Twine":
       ret = 0;
       break;
@@ -946,6 +949,8 @@ export function calculateStyledNodes(smoothNodes, sketchStyles, groupPosition) {
             aimNodes = _relateCollide(tmpSketchNodes[i][j], stdY, cntNum, id);
           } else if (styleOption === "Knot") {
             aimNodes = _relateKnot(tmpSketchNodes[i][j], stdY, id);
+          } else if (styleOption === "Merge") {
+            aimNodes = _relateMerge(tmpSketchNodes[i][j], stdY, id);
           } else if (styleOption === "Twine") {
             let tmpTwine = _relateTwine(
               tmpSketchNodes[i][j],
@@ -1486,6 +1491,37 @@ function _relateKnot(tmpSketchNodes, stdY, KNOTHEIGHT = 2 * GLOBALRATE) {
   }
   return aimNodes;
 }
+function _relateMerge(tmpSketchNodes, stdY, id) {
+  const { aNodes, bNodes } = _forRelateTurn(tmpSketchNodes, 0.4, stdY, 0);
+  let aimNodes = new Array();
+  let cnt = 0;
+  if (id) {
+    if (id === 3) {
+      for (let z = 0; z < aNodes.length; z++) {
+        aimNodes[cnt++] = deepCopy(aNodes[z]);
+      }
+      for (let z = 0; z < bNodes.length; z++) {
+        aimNodes[cnt++] = deepCopy(bNodes[z]);
+      }
+    }
+    if (id === 1) {
+      for (let z = 0; z < aNodes.length; z++) {
+        aimNodes[cnt++] = deepCopy(aNodes[z]);
+      }
+      aimNodes[cnt++] = [bNodes[bNodes.length - 1][0], stdY];
+    }
+    if (id === 2) {
+      aimNodes[cnt++] = [aNodes[0][0], stdY];
+      for (let z = 0; z < bNodes.length; z++) {
+        aimNodes[cnt++] = deepCopy(bNodes[z]);
+      }
+    }
+  } else {
+    aimNodes[cnt++] = [aNodes[0][0], stdY];
+    aimNodes[cnt++] = [bNodes[bNodes.length - 1][0], stdY];
+  }
+  return aimNodes;
+}
 function _relateTwine(
   tmpSketchNodes,
   stdY,
@@ -1494,7 +1530,8 @@ function _relateTwine(
   flag,
   TWINEHEIGHT = 10 * GLOBALRATE,
   PI = 3.14,
-  WAVESIZE = 15
+  WAVESIZE = 15,
+  SAMPLESIZE = 1
 ) {
   const { aNodes, bNodes } = _forRelateTurn(tmpSketchNodes, 0.2, stdY, 0);
   let aimNodes = new Array();
@@ -1509,7 +1546,7 @@ function _relateTwine(
         (tmpSketchNodes[tmpSketchNodes.length - 1][0] - tmpSketchNodes[0][0]) *
         0.6;
       let WAVERATE = Math.ceil(midLength / WAVESIZE);
-      let SAMPLERATE = Math.ceil(midLength / 10);
+      let SAMPLERATE = Math.ceil(midLength / SAMPLESIZE);
       if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
       waveNum += WAVERATE;
       for (let i = 0; i <= SAMPLERATE; i++) {
@@ -1533,7 +1570,7 @@ function _relateTwine(
         (tmpSketchNodes[tmpSketchNodes.length - 1][0] - tmpSketchNodes[0][0]) *
         0.8;
       let WAVERATE = Math.ceil(midLength / WAVESIZE);
-      let SAMPLERATE = Math.ceil(midLength / 10);
+      let SAMPLERATE = Math.ceil(midLength / SAMPLESIZE);
       waveNum += WAVERATE;
       if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
       for (let i = 0; i <= SAMPLERATE; i++) {
@@ -1559,7 +1596,7 @@ function _relateTwine(
         (tmpSketchNodes[tmpSketchNodes.length - 1][0] - tmpSketchNodes[0][0]) *
         0.8;
       let WAVERATE = Math.ceil(midLength / WAVESIZE);
-      let SAMPLERATE = Math.ceil(midLength / 10);
+      let SAMPLERATE = Math.ceil(midLength / SAMPLESIZE);
       waveNum += WAVERATE;
       if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
       for (let i = 0; i <= SAMPLERATE; i++) {
@@ -1579,7 +1616,7 @@ function _relateTwine(
     let midLength =
       tmpSketchNodes[tmpSketchNodes.length - 1][0] - tmpSketchNodes[0][0];
     let WAVERATE = Math.ceil(midLength / WAVESIZE);
-    let SAMPLERATE = Math.ceil(midLength / 10);
+    let SAMPLERATE = Math.ceil(midLength / SAMPLESIZE);
     if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
     waveNum += WAVERATE;
     for (let i = 0; i <= SAMPLERATE; i++) {
@@ -1597,22 +1634,46 @@ function _relateTwine(
   return [aimNodes, waveNum];
 }
 function _forRelateTurn(tmpSketchNodes, rate, stdY, HEIGHT) {
-  let tail = tmpSketchNodes.length - 1;
-  let tmpLength = tmpSketchNodes[tail][0] - tmpSketchNodes[0][0];
-  let staX = rate * tmpLength + tmpSketchNodes[0][0];
-  let endX = (1 - rate) * tmpLength + tmpSketchNodes[0][0];
-  let SAMPLERATE = Math.ceil((0.2 * tmpLength) / 8);
+  let head = 0,
+    tail = tmpSketchNodes.length - 1;
+  // while(head < tmpSketchNodes.length - 2){
+  //   if(tmpSketchNodes[head][1] === tmpSketchNodes[head + 1][1]) break;
+  //   head ++;
+  // }
+  // while(tail > 0){
+  //   if(tmpSketchNodes[tail][1] === tmpSketchNodes[tail - 1][1]) break;
+  //   tail --;
+  // }
+  let tmpLength = tmpSketchNodes[tail][0] - tmpSketchNodes[head][0];
+  let staX = rate * tmpLength + tmpSketchNodes[head][0];
+  let endX = tmpSketchNodes[tail][0] - rate * tmpLength;
+  let SAMPLERATE = Math.ceil(rate * tmpLength);
   if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
-  let aNodes = linkNodes(
-    [tmpSketchNodes[0], [staX, stdY + HEIGHT]],
+  if (SAMPLERATE > 11) SAMPLERATE = 11;
+  let tmpaNodes = linkNodes(
+    [tmpSketchNodes[head], [staX, stdY + HEIGHT]],
     0,
     SAMPLERATE
   );
-  let bNodes = linkNodes(
+  let tmpbNodes = linkNodes(
     [[endX, stdY + HEIGHT], tmpSketchNodes[tail]],
     0,
     SAMPLERATE
   );
+  let aNodes = [],
+    bNodes = [];
+  // for(let g = 0;g < head;g ++){
+  //   aNodes.push(deepCopy(tmpSketchNodes[g]));
+  // }
+  for (let g = 0; g < tmpaNodes.length; g++) {
+    aNodes.push(deepCopy(tmpaNodes[g]));
+  }
+  for (let g = 0; g < tmpbNodes.length; g++) {
+    bNodes.push(deepCopy(tmpbNodes[g]));
+  }
+  // for(let g = tail + 1;g < tmpSketchNodes.length;g ++){
+  //   bNodes.push(deepCopy(tmpSketchNodes[g]));
+  // }
   return { aNodes, bNodes };
 }
 

@@ -52,6 +52,8 @@ function drawGraph(rawData) {
   protoc.stylishInfo = [];
   protoc.relateInfo = [];
   protoc.scaleInfo = [];
+  protoc.relateInfo.push({ names: [3, 4], timespan: [3, 5], style: "Merge" });
+  protoc.relateInfo.push({ names: [3, 4], timespan: [4, 5], style: "Split" });
   //protoc.stylishInfo.push({ names: [10], timespan: [18, 33], style: "Wave" });
   // protoc.stylishInfo.push({ names: [1], timespan: [1, 4], style: "Zigzag" });
   // protoc.stylishInfo.push({ names: [10], timespan: [23, 24], style: "Bump" });
@@ -191,5 +193,5 @@ let path =
 // main(path + "Suiciders.xml");
 // main(path + "Busan.xml");
 // main(path + "TrainToBusan.xml");
-// main(path + "CocoNew.xml");
-main(path + "WuKong.xml");
+main(path + "CocoNew.xml");
+// main(path + "WuKong.xml");

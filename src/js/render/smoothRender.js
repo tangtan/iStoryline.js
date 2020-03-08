@@ -125,7 +125,6 @@ function calculateSmoothNodes(
           _getLength(tmpSmoothNodes[i][j][1], tmpSmoothNodes[i][j + 1][0]) / 20
         );
         if (!(SAMPLERATE & 1)) SAMPLERATE += 1;
-        // console.log(SAMPLERATE);
         if (SAMPLERATE > 11) SAMPLERATE = 11;
         let aimNodes = linkNodes(
           [
