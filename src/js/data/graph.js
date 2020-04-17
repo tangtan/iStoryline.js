@@ -514,10 +514,7 @@ export class Graph {
   getStorySegmentIDByTime(storylineID, timespan) {
     for (let i = 0; i < this._nodes[Number(storylineID)].length; i++) {
       let seg = this._nodes[Number(storylineID)][i];
-      let realspan = this.getStoryTimeSpan(
-        (seg[0][0] + seg[1][0]) / 2,
-        (seg[0][1] + seg[1][1]) / 2
-      );
+      let realspan = this.getStoryTimeSpan(seg[0][0], seg[0][1]);
       if (timespan[0] <= realspan[0] && realspan[1] <= timespan[1]) {
         return i;
       }

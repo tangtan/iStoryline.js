@@ -980,6 +980,7 @@ export function removeAngularNodes(renderNodes, group, RATE = 3) {
       let L = renderNodes[i][j][0][0],
         R = renderNodes[i][j][1][0],
         H = renderNodes[i][j][0][1];
+      if (R < L) (L ^= R), (R ^= L), (L ^= R);
       let length = R - L;
       let flag = 0;
       if (las >= 0 && las < renderNodes[i].length) {

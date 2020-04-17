@@ -60,8 +60,8 @@ function smoothRender(
   const height = scaleInfo.length > 0 ? scaleInfo[0].param.height || 372 : 372;
   const reserveRatio =
     scaleInfo.length > 0 ? scaleInfo[0].param.reserveRatio || false : false;
-  let stdX = (1900 - width) / 2;
-  let stdY = (1000 - height) / 2;
+  let stdX = (1366 - width) / 2;
+  let stdY = (1024 - height) / 2;
   const x0 = scaleInfo.length > 0 ? scaleInfo[0].param.x0 || stdX : stdX;
   const y0 = scaleInfo.length > 0 ? scaleInfo[0].param.y0 || stdY : stdY;
 
