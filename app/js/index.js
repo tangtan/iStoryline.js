@@ -1,8 +1,10 @@
 import Snap from "snapsvg";
 import iStoryline from "../../src/js/index";
+import { testTableUnit } from "../../test/table.test";
 
 function main(url) {
-  post(url);
+  // post(url);
+  testTableUnit();
 }
 function post(url) {
   let tmpAjax = null;

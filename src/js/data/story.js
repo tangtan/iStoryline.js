@@ -1,16 +1,11 @@
 import { Table } from "./util";
 
 export class Story {
-  #tableMap;
-  #characters;
-  #locations;
-  #timeStamps;
-
   constructor() {
-    this.#tableMap = new Map();
-    this.#characters = [];
-    this.#locations = [];
-    this.#timeStamps = [];
+    this._tableMap = new Map();
+    this._characters = [];
+    this._locations = [];
+    this._timeStamps = [];
   }
 
   /**
@@ -41,11 +36,11 @@ export class Story {
   setTable(tableName, table) {}
 
   getTableRows() {
-    return this.#characters.length || 0;
+    return this._characters.length || 0;
   }
 
   getTableCols() {
-    return this.#timeStamps.length || 0;
+    return this._timeStamps.length || 0;
   }
 
   /**
