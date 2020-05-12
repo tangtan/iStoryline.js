@@ -11,14 +11,12 @@ export class Story {
   /**
    * read xml/json document
    */
-  load(file, fileType = "xml") {
-    //
-  }
+  load(fileUrl, fileType) {}
 
   /**
    * export xml/json document
    */
-  dump(story, fileType = "xml") {}
+  dump(fileName, fileType) {}
 
   /**
    * get table (tableMap)
@@ -83,9 +81,9 @@ export class Story {
   /**
    * change the sessions of characters
    * @param {String | Number[]} characters
-   * @param {Number[]} timeSteps
+   * @param {Number[]} timeSpan
    */
-  addSession(characters = [], timeSteps = []) {}
+  addSession(characters = [], timeSpan = []) {}
 
   /**
    * delete sessions from table
@@ -97,9 +95,9 @@ export class Story {
    * change the locations of characters
    * @param {Number | String | null} location
    * @param {Number | String[]} characters
-   * @param {Number[]} timeSteps
+   * @param {Number[]} timeRange
    */
-  changeLocation(location, characters = [], timeSteps = []) {}
+  changeLocation(location, characters = [], timeRange = []) {}
 
   /**
    * get character name

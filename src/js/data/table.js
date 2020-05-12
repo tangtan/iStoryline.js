@@ -125,7 +125,6 @@ export class Table {
       const rows = isColumn ? arr.length : 1;
       const cols = isColumn ? 1 : arr.length;
       this.resize(rows, cols);
-      console.log(this.mat);
     }
     let _zeroTable;
     if (isColumn) {
