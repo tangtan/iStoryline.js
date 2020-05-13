@@ -1,12 +1,14 @@
-import {locationSort} from "./locationSort";
-import {greedySort} from "./greedySort";
-import {orderModelError} from "../utils";
+import { logGeneratorError } from "../utils/logger";
+import { locationSort } from "./locationSort";
+import { greedySort } from "./greedySort";
 
-export function storyOrder(orderModule, data,  constraints) {
-  switch (orderModule) {
-    case "GreedyOrder": return greedySort(data,constraints.filter(ctrs=>ctrs.style==="Sort"));
-    case "LocationOrder": return locationSort(data,constraints.filter(ctrs=>ctrs.style==="Sort"));
+export function storyOrder(generator, story, constraints) {
+  switch (generator) {
+    case "GreedyOrder":
+      greedySort(story, constraints);
+    case "LocationOrder":
+      locationSort(story, constraints);
     default:
-      orderModelError(orderModule);
+      logGeneratorError(generator);
   }
 }

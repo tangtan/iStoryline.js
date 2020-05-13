@@ -1,21 +1,14 @@
+import { logGeneratorError } from "../utils/logger";
 import { freeTransform } from "./freeTransform";
 import { circleTransform } from "./circleTransform";
-import { transformModelError } from "../utils";
 
-export function storyTransform(transformModule, renderedGraph, constraints) {
-  const reshapeInfo = constraints.filter(ctr => ctr.style === "Reshape");
-  let transformFunc = freeTransform;
-  switch (transformModule) {
+export function storyTransform(generator, story, constraints) {
+  switch (generator) {
     case "CircleTransform":
-      transformFunc = circleTransform;
-      break;
+      circleTransform(story, constraints);
     case "FreeTransform":
-      transformFunc = freeTransform;
-      break;
+      freeTransform(story, constraints);
     default:
-      transformModelError(transformModule);
+      logGeneratorError(generator);
   }
-  let upperPath = reshapeInfo.length > 0 ? reshapeInfo[0].param.upperPath : [];
-  let lowerPath = reshapeInfo.length > 0 ? reshapeInfo[0].param.lowerPath : [];
-  return transformFunc(renderedGraph, upperPath, lowerPath);
 }

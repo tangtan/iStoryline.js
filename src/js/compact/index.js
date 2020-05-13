@@ -1,40 +1,17 @@
+import { logGeneratorError } from "../utils/logger";
 import { greedySlotCompact } from "./greedySlotCompact";
 import { opCompact } from "./opCompact";
 import { opSlotCompact } from "./opSlotCompact";
-import { compactModelError } from "../utils";
 
-export function storyCompact(compactModule, alignedSession, constraints) {
-  const compressInfo = constraints.filter(ctr => ctr.style === "Compress");
-  const expandInfo = constraints.filter(ctr => ctr.style === "Expand");
-  const mergeInfo = constraints.filter(ctr => ctr.style === "Merge");
-  const splitInfo = constraints.filter(ctr => ctr.style === "Split");
-  const spaceInfo = constraints.filter(ctr => ctr.style === "Space");
-  let compactFunc = greedySlotCompact;
-  switch (compactModule) {
+export function storyCompact(generator, story, constraints) {
+  switch (generator) {
     case "GreedySlotCompact":
-      compactFunc = greedySlotCompact;
-      break;
+      greedySlotCompact(story, constraints);
     case "OpCompact":
-      compactFunc = opCompact;
-      break;
+      opCompact(story, constraints);
     case "OpSlotCompact":
-      compactFunc = opSlotCompact;
-      break;
+      opSlotCompact(story, constraints);
     default:
-      compactFunc = compactModelError;
+      logGeneratorError(generator);
   }
-  const din = spaceInfo.length > 0 ? spaceInfo[0].param.intraSep : 1000;
-  const dout = spaceInfo.length > 0 ? spaceInfo[0].param.interSep : 10;
-  if (compactFunc === compactModelError) {
-    return compactFunc(compactModule);
-  }
-  return compactFunc(
-    alignedSession,
-    compressInfo,
-    expandInfo,
-    mergeInfo,
-    splitInfo,
-    din,
-    dout
-  );
 }
