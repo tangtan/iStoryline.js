@@ -1,7 +1,7 @@
 # iStoryline.js
 
 <p align="left">
-    <a href='#'><img src='https://travis-ci.org/meolu/walle-web.svg?branch=master' alt="Build Status"></a>  
+    <a href='#'><img src='https://travis-ci.com/tangtan/iStoryline.js.svg?branch=master' alt="Build Status"></a>  
     <a href='#'><img src='https://badges.gitter.im/Join%20Chat.svg'></a>
 </p>
 
@@ -31,34 +31,32 @@ yarn add https://github.com/tangtan/istoryline.git
 ## Basic Usage
 
 ```JavaScript
-import iStoryline from "istoryline"
+import iStoryline from "iStoryline.js"
 let iStoryliner = new iStoryline();
 
 // generate storyline visualizations from the story script
 let storyScriptUrl = './data/Redcap.xml';
 
 // graph can be drawed using any canvas or svg libraries
-let graph = iStoryliner.readFile(storyScriptUrl);
+let graph = iStoryliner.load(storyScriptUrl, fileType='xml');
 
 // obtain the characters names
-console.log(graph.names);  // ['Red cap', 'Mother', 'Wolf', 'GrandMa']
+console.log(graph.characters);  // ['Red cap', 'Mother', 'Wolf', 'GrandMa']
 
 // obtain the paths of the characters
-console.log(graph.paths);  // [[[x1, y1], [x2, y2], ...], ...]
-
-// obtain the timeline of the layout
-console.log(graph.timeline); // [time => x, ...]
+console.log(graph.storylines);  // [[x1, y1, x2, y2, ...], ...]
 ```
 
 ### TODO
 
 - provide the drawing APIs based on [canvas](https://www.w3schools.com/html/html5_canvas.asp) or [svg](https://www.w3schools.com/html/html5_svg.asp).
 
-## Interactive Storyline Editor
+## Storyline Board
 
 iStoryline.js provides a build-in editor for producing storyline visualizations.
 
 1. Install Node.js (>= 6.0)
+
 2. Install dependencies `npm i` or `yarn`
 
 3. Start the editor `npm run start`
@@ -67,11 +65,13 @@ iStoryline.js provides a build-in editor for producing storyline visualizations.
 
 ## Documentation
 
-- [Story Script](https://github.com/tangtan/istoryline/wiki/Story-Script)
+- [Story Script](https://github.com/tangtan/iStoryline.js/wiki/Story-Script)
 
-- [Data Structure and Workflow](https://github.com/tangtan/istoryline/wiki/Data-Structure-and-Workflow)
+- [Data Structure and Workflow](https://github.com/tangtan/iStoryline.js/wiki/Data-Structure-and-Workflow)
 
-- [API Reference](https://github.com/tangtan/istoryline/wiki/API-Reference)
+- [API Reference](https://github.com/tangtan/iStoryline.js/wiki/API-Reference)
+
+- [Graph Drawing](https://github.com/tangtan/iStoryline.js/wiki/Graph-Drawing)
 
 ## Reference
 
