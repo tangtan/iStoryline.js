@@ -1,8 +1,10 @@
 # iStoryline.js
 
 <p align="left">
-    <a href='#'><img src='https://travis-ci.com/tangtan/iStoryline.js.svg?branch=master' alt="Build Status"></a>  
-    <a href='#'><img src='https://badges.gitter.im/Join%20Chat.svg'></a>
+  ![](https://travis-ci.com/tangtan/iStoryline.js.svg?branch=master)
+  ![](https://img.shields.io/github/downloads/tangtan/iStoryline.js/total)
+  ![](https://img.shields.io/github/package-json/v/tangtan/iStoryline.js)
+  ![](https://img.shields.io/github/license/tangtan/iStoryline.js)
 </p>
 
 iStoryline.js is a JavaScript library for producing storyline visualizations with diverse sketchy styles. [Storyline visualization](https://xkcd.com/657/) is a fancy way to tell a story. Lines represent characters in the story. This fancy visualization naturally has some advantages in explaining the story:
@@ -19,13 +21,13 @@ For more information, please check [our paper](http://www.tantang.org/publicatio
 Use the package manager [npm](https://docs.npmjs.com/cli/install) or [yarn](https://yarnpkg.com/lang/en/docs/cli/add/) to install iStoryline.
 
 ```Json
-npm install https://github.com/tangtan/istoryline.git
+npm install https://github.com/tangtan/iStoryline.js.git
 ```
 
 or
 
 ```Json
-yarn add https://github.com/tangtan/istoryline.git
+yarn add https://github.com/tangtan/iStoryline.js.git
 ```
 
 ## Basic Usage
