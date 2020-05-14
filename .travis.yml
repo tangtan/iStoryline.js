@@ -1,9 +1,12 @@
 language: node_js
 node_js:
-  - 7
+  - 10
+branches:
+  only:
+    - ng
 before_install:
   - npm i -g npm@latest
 install:
   - npm install
 script:
-  - npm run build
+  - npm test
