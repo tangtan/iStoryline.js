@@ -112,7 +112,9 @@ export class Story {
    * @returns
    * - table: Table
    */
-  getTable(tableName) {}
+  getTable(tableName) {
+    return this._tableMap.get(tableName);
+  }
 
   /**
    * set table (tableMap)
@@ -193,7 +195,9 @@ export class Story {
    * @returns
    * - name: string
    */
-  getCharacterName(characterID) {}
+  getCharacterName(characterID) {
+    return this._characters[characterID];
+  }
 
   /**
    * get character ID
@@ -201,7 +205,9 @@ export class Story {
    * @returns
    * - ID: number
    */
-  getCharacterID(characterName) {}
+  getCharacterID(characterName) {
+    return this._characters.indexOf(characterName);
+  }
 
   /**
    * get the time range of characters
@@ -209,7 +215,21 @@ export class Story {
    * @returns
    * - timeRange: [[t1, t2], ..]
    */
-  getCharacterTimeRange(character) {}
+  getCharacterTimeRange(character) {
+    if (character instanceof String) {
+      character = this.getCharacterID(character);
+    }
+    //从timeTable中取到这个人不为零的timeIndex
+    //从timeStamps中取到timeSpan
+    //拼接
+    var timeRange = [];
+    for(let i = 0; i < this.getTableCols(); i++){
+      if(this._tableMap.get("timeTable").value(i, character)===1){
+        this.timeRange.append(this._timeStamps[i]);
+      }
+    }
+    return timeRange;
+  }
 
   /**
    * get location name
@@ -217,7 +237,9 @@ export class Story {
    * @returns
    * - locationName: string
    */
-  getLocationName(locationID) {}
+  getLocationName(locationID) {
+    return this._locations[locationID];
+  }
 
   /**
    * get location ID
@@ -225,7 +247,9 @@ export class Story {
    * @returns
    * - locationID: number
    */
-  getLocationID(locationName) {}
+  getLocationID(locationName) {
+    return this._locations.indexOf(locationName);
+  }
 
   /**
    * get characters according to the location
@@ -233,7 +257,20 @@ export class Story {
    * @returns
    * - characterIDs: number[]
    */
-  getLocationCharacters(location) {}
+  getLocationCharacters(location) {
+    if (location instanceof String) {
+      location = getLocationID(location);
+    }
+    var characterIDs = [];
+    for (let i = 0; i < this.getTableRows(); i++) {
+      for (let j = 0; j < this.getTableCols(); j++) {
+        if (this._tableMap.get("locationTable").value(j, i) === location) {
+          characterIDs.append(i);
+        }
+      }
+    }
+    return characterIDs;
+  }
 
   /**
    * get session according to the location
@@ -241,7 +278,20 @@ export class Story {
    * @returns
    * - sessionIDs: number[]
    */
-  getLocationSessions(location) {}
+  getLocationSessions(location) {
+    if (location instanceof String) {
+      location = getLocationID(location);
+    }
+    var sessionIDs = [];
+    for (let i = 0; i < this.getTableRows(); i++) {
+      for (let j = 0; j < this.getTableCols(); j++) {
+        if (this._tableMap.get("locationTable").value(j, i) === location) {
+          sessionIDs.append(this._tableMap.get("sessionTable").value(j, i));
+        }
+      }
+    }
+    return sessionIDs;
+  }
 
   /**
    * get characters according to the session
@@ -249,7 +299,18 @@ export class Story {
    * @returns
    * - characterIDs: number[]
    */
-  getSessionCharacters(sessionID) {}
+  getSessionCharacters(sessionID) {
+    var characterIDs = [];
+    for (let i = 0; i < this.getTableRows(); i++) {
+      for (let j = 0; j < this.getTableCols(); j++) {
+        if (this._tableMap.get("sessionTable").value(j, i) === sessionID) {
+          characterIDs.append(i);
+          break;
+        }
+      }
+    }
+    return characterIDs;
+  }
 
   /**
    * get the timeSpan of sessions
@@ -257,5 +318,13 @@ export class Story {
    * @returns
    * - timeRange: timeSpan[]
    */
-  getSessionTimeRange(sessionID) {}
+  getSessionTimeRange(sessionID) {
+    for (let i = 0; i < this.getTableRows(); i++) {
+      for (let j = 0; j < this.getTableCols(); j++) {
+        if (this._tableMap.get("sessionTable").value(j, i) === sessionID) {
+          return this._timeStamps[j];
+        }
+      }
+    }
+  }
 }
