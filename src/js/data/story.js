@@ -1,4 +1,11 @@
+import * as d3 from "d3";
 import { Table } from "./table";
+import {
+  parseXMLFile,
+  parseJSONFile,
+  dumpXMLFile,
+  dumpJSONFile
+} from "../utils/io";
 
 export class Story {
   constructor() {
@@ -11,85 +18,26 @@ export class Story {
     this._timeStamps = [];
   }
 
+  get characters() {
+    return this._characters;
+  }
+
+  get locations() {
+    return this._locations;
+  }
+
   /**
    * read xml/json document
    */
   async load(fileUrl, fileType) {
     if (fileType === "xml") {
       const xml = await d3.xml(fileUrl);
-      this._parseXml(xml);
+      parseXMLFile(xml, this);
     } else if (fileType === "json") {
       const json = await d3.json(fileUrl);
-      // this._parseJson(json)
+      parseJSONFile(json, this);
     } else {
-      console.error("wrong fileType!");
-    }
-  }
-
-  _parseXml(xml) {
-    let story = xml.querySelector("Story");
-    if (story) {
-      let characters = story.querySelector("Characters");
-      characters = characters.querySelectorAll("Character");
-      for (let character of characters) {
-        let name = character.getAttribute("Name");
-        this._characters.push(name);
-        let spans = character.querySelectorAll("Span");
-        for (let span of spans) {
-          let start = span.getAttribute("Start");
-          let end = span.getAttribute("End");
-          this._timeStamps.push(start, end);
-        }
-      }
-      const timeset = new Set(this._timeStamps);
-      this._timeStamps = Array.from(timeset);
-      this._timeStamps.sort();
-      let sessionTable = this._tableMap.get("sessionTable");
-      let timeTable = this._tableMap.get("timeTable");
-      let locationTable = this._tableMap.get("locationTable");
-      for (let table of [sessionTable, timeTable, locationTable]) {
-        table.resize(this._characters.length, this._timeStamps.length);
-      }
-      for (let character of characters) {
-        let spans = character.querySelectorAll("Span");
-        let characterName = character.getAttribute("Name");
-        let characterId = this._characters.indexOf(characterName);
-        for (let span of spans) {
-          let start = span.getAttribute("Start");
-          let timeId = this._timeStamps.indexOf(start);
-          timeTable.replace(characterId, timeId, 1);
-          let sessionId = span.getAttribute("Session");
-          sessionId = parseInt(sessionId);
-          sessionTable.replace(characterId, timeId, sessionId);
-        }
-      }
-      //parse the location part
-      let locations = story.querySelector("Locations");
-      locations = story.querySelectorAll("Location");
-      for (let location of locations) {
-        let locationTable = this._tableMap.get("locationTable");
-        let sessionTable = this._tableMap.get("sessionTable");
-        let timeTable = this._tableMap.get("timeTable");
-        let locationName = location.getAttribute("Name");
-        this._locations.push(locationName);
-        const locationId = this._locations.length - 1;
-        let sessionsInthislocation = location
-          .getAttribute("Sessions")
-          .split(",");
-        sessionsInthislocation = sessionsInthislocation.map(x => parseInt(x));
-        for (let i = 0; i < sessionTable.rows; i++)
-          for (let j = 0; j < sessionTable.cols; j++) {
-            if (
-              timeTable.value(i, j) &&
-              sessionTable.value(i, j) in sessionsInthislocation
-            ) {
-              locationTable.replace(i, j, locationId);
-            }
-          }
-      }
-      console.log(this);
-    } else {
-      console.error("No story in this Url!");
+      console.error("Wrong fileType!");
     }
   }
 
@@ -98,11 +46,11 @@ export class Story {
    */
   dump(fileName, fileType) {
     if (fileType === "xml") {
-      // dumpXml(xml)
+      dumpXMLFile(fileName, this);
     } else if (fileType === "json") {
-      // dumpJson(json)
+      dumpJSONFile(fileName, this);
     } else {
-      console.error("wrong fileType!");
+      console.error("Wrong fileType!");
     }
   }
 
@@ -128,7 +76,7 @@ export class Story {
   }
 
   getTableCols() {
-    return this._timeStamps.length || 0;
+    return this._timeStamps.length - 1 || 0;
   }
 
   /**
@@ -219,13 +167,13 @@ export class Story {
     if (character instanceof String) {
       character = this.getCharacterID(character);
     }
-    //从timeTable中取到这个人不为零的timeIndex
+    //从character table中取到这个人不为零的timeStep
     //从timeStamps中取到timeSpan
     //拼接
     var timeRange = [];
-    for(let i = 0; i < this.getTableCols(); i++){
-      if(this._tableMap.get("timeTable").value(i, character)===1){
-        this.timeRange.append(this._timeStamps[i]);
+    for (let i = 0; i < this.getTableCols(); i++) {
+      if (this._tableMap.get("timeTable").value(i, character) === 1) {
+        this.timeRange.push(this._timeStamps[i]);
       }
     }
     return timeRange;

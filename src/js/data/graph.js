@@ -23,6 +23,10 @@ export class Graph {
     this._story = story;
   }
 
+  get characters() {}
+
+  get storylines() {}
+
   /**
    * Get the character ID according to the given position.
    *
