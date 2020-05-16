@@ -10,9 +10,9 @@ import {
 export class Story {
   constructor() {
     this._tableMap = new Map();
-    this._tableMap.set("timeTable", new Table(0));
-    this._tableMap.set("sessionTable", new Table(0));
-    this._tableMap.set("locationTable", new Table(0));
+    this._tableMap.set("character", new Table(0));
+    this._tableMap.set("session", new Table(0));
+    this._tableMap.set("location", new Table(0));
     this._characters = [];
     this._locations = [];
     this._timeStamps = [];
@@ -172,7 +172,7 @@ export class Story {
     //拼接
     var timeRange = [];
     for (let i = 0; i < this.getTableCols(); i++) {
-      if (this._tableMap.get("timeTable").value(i, character) === 1) {
+      if (this._tableMap.get("character").value(i, character) === 1) {
         this.timeRange.push(this._timeStamps[i]);
       }
     }
@@ -212,7 +212,7 @@ export class Story {
     var characterIDs = [];
     for (let i = 0; i < this.getTableRows(); i++) {
       for (let j = 0; j < this.getTableCols(); j++) {
-        if (this._tableMap.get("locationTable").value(j, i) === location) {
+        if (this._tableMap.get("location").value(j, i) === location) {
           characterIDs.append(i);
         }
       }
@@ -233,8 +233,8 @@ export class Story {
     var sessionIDs = [];
     for (let i = 0; i < this.getTableRows(); i++) {
       for (let j = 0; j < this.getTableCols(); j++) {
-        if (this._tableMap.get("locationTable").value(j, i) === location) {
-          sessionIDs.append(this._tableMap.get("sessionTable").value(j, i));
+        if (this._tableMap.get("location").value(j, i) === location) {
+          sessionIDs.append(this._tableMap.get("session").value(j, i));
         }
       }
     }
@@ -251,7 +251,7 @@ export class Story {
     var characterIDs = [];
     for (let i = 0; i < this.getTableRows(); i++) {
       for (let j = 0; j < this.getTableCols(); j++) {
-        if (this._tableMap.get("sessionTable").value(j, i) === sessionID) {
+        if (this._tableMap.get("session").value(j, i) === sessionID) {
           characterIDs.append(i);
           break;
         }
@@ -269,7 +269,7 @@ export class Story {
   getSessionTimeRange(sessionID) {
     for (let i = 0; i < this.getTableRows(); i++) {
       for (let j = 0; j < this.getTableCols(); j++) {
-        if (this._tableMap.get("sessionTable").value(j, i) === sessionID) {
+        if (this._tableMap.get("session").value(j, i) === sessionID) {
           return this._timeStamps[j];
         }
       }

@@ -8,8 +8,8 @@ export function parseXMLFile(xml, story) {
       story._characters.push(name);
       let spans = character.querySelectorAll("Span");
       for (let span of spans) {
-        let start = span.getAttribute("Start");
-        let end = span.getAttribute("End");
+        let start = parseInt(span.getAttribute("Start"));
+        let end = parseInt(span.getAttribute("End"));
         story._timeStamps.push(start, end);
       }
     }
@@ -17,9 +17,9 @@ export function parseXMLFile(xml, story) {
     story._timeStamps = Array.from(timeset);
     story._timeStamps.sort();
     let sessionTable = story._tableMap.get("sessionTable");
-    let timeTable = story._tableMap.get("timeTable");
+    let characterTable = story._tableMap.get("character");
     let locationTable = story._tableMap.get("locationTable");
-    for (let table of [sessionTable, timeTable, locationTable]) {
+    for (let table of [sessionTable, characterTable, locationTable]) {
       table.resize(story._characters.length, story._timeStamps.length);
     }
     for (let character of characters) {
@@ -29,7 +29,7 @@ export function parseXMLFile(xml, story) {
       for (let span of spans) {
         let start = span.getAttribute("Start");
         let timeId = story._timeStamps.indexOf(start);
-        timeTable.replace(characterId, timeId, 1);
+        characterTable.replace(characterId, timeId, 1);
         let sessionId = span.getAttribute("Session");
         sessionId = parseInt(sessionId);
         sessionTable.replace(characterId, timeId, sessionId);
@@ -41,7 +41,7 @@ export function parseXMLFile(xml, story) {
     for (let location of locations) {
       let locationTable = story._tableMap.get("locationTable");
       let sessionTable = story._tableMap.get("sessionTable");
-      let timeTable = story._tableMap.get("timeTable");
+      let characterTable = story._tableMap.get("character");
       let locationName = location.getAttribute("Name");
       story._locations.push(locationName);
       const locationId = story._locations.length - 1;
@@ -50,7 +50,7 @@ export function parseXMLFile(xml, story) {
       for (let i = 0; i < sessionTable.rows; i++)
         for (let j = 0; j < sessionTable.cols; j++) {
           if (
-            timeTable.value(i, j) &&
+            characterTable.value(i, j) &&
             sessionTable.value(i, j) in sessionsInthislocation
           ) {
             locationTable.replace(i, j, locationId);
