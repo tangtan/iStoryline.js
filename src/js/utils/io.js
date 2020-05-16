@@ -15,10 +15,10 @@ export function parseXMLFile(xml, story) {
     }
     const timeset = new Set(story._timeStamps);
     story._timeStamps = Array.from(timeset);
-    story._timeStamps.sort();
-    let sessionTable = story._tableMap.get("sessionTable");
+    story._timeStamps.sort((a, b) => a - b);
+    let sessionTable = story._tableMap.get("session");
     let characterTable = story._tableMap.get("character");
-    let locationTable = story._tableMap.get("locationTable");
+    let locationTable = story._tableMap.get("location");
     for (let table of [sessionTable, characterTable, locationTable]) {
       table.resize(story._characters.length, story._timeStamps.length);
     }
@@ -27,20 +27,24 @@ export function parseXMLFile(xml, story) {
       let characterName = character.getAttribute("Name");
       let characterId = story._characters.indexOf(characterName);
       for (let span of spans) {
-        let start = span.getAttribute("Start");
+        let start = parseInt(span.getAttribute("Start"));
+        let end = parseInt(span.getAttribute("End"));
         let timeId = story._timeStamps.indexOf(start);
-        characterTable.replace(characterId, timeId, 1);
+        let timeIdend = story._timeStamps.indexOf(end);
         let sessionId = span.getAttribute("Session");
         sessionId = parseInt(sessionId);
-        sessionTable.replace(characterId, timeId, sessionId);
+        for (let id = timeId; id < timeIdend; id++) {
+          characterTable.replace(characterId, id, 1);
+          sessionTable.replace(characterId, id, sessionId);
+        }
       }
     }
     //parse the location part
     let locations = storyNode.querySelector("Locations");
     locations = storyNode.querySelectorAll("Location");
     for (let location of locations) {
-      let locationTable = story._tableMap.get("locationTable");
-      let sessionTable = story._tableMap.get("sessionTable");
+      let locationTable = story._tableMap.get("location");
+      let sessionTable = story._tableMap.get("session");
       let characterTable = story._tableMap.get("character");
       let locationName = location.getAttribute("Name");
       story._locations.push(locationName);
@@ -49,10 +53,9 @@ export function parseXMLFile(xml, story) {
       sessionsInthislocation = sessionsInthislocation.map(x => parseInt(x));
       for (let i = 0; i < sessionTable.rows; i++)
         for (let j = 0; j < sessionTable.cols; j++) {
-          if (
-            characterTable.value(i, j) &&
-            sessionTable.value(i, j) in sessionsInthislocation
-          ) {
+          let rightSession =
+            sessionsInthislocation.indexOf(sessionTable.value(i, j)) !== -1;
+          if (characterTable.value(i, j) === 1 && rightSession) {
             locationTable.replace(i, j, locationId);
           }
         }
