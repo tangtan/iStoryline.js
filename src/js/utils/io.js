@@ -1,3 +1,5 @@
+import { cos } from "snapsvg";
+
 export function parseXMLFile(xml, story) {
   let storyNode = xml.querySelector("Story");
   if (storyNode) {
@@ -67,6 +69,43 @@ export function parseXMLFile(xml, story) {
 
 export function parseJSONFile(json, story) {}
 
-export function dumpXMLFile(url, story) {}
+export function dumpXMLFile(fileName, story) {
+  if (fileName.indexOf(".xml") == -1) fileName += ".xml ";
+}
 
-export function dumpJSONFile(url, story) {}
+export function dumpJSONFile(fileName, story) {
+  if (fileName.indexOf(".json") == -1) fileName += ".json";
+  let locationsJson = dumpJsonLocation(story);
+  let charactersJson = dumpJsonCharacters(story);
+  let storyJson = {
+    Story: { Locations: locationsJson, Characters: charactersJson }
+  };
+  downloadFile(fileName, JSON.stringify(storyJson));
+}
+
+function dumpJsonLocation(story) {
+  let locationsJson = [];
+  console.log(story);
+  let locations = story._locations;
+  debugger;
+  for (let location of locations) {
+    console.log(location);
+  }
+  return locationsJson;
+}
+
+function dumpJsonCharacters(story) {
+  return [];
+}
+
+function downloadFile(fileName, content) {
+  let aLink = document.createElement("a");
+  let blob = new Blob([content]);
+  aLink.download = fileName;
+  aLink.style.display = "none";
+  aLink.href = URL.createObjectURL(blob);
+  document.body.appendChild(aLink);
+  // aLink.click();
+  console.log(content);
+  document.body.removeChild(aLink);
+}
