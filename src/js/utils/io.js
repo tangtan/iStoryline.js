@@ -71,31 +71,52 @@ export function parseJSONFile(json, story) {}
 
 export function dumpXMLFile(fileName, story) {
   if (fileName.indexOf(".xml") == -1) fileName += ".xml ";
+  const JSONFile = generateJSONFile(story);
+  let builder = new xml2js.Builder();
+  let xml = builder.buildObject(JSONFile);
+  downloadFile(fileName, xml);
 }
 
 export function dumpJSONFile(fileName, story) {
   if (fileName.indexOf(".json") == -1) fileName += ".json";
+  let storyJson = generateJSONFile(story);
+  downloadFile(fileName, JSON.stringify(storyJson));
+}
+
+function generateJSONFile(story) {
   let locationsJson = dumpJsonLocation(story);
   let charactersJson = dumpJsonCharacters(story);
   let storyJson = {
     Story: { Locations: locationsJson, Characters: charactersJson }
   };
-  downloadFile(fileName, JSON.stringify(storyJson));
+  return storyJson;
 }
 
 function dumpJsonLocation(story) {
-  let locationsJson = [];
-  console.log(story);
+  let locationsJson = {};
   let locations = story._locations;
-  debugger;
   for (let location of locations) {
-    console.log(location);
+    let sessions = story.getLocationSessions(location);
+    locationsJson[location] = sessions;
   }
   return locationsJson;
 }
 
 function dumpJsonCharacters(story) {
-  return [];
+  let charactersJson = {};
+  let characters = story._characters;
+  for (let character of characters) {
+    let timeStamps = story.getCharacterTimeRange(character);
+    let spansJson = [];
+    for (let timeStamp of timeStamps) {
+      let [start, end] = timeStamp;
+      let sessionId = story.getSessionID(start, character);
+      let spanJson = { Start: start, End: end, Session: sessionId };
+      spansJson.push(spanJson);
+    }
+    charactersJson[character] = spansJson;
+  }
+  return charactersJson;
 }
 
 function downloadFile(fileName, content) {
@@ -105,7 +126,6 @@ function downloadFile(fileName, content) {
   aLink.style.display = "none";
   aLink.href = URL.createObjectURL(blob);
   document.body.appendChild(aLink);
-  // aLink.click();
-  console.log(content);
+  aLink.click();
   document.body.removeChild(aLink);
 }

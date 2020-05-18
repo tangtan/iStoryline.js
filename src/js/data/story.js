@@ -158,22 +158,35 @@ export class Story {
   }
 
   /**
+   * get session ID
+   * @param {Number} timeStamp
+   * @param {String} characterName
+   * @returns
+   * - ID: number
+   */
+  getSessionID(timeStamp, characterName) {
+    let timeID = this._timeStamps.indexOf(timeStamp);
+    let characterID = this.getCharacterID(characterName);
+    return this._tableMap.get("session").value(characterID, timeID);
+  }
+
+  /**
    * get the time range of characters
    * @param {String | Number} character
    * @returns
    * - timeRange: [[t1, t2], ..]
    */
   getCharacterTimeRange(character) {
-    if (character instanceof String) {
+    if (typeof character == "string") {
       character = this.getCharacterID(character);
     }
-    //从character table中取到这个人不为零的timeStep
-    //从timeStamps中取到timeSpan
-    //拼接
-    var timeRange = [];
+    let timeRange = [];
     for (let i = 0; i < this.getTableCols(); i++) {
-      if (this._tableMap.get("character").value(i, character) === 1) {
-        this.timeRange.push(this._timeStamps[i]);
+      if (
+        this._tableMap.get("character").value(character, i) == 1 &&
+        this._tableMap.get("character").value(character, i) === 1
+      ) {
+        timeRange.push([this._timeStamps[i], this._timeStamps[i + 1]]);
       }
     }
     return timeRange;
@@ -206,18 +219,21 @@ export class Story {
    * - characterIDs: number[]
    */
   getLocationCharacters(location) {
-    if (location instanceof String) {
-      location = getLocationID(location);
+    if (typeof location == "string") {
+      location = this.getLocationID(location);
     }
-    var characterIDs = [];
+    let characterIDs = new Set();
     for (let i = 0; i < this.getTableRows(); i++) {
       for (let j = 0; j < this.getTableCols(); j++) {
-        if (this._tableMap.get("location").value(j, i) === location) {
-          characterIDs.append(i);
+        if (
+          this._tableMap.get("character").value(i, j) == 1 &&
+          this._tableMap.get("location").value(i, j) === location
+        ) {
+          characterIDs.add(i);
         }
       }
     }
-    return characterIDs;
+    return Array.from(characterIDs);
   }
 
   /**
@@ -227,18 +243,21 @@ export class Story {
    * - sessionIDs: number[]
    */
   getLocationSessions(location) {
-    if (location instanceof String) {
-      location = getLocationID(location);
+    if (typeof location == "string") {
+      location = this.getLocationID(location);
     }
-    var sessionIDs = [];
+    let sessionIDs = new Set();
     for (let i = 0; i < this.getTableRows(); i++) {
       for (let j = 0; j < this.getTableCols(); j++) {
-        if (this._tableMap.get("location").value(j, i) === location) {
-          sessionIDs.append(this._tableMap.get("session").value(j, i));
+        if (
+          this._tableMap.get("character").value(i, j) == 1 &&
+          this._tableMap.get("location").value(i, j) === location
+        ) {
+          sessionIDs.add(this._tableMap.get("session").value(i, j));
         }
       }
     }
-    return sessionIDs;
+    return Array.from(sessionIDs);
   }
 
   /**
@@ -248,16 +267,19 @@ export class Story {
    * - characterIDs: number[]
    */
   getSessionCharacters(sessionID) {
-    var characterIDs = [];
+    let characterIDs = new Set();
     for (let i = 0; i < this.getTableRows(); i++) {
       for (let j = 0; j < this.getTableCols(); j++) {
-        if (this._tableMap.get("session").value(j, i) === sessionID) {
-          characterIDs.append(i);
+        if (
+          this._tableMap.get("character").value(i, j) == 1 &&
+          this._tableMap.get("session").value(i, j) === sessionID
+        ) {
+          characterIDs.add(i);
           break;
         }
       }
     }
-    return characterIDs;
+    return Array.from(characterIDs);
   }
 
   /**
@@ -269,7 +291,7 @@ export class Story {
   getSessionTimeRange(sessionID) {
     for (let i = 0; i < this.getTableRows(); i++) {
       for (let j = 0; j < this.getTableCols(); j++) {
-        if (this._tableMap.get("session").value(j, i) === sessionID) {
+        if (this._tableMap.get("session").value(i, j) === sessionID) {
           return this._timeStamps[j];
         }
       }
