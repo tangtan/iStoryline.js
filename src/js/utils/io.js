@@ -1,5 +1,3 @@
-import { cos } from "snapsvg";
-
 export function parseXMLFile(xml, story) {
   let storyNode = xml.querySelector("Story");
   if (storyNode) {
