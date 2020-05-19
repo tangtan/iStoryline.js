@@ -1,0 +1,216 @@
+{
+  "Story": {
+    "Locations": {
+      "All": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    },
+    "Characters": {
+      "荣国": [
+        {
+          "Start": 1,
+          "End": 2,
+          "Session": 1
+        },
+        {
+          "Start": 2,
+          "End": 3,
+          "Session": 7
+        },
+        {
+          "Start": 3,
+          "End": 4,
+          "Session": 9
+        },
+        {
+          "Start": 4,
+          "End": 5,
+          "Session": 10
+        }
+      ],
+      "尚华": [
+        {
+          "Start": 1,
+          "End": 2,
+          "Session": 2
+        },
+        {
+          "Start": 2,
+          "End": 3,
+          "Session": 7
+        },
+        {
+          "Start": 3,
+          "End": 4,
+          "Session": 9
+        },
+        {
+          "Start": 4,
+          "End": 5,
+          "Session": 10
+        },
+        {
+          "Start": 5,
+          "End": 6,
+          "Session": 11
+        }
+      ],
+      "石宇": [
+        {
+          "Start": 1,
+          "End": 2,
+          "Session": 3
+        },
+        {
+          "Start": 2,
+          "End": 3,
+          "Session": 7
+        },
+        {
+          "Start": 3,
+          "End": 4,
+          "Session": 9
+        },
+        {
+          "Start": 4,
+          "End": 5,
+          "Session": 10
+        },
+        {
+          "Start": 5,
+          "End": 6,
+          "Session": 11
+        },
+        {
+          "Start": 6,
+          "End": 7,
+          "Session": 13
+        },
+        {
+          "Start": 7,
+          "End": 8,
+          "Session": 15
+        }
+      ],
+      "秀宇": [
+        {
+          "Start": 1,
+          "End": 2,
+          "Session": 4
+        },
+        {
+          "Start": 2,
+          "End": 3,
+          "Session": 8
+        },
+        {
+          "Start": 3,
+          "End": 4,
+          "Session": 9
+        },
+        {
+          "Start": 4,
+          "End": 5,
+          "Session": 10
+        },
+        {
+          "Start": 5,
+          "End": 6,
+          "Session": 11
+        },
+        {
+          "Start": 6,
+          "End": 7,
+          "Session": 13
+        },
+        {
+          "Start": 7,
+          "End": 8,
+          "Session": 14
+        },
+        {
+          "Start": 8,
+          "End": 9,
+          "Session": 16
+        }
+      ],
+      "盛京": [
+        {
+          "Start": 1,
+          "End": 2,
+          "Session": 5
+        },
+        {
+          "Start": 2,
+          "End": 3,
+          "Session": 8
+        },
+        {
+          "Start": 3,
+          "End": 4,
+          "Session": 9
+        },
+        {
+          "Start": 4,
+          "End": 5,
+          "Session": 10
+        },
+        {
+          "Start": 5,
+          "End": 6,
+          "Session": 11
+        },
+        {
+          "Start": 6,
+          "End": 7,
+          "Session": 13
+        },
+        {
+          "Start": 7,
+          "End": 8,
+          "Session": 14
+        },
+        {
+          "Start": 8,
+          "End": 9,
+          "Session": 16
+        }
+      ],
+      "金常务": [
+        {
+          "Start": 1,
+          "End": 2,
+          "Session": 6
+        },
+        {
+          "Start": 2,
+          "End": 3,
+          "Session": 6
+        },
+        {
+          "Start": 3,
+          "End": 4,
+          "Session": 6
+        },
+        {
+          "Start": 4,
+          "End": 5,
+          "Session": 10
+        },
+        {
+          "Start": 5,
+          "End": 6,
+          "Session": 12
+        },
+        {
+          "Start": 6,
+          "End": 7,
+          "Session": 13
+        },
+        {
+          "Start": 7,
+          "End": 8,
+          "Session": 15
+        }
+      ]
+    }
+  }
+}
