@@ -257,7 +257,9 @@ export class Story {
         }
       }
     }
-    return Array.from(sessionIDs);
+    let ans = Array.from(sessionIDs);
+    ans.sort((a, b) => a - b);
+    return ans;
   }
 
   /**
