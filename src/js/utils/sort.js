@@ -1,5 +1,6 @@
+import { DisjointSet } from "./disjointset";
+
 export function topoSort(mapSetArr, inDegree, listWeight) {
-  debugger;
   let order = [];
   for (let i = 0; i < inDegree.length; i++) {
     let minWeight = Number.MAX_SAFE_INTEGER;
@@ -26,26 +27,24 @@ export function dealSetConstraints(list, constraints, listWeight) {
   let mapSetArr = [];
   //transform constraint to edges in a graph
   let inDegree = [];
-  let setArr = [];
+  let setArr = new DisjointSet(list.length);
   //binding sets
   list.forEach(x => {
     mapSetArr.push([]);
     inDegree.push(0);
-    setArr.push([setArr.length]);
   });
   for (let constraint of constraints) {
     let [first, second] = constraint;
     let firstSetId = getSetId(first, list);
     let secondSetId = getSetId(second, list);
-
-    setArr[firstSetId] = [...setArr[firstSetId], ...setArr[secondSetId]];
-    setArr[secondSetId] = [-1];
-    let sumWeight = 0;
-    setArr[firstSetId].forEach(id => (sumWeight += listWeight[id]));
-    for (let i = 0; i < setArr[firstSetId].length; i++) {
-      setArr[firstSetId][i] = sumWeight / setArr[firstSetId].length;
-    }
     if (firstSetId !== secondSetId) {
+      setArr.union(firstSetId, secondSetId);
+      let sumWeight = 0;
+      let allElement = setArr.allElementinSet(firstSetId);
+      allElement.forEach(id => (sumWeight += listWeight[id]));
+      for (let i = 0; i < allElement.length; i++) {
+        listWeight[allElement[i]] = sumWeight / allElement.length;
+      }
       mapSetArr[firstSetId][secondSetId] = 1;
       inDegree[secondSetId] += 1;
     }
@@ -65,4 +64,41 @@ export function getSetId(element, setArr) {
   }
   console.error("Can't find this element in any set!");
   return -1;
+}
+
+export function dealElementConstraints(list, constraints, listWeight) {
+  let listAllElement = [];
+  list.forEach(x => {
+    listAllElement = [...listAllElement, ...x];
+  });
+  let mapElementArr = [];
+  let inDegree = [];
+  let setArr = new DisjointSet(listAllElement.length);
+
+  listAllElement.forEach(x => {
+    mapElementArr.push([]);
+    inDegree.push(0);
+  });
+  for (let constraint of constraints) {
+    let [first, second] = constraint;
+    let firstSetId = getSetId(first, list);
+    let secondSetId = getSetId(second, list);
+    if (firstSetId === secondSetId) {
+      setArr.union(
+        listAllElement.indexOf(first),
+        listAllElement.indexOf(second)
+      );
+      let allElement = setArr.allElementinSet(listAllElement.indexOf(first));
+      let sumWeight = 0;
+      allElement.forEach(id => (sumWeight += listWeight[id]));
+      for (let i = 0; i < allElement.length; i++) {
+        listWeight[allElement[i]] = sumWeight / allElement.length;
+      }
+      mapElementArr[listAllElement.indexOf(first)][
+        listAllElement.indexOf(second)
+      ] = 1;
+      inDegree[listAllElement.indexOf(second)] += 1;
+    }
+  }
+  return [mapElementArr, inDegree];
 }
