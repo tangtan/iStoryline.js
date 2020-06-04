@@ -8,7 +8,6 @@ export class Table {
    * @param {null | Number | Array | DenseMatrix} param
    */
   constructor(data) {
-    console.log(1);
     if (data) {
       if (data.length) {
         this._mat = math.matrix(data);
@@ -130,11 +129,11 @@ export class Table {
    */
   extend(index, arr, isColumn = false) {
     // A scalar or null must be resized before beding extended.
-    console.log(this._mat, this.type);
+    // console.log(this._mat, this.type);
     if (this._mat === null || this.type === "number") {
       const rows = isColumn ? arr.length : 1;
       const cols = isColumn ? 1 : arr.length;
-      console.log(rows, cols, this._mat);
+      // console.log(rows, cols, this._mat);
       this.resize(rows, cols, this._mat || 0);
     }
     let _zeroTable;
