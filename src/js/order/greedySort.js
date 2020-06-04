@@ -5,15 +5,48 @@ import {
   dealElementConstraints
 } from "../utils/sort";
 
+import { Table } from "../data/table";
+
 /**
  * @param {Story} story
- * @param {constraints} Object
+ * @param {Number[][]} constraints
  */
 
 export function greedySort(story, constraints) {
   const param = getParam(story, constraints);
   const sortTable = runAlgorithms(param);
   story.setTable("sort", sortTable);
+}
+
+/**
+ *
+ * @param {Story} story
+ * @param {Number[][]} constraints
+ * @returns {Object}
+ */
+function getParam(story, constraints) {
+  console.log(story);
+  let storyCharacterTable = story.getTable("character");
+  let charactersInSessions = [];
+  let initOrder = [];
+  return null;
+}
+
+/**
+ *
+ * @param {Number[]} order
+ * @returns {Number[]}
+ */
+function order2Weight(order) {}
+
+/**
+ *
+ * @param {Object} param
+ * @returns {Table}
+ */
+function runAlgorithms(param) {
+  let ans = new Table();
+  return ans;
 }
 
 /**

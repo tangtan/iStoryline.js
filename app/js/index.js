@@ -1,15 +1,10 @@
 import { Story } from "../../src/js/data/story";
-import { Table } from "../../src/js/data/table";
+import { greedySort } from "../../src/js/order/greedySort";
 
-const fileUrl = "../../data/Redcap.xml";
-
-// const table = new Table();
-
-// console.log(table, table.rows, table.cols, table.type);
+const fileUrl = "../../data/json/Redcap.json";
 
 let story = new Story();
 
-// story.load(fileUrl, "xml");
-story.addCharacter("Test1", [[1, 10]]);
+story.load(fileUrl, "json");
 
-console.log(story.characters);
+greedySort(story, []);
