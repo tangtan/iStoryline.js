@@ -1,4 +1,7 @@
+import xml2js from "xml2js";
+
 export function parseXMLFile(xml, story) {
+  story.restore();
   let storyNode = xml.querySelector("Story");
   if (storyNode) {
     let characters = storyNode.querySelector("Characters");
@@ -11,6 +14,8 @@ export function parseXMLFile(xml, story) {
         let start = parseInt(span.getAttribute("Start"));
         let end = parseInt(span.getAttribute("End"));
         story._timeStamps.push(start, end);
+        let session = parseInt(span["Session"]);
+        story._maxSessionID = Math.max(story._maxSessionID, session);
       }
     }
     const timeset = new Set(story._timeStamps);
@@ -20,7 +25,7 @@ export function parseXMLFile(xml, story) {
     let characterTable = story._tableMap.get("character");
     let locationTable = story._tableMap.get("location");
     for (let table of [sessionTable, characterTable, locationTable]) {
-      table.resize(story._characters.length, story._timeStamps.length);
+      table.resize(story._characters.length, story._timeStamps.length - 1);
     }
     for (let character of characters) {
       let spans = character.querySelectorAll("Span");
@@ -67,6 +72,7 @@ export function parseXMLFile(xml, story) {
 
 export function parseJSONFile(json, story) {
   // let jsonObject=JSON.parse(json)
+  story.restore();
   let storyJson = json.Story;
   let locations = storyJson.Locations;
   let characters = storyJson.Characters;
@@ -78,6 +84,8 @@ export function parseJSONFile(json, story) {
       let start = parseInt(span["Start"]);
       let end = parseInt(span["End"]);
       story._timeStamps.push(start, end);
+      let session = parseInt(span["Session"]);
+      story._maxSessionID = Math.max(story._maxSessionID, session);
     }
   }
   const timeset = new Set(story._timeStamps);
@@ -87,7 +95,7 @@ export function parseJSONFile(json, story) {
   let characterTable = story._tableMap.get("character");
   let locationTable = story._tableMap.get("location");
   for (let table of [sessionTable, characterTable, locationTable]) {
-    table.resize(story._characters.length, story._timeStamps.length);
+    table.resize(story._characters.length, story._timeStamps.length - 1);
   }
   for (let character in characters) {
     let characterName = character;
@@ -141,7 +149,7 @@ export function dumpJSONFile(fileName, story) {
   downloadFile(fileName, JSON.stringify(storyJson));
 }
 
-function generateJSONFile(story) {
+export function generateJSONFile(story) {
   let locationsJson = dumpJsonLocation(story);
   let charactersJson = dumpJsonCharacters(story);
   let storyJson = {

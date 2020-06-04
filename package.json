@@ -1,5 +1,5 @@
 {
-  "name": "iStoryline",
+  "name": "iStoryline.js",
   "version": "0.0.1",
   "description": "Implementation of [iStoryline](http://www.tantang.org/publication/2018_infovis_istoryline/2018_infovis_istoryline.pdf)",
   "keywords": [
@@ -41,7 +41,8 @@
     "mathjs": "^7.0.0",
     "quadprog": "^1.5.1",
     "simplify-js": "git+https://github.com/mourner/simplify-js.git",
-    "snapsvg": "^0.5.1"
+    "snapsvg": "^0.5.1",
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.0",
