@@ -7,7 +7,6 @@ import {
   dumpJSONFile,
   generateJSONFile
 } from "../utils/io";
-import { sessionScissors } from "../utils/sessionScissors";
 
 export class Story {
   constructor() {
@@ -108,12 +107,14 @@ export class Story {
    * - timeStep: number
    */
   getTimeStep(timeStamp) {
-    for (let i = 0, len = this.getTableCols() + 1; i < len; i++) {
+    const len = this.getTableCols();
+    if (len === 0 || timeStamp < this._timeStamps[0]) return null;
+    for (let i = 0; i < len; i++) {
       if (this._timeStamps[i] >= timeStamp) {
-        return i - 1;
+        return i;
       }
     }
-    return -1;
+    return timeStamp <= this._timeStamps[len] ? len : null;
   }
 
   /**
@@ -154,12 +155,54 @@ export class Story {
 
   /**
    * add timestamp to timestamps
-   * @param {Number} timeStamp //real time not index
+   * @param {Number} timeStamp
    */
-  addTimeStamp(timeStamp) {}
+  addTimeStamp(timeStamp) {
+    const storyJson = generateJSONFile(this);
+    const characters = storyJson.Story.Characters;
+    const maxTimeStamp = Math.max(...this._timeStamps);
+    if (timeStamp < maxTimeStamp) {
+      for (let name in characters) {
+        const character = characters[name];
+        const _character = [];
+        character.forEach(_ => {
+          const start = _["Start"];
+          const end = _["End"];
+          const sessionID = _["Session"];
+          if (timeStamp > start && timeStamp < end) {
+            _character.push(
+              {
+                Start: start,
+                End: timeStamp,
+                Session: sessionID
+              },
+              {
+                Start: timeStamp,
+                End: end,
+                Session: sessionID
+              }
+            );
+          } else {
+            _character.push(_);
+          }
+        });
+        characters[name] = _character;
+      }
+    } else if (timeStamp > maxTimeStamp) {
+      for (let character of characters) {
+        character.push({
+          Start: maxTimeStamp,
+          End: timeStamp,
+          Session: this.getNewSessionID()
+        });
+      }
+    }
+    console.log(storyJson);
+    parseJSONFile(storyJson, this);
+  }
 
   /**
-   * delete timestamp to timestamps //real time not index
+   * delete timestamp from timestamps
    * @param {Number} timeStamp
    */
   deleteTimeStamp(timeStamp) {}
@@ -189,7 +232,6 @@ export class Story {
           Session: sessionID
         };
       });
-      // debugger
       parseJSONFile(storyJson, this);
     }
   }
@@ -239,34 +281,21 @@ export class Story {
 
   /**
    * change the sessions of characters
+   * WARN!: this operation will disturb locations
    * @param {Number} sessionID
    * @param {String | Number[]} characters
    * @param {timeSpan} timeSpan
    */
-  changeSession(sessionID, characters = [], timeSpan, isHardBoundary = true) {
+  changeSession(sessionID, characters = [], timeSpan, isHardBoundary = false) {
     if (isHardBoundary) {
-      const storyJson = generateJSONFile(this);
-      const characterDict = storyJson.Characters;
-      characters.forEach(character => {
-        const characterName =
-          typeof character === "number"
-            ? this.getCharacterName(character)
-            : character;
-        if (characterName) {
-          let tmpSessions = [];
-          characterDict[characterName].forEach(session => {
-            const newSessions = sessionScissors(session, sessionID, timeSpan);
-            tmpSessions.push(...newSessions);
-          });
-          characterDict[characterName] = tmpSessions;
-        }
-      });
-    } else {
-      this.changeSessionSoft(sessionID, characters, timeSpan);
+      const [start, end] = timeSpan;
+      this.addTimeStamp(start);
+      this.addTimeStamp(end);
     }
+    this._changeSessionSoft(sessionID, characters, timeSpan);
   }
 
-  changeSessionSoft(sessionID, characters = [], timeSpan) {
+  _changeSessionSoft(sessionID, characters = [], timeSpan) {
     let timeSteps = this.getTimeSteps([timeSpan]);
     let session = this.getTable("session");
     for (let i = 0; i < characters.length; i++) {
@@ -284,30 +313,23 @@ export class Story {
 
   /**
    * change the locations of characters
-   * @param {Number | String | null} location
-   * @param {Number | String[]} characters
-   * @param {Number[]} timeRange
+   * @param {String} location
+   * @param {Number[]} sessions
    */
-  changeLocation(location, characters = [], timeRange = []) {
-    let timeSteps = this.getTimeSteps(timeRange);
-    let locations = this._tableMap.get("location");
-    let rec = 0; //0 represents the default location
-    for (let i = 1; i < this._locations; i++) {
-      if (location === this._locations[i]) {
-        rec = i;
-      }
-    }
-    if (location && rec === 0) {
+  changeLocation(location, sessions) {
+    if (this._locations.indexOf(location) < 0) {
       this._locations.push(location);
-      rec = this._locations.length - 1;
     }
-    for (let i = 0; i < characters.length; i++) {
-      let character = characters[i];
-      if (typeof character === "string") {
-        character = this.getCharacterID(character);
-      }
-      for (let j = 0; j < timeSteps.length; j++) {
-        locations.replace(character, timeSteps[j], rec);
+    let locationID = this.getLocationID(location);
+    if (locationID === null) return;
+    const locationTable = this.getTable("location");
+    const sessionTable = this.getTable("session");
+    for (let i = 0, len = this.getTableRows(); i < len; i++) {
+      for (let j = 0, len = this.getTableCols(); j < len; j++) {
+        const sessionID = sessionTable.value(i, j);
+        if (sessions.indexOf(sessionID) > -1) {
+          locationTable.replace(i, j, locationID);
+        }
       }
     }
   }
@@ -336,26 +358,6 @@ export class Story {
   }
 
   /**
-   * get session ID
-   * @param {Number} timeStamp
-   * @param {String} characterName
-   * @returns
-   * - ID: number
-   */
-  getSessionID(timeStamp, characterName) {
-    let timeID = this._timeStamps.indexOf(timeStamp);
-    let characterID = this.getCharacterID(characterName);
-    return this._tableMap.get("session").value(characterID, timeID);
-  }
-
-  /**
-   * increment maxSessionID
-   */
-  getNewSessionID() {
-    return ++this._maxSessionID;
-  }
-
-  /**
    * get the time range of characters
    * @param {String | Number} character
    * @returns
@@ -378,13 +380,84 @@ export class Story {
   }
 
   /**
+   * get session ID
+   * @param {Number} timeStamp
+   * @param {String} characterName
+   * @returns
+   * - ID: number
+   */
+  getSessionID(timeStamp, characterName) {
+    let timeStep = this.getTimeStep(timeStamp);
+    let characterID = this.getCharacterID(characterName);
+    if (timeStep !== null && characterID !== null) {
+      return this.getTable("session").value(characterID, timeStep);
+    }
+    return null;
+  }
+
+  /**
+   * increment maxSessionID
+   */
+  getNewSessionID() {
+    return ++this._maxSessionID;
+  }
+
+  /**
+   * get characters according to the session
+   * @param {Number} sessionID
+   * @returns
+   * - characterIDs: number[]
+   */
+  getSessionCharacters(sessionID) {
+    let characterIDs = new Set();
+    for (let i = 0; i < this.getTableRows(); i++) {
+      for (let j = 0; j < this.getTableCols(); j++) {
+        if (
+          this.getTable("character").value(i, j) == 1 &&
+          this.getTable("session").value(i, j) === sessionID
+        ) {
+          characterIDs.add(i);
+          break;
+        }
+      }
+    }
+    return Array.from(characterIDs);
+  }
+
+  /**
+   * get the timeSpan of sessions
+   * @param {Number} sessionID
+   * @returns
+   * - timeRange: timeSpan[]
+   */
+  getSessionTimeRange(sessionID) {
+    let timeSteps = [];
+    for (let i = 0; i < this.getTableRows(); i++) {
+      for (let j = 0; j < this.getTableCols(); j++) {
+        if (
+          this.getTable("session").value(i, j) === sessionID &&
+          timeSteps.indexOf(j) < 0
+        ) {
+          timeSteps.push(j);
+        }
+      }
+    }
+    return timeSteps.map(step => [
+      this._timeStamps[step],
+      this._timeStamps[step + 1]
+    ]);
+  }
+
+  /**
    * get location name
    * @param {Number} locationID
    * @returns
    * - locationName: string
    */
   getLocationName(locationID) {
-    return this._locations[locationID];
+    return locationID < this._locations.length
+      ? this._locations[locationID]
+      : null;
   }
 
   /**
@@ -394,7 +467,8 @@ export class Story {
    * - locationID: number
    */
   getLocationID(locationName) {
-    return this._locations.indexOf(locationName);
+    const locationID = this._locations.indexOf(locationName);
+    return locationID > -1 ? locationID : null;
   }
 
   /**
@@ -431,57 +505,22 @@ export class Story {
     if (typeof location == "string") {
       location = this.getLocationID(location);
     }
-    let sessionIDs = new Set();
-    for (let i = 0; i < this.getTableRows(); i++) {
-      for (let j = 0; j < this.getTableCols(); j++) {
-        if (
-          this._tableMap.get("character").value(i, j) == 1 &&
-          this._tableMap.get("location").value(i, j) === location
-        ) {
-          sessionIDs.add(this._tableMap.get("session").value(i, j));
+    if (location !== null) {
+      let sessionIDs = new Set();
+      for (let i = 0; i < this.getTableRows(); i++) {
+        for (let j = 0; j < this.getTableCols(); j++) {
+          if (
+            this.getTable("character").value(i, j) == 1 &&
+            this.getTable("location").value(i, j) === location
+          ) {
+            sessionIDs.add(this._tableMap.get("session").value(i, j));
+          }
         }
       }
+      let ans = Array.from(sessionIDs);
+      ans.sort((a, b) => a - b);
+      return ans;
     }
-    let ans = Array.from(sessionIDs);
-    ans.sort((a, b) => a - b);
-    return ans;
-  }
-
-  /**
-   * get characters according to the session
-   * @param {Number} sessionID
-   * @returns
-   * - characterIDs: number[]
-   */
-  getSessionCharacters(sessionID) {
-    let characterIDs = new Set();
-    for (let i = 0; i < this.getTableRows(); i++) {
-      for (let j = 0; j < this.getTableCols(); j++) {
-        if (
-          this._tableMap.get("character").value(i, j) == 1 &&
-          this._tableMap.get("session").value(i, j) === sessionID
-        ) {
-          characterIDs.add(i);
-          break;
-        }
-      }
-    }
-    return Array.from(characterIDs);
-  }
-
-  /**
-   * get the timeSpan of sessions
-   * @param {Number} sessionID
-   * @returns
-   * - timeRange: timeSpan[]
-   */
-  getSessionTimeRange(sessionID) {
-    for (let i = 0; i < this.getTableRows(); i++) {
-      for (let j = 0; j < this.getTableCols(); j++) {
-        if (this._tableMap.get("session").value(i, j) === sessionID) {
-          return this._timeStamps[j];
-        }
-      }
-    }
+    return [];
   }
 }

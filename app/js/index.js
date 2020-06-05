@@ -10,13 +10,18 @@ async function main() {
   story.addCharacter("TT3", [[7, 30], [65, 80]]);
   // story.deleteCharacter('TT3')
   story.changeCharacter("TT3", [[1, 5], [7, 22]]);
+  const newSessionID = story.getNewSessionID();
+  story.changeSession(newSessionID, [0, 1], [3, 9]);
+  // story.changeLocation('ZJU', [1]);
+  // story.changeLocation('HZ', [2, 3]);
+  story.addTimeStamp(15);
+  window.story = story;
   const rows = story.getTableRows();
   const cols = story.getTableCols();
   const timeStamps = story.timeline;
   const charaTable = story.getTable("character");
   const locationTable = story.getTable("location");
   const sessionTable = story.getTable("session");
-  story.changeSession(10, [0, 1], [3, 9], false);
   console.log(story);
   console.log(`Story Size: ${rows}x${cols}`);
   console.log(`Story Timeline: ${timeStamps}`);

@@ -163,7 +163,9 @@ function dumpJsonLocation(story) {
   let locations = story._locations;
   for (let location of locations) {
     let sessions = story.getLocationSessions(location);
-    locationsJson[location] = sessions;
+    if (sessions.length > 0) {
+      locationsJson[location] = sessions;
+    }
   }
   return locationsJson;
 }
