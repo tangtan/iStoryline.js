@@ -35,9 +35,9 @@
     }
   },
   "dependencies": {
-    "d3": "^5.16.0",
     "d3-fetch": "^1.1.2",
     "d3-scale": "^3.2.0",
+    "lodash": "^4.17.18",
     "mathjs": "^7.0.0",
     "quadprog": "^1.5.1",
     "simplify-js": "git+https://github.com/mourner/simplify-js.git",
@@ -48,8 +48,8 @@
     "@babel/cli": "^7.7.0",
     "@babel/core": "^7.7.2",
     "@babel/preset-env": "^7.9.6",
-    "babel-preset-env": "^1.7.0",
     "chai": "^4.2.0",
+    "eslint-config-prettier": "^6.11.0",
     "esm": "^3.2.25",
     "html-webpack-plugin": "^3.2.0",
     "husky": "^3.0.9",

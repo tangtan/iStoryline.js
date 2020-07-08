@@ -1,42 +1,42 @@
-import * as d3 from "d3";
-import { Table } from "./table";
+import * as d3Fetch from 'd3-fetch'
+import { Table } from './table'
 import {
   parseXMLFile,
   parseJSONFile,
   dumpXMLFile,
   dumpJSONFile,
-  generateJSONFile
-} from "../utils/io";
+  generateJSONFile,
+} from '../utils/io'
 
 export class Story {
   constructor() {
-    this.restore();
+    this.restore()
   }
 
   /**
    * init story
    */
   restore() {
-    this._tableMap = new Map();
-    this._tableMap.set("character", new Table());
-    this._tableMap.set("session", new Table());
-    this._tableMap.set("location", new Table());
-    this._characters = [];
-    this._locations = [];
-    this._timeStamps = [];
-    this._maxSessionID = -1;
+    this._tableMap = new Map()
+    this._tableMap.set('character', new Table())
+    this._tableMap.set('session', new Table())
+    this._tableMap.set('location', new Table())
+    this._characters = []
+    this._locations = []
+    this._timeStamps = []
+    this._maxSessionID = -1
   }
 
   get characters() {
-    return this._characters;
+    return this._characters
   }
 
   get locations() {
-    return this._locations;
+    return this._locations
   }
 
   get timeline() {
-    return this._timeStamps;
+    return this._timeStamps
   }
 
   /**
@@ -46,14 +46,14 @@ export class Story {
    * @returns
    */
   async load(fileUrl, fileType) {
-    if (fileType === "xml") {
-      const xml = await d3.xml(fileUrl);
-      parseXMLFile(xml, this);
-    } else if (fileType === "json") {
-      const json = await d3.json(fileUrl);
-      parseJSONFile(json, this);
+    if (fileType === 'xml') {
+      const xml = await d3Fetch.xml(fileUrl)
+      parseXMLFile(xml, this)
+    } else if (fileType === 'json') {
+      const json = await d3Fetch.json(fileUrl)
+      parseJSONFile(json, this)
     } else {
-      console.error("Wrong fileType!");
+      console.error('Wrong fileType!')
     }
   }
 
@@ -64,12 +64,12 @@ export class Story {
    * @returns
    */
   dump(fileName, fileType) {
-    if (fileType === "xml") {
-      dumpXMLFile(fileName, this);
-    } else if (fileType === "json") {
-      dumpJSONFile(fileName, this);
+    if (fileType === 'xml') {
+      dumpXMLFile(fileName, this)
+    } else if (fileType === 'json') {
+      dumpJSONFile(fileName, this)
     } else {
-      console.error("Wrong fileType!");
+      console.error('Wrong fileType!')
     }
   }
 
@@ -80,7 +80,7 @@ export class Story {
    * - table: Table
    */
   getTable(tableName) {
-    return this._tableMap.get(tableName);
+    return this._tableMap.get(tableName)
   }
 
   /**
@@ -89,15 +89,15 @@ export class Story {
    * @param {Table} table
    */
   setTable(tableName, table) {
-    this._tableMap.set(tableName, table);
+    this._tableMap.set(tableName, table)
   }
 
   getTableRows() {
-    return this._characters.length || 0;
+    return this._characters.length || 0
   }
 
   getTableCols() {
-    return this._timeStamps.length - 1 || 0;
+    return this._timeStamps.length - 1 || 0
   }
 
   /**
@@ -107,14 +107,14 @@ export class Story {
    * - timeStep: number
    */
   getTimeStep(timeStamp) {
-    const len = this.getTableCols();
-    if (len === 0 || timeStamp < this._timeStamps[0]) return null;
+    const len = this.getTableCols()
+    if (len === 0 || timeStamp < this._timeStamps[0]) return null
     for (let i = 0; i < len; i++) {
       if (this._timeStamps[i] >= timeStamp) {
-        return i;
+        return i
       }
     }
-    return timeStamp <= this._timeStamps[len] ? len : null;
+    return timeStamp <= this._timeStamps[len] ? len : null
   }
 
   /**
@@ -125,32 +125,32 @@ export class Story {
    */
   getTimeSteps(timeRange) {
     let tmpTimeSteps = [],
-      timeSteps = [];
+      timeSteps = []
     timeRange.forEach(timeSpan => {
       let l = -1,
-        r = -1;
+        r = -1
       for (let i = 0; i < this.getTableCols(); i++) {
         if (
           this._timeStamps[i] <= timeSpan[0] &&
           timeSpan[0] < this._timeStamps[i + 1]
         )
-          l = i;
+          l = i
         if (
           this._timeStamps[i] < timeSpan[1] &&
           timeSpan[1] <= this._timeStamps[i + 1]
         )
-          r = i;
+          r = i
       }
-      for (let i = l; i <= r; i++) tmpTimeSteps.push(i);
-    });
-    tmpTimeSteps.sort();
-    if (tmpTimeSteps.length >= 1) timeSteps.push(tmpTimeSteps[0]);
+      for (let i = l; i <= r; i++) tmpTimeSteps.push(i)
+    })
+    tmpTimeSteps.sort()
+    if (tmpTimeSteps.length >= 1) timeSteps.push(tmpTimeSteps[0])
     for (let i = 1; i < tmpTimeSteps.length; i++) {
       if (tmpTimeSteps[i] !== timeSteps[timeSteps.length - 1]) {
-        timeSteps.push(tmpTimeSteps[i]);
+        timeSteps.push(tmpTimeSteps[i])
       }
     }
-    return timeSteps;
+    return timeSteps
   }
 
   /**
@@ -158,47 +158,46 @@ export class Story {
    * @param {Number} timeStamp
    */
   addTimeStamp(timeStamp) {
-    const storyJson = generateJSONFile(this);
-    const characters = storyJson.Story.Characters;
-    const maxTimeStamp = Math.max(...this._timeStamps);
+    const storyJson = generateJSONFile(this)
+    const characters = storyJson.Story.Characters
+    const maxTimeStamp = Math.max(...this._timeStamps)
     if (timeStamp < maxTimeStamp) {
       for (let name in characters) {
-        const character = characters[name];
-        const _character = [];
+        const character = characters[name]
+        const _character = []
         character.forEach(_ => {
-          const start = _["Start"];
-          const end = _["End"];
-          const sessionID = _["Session"];
+          const start = _['Start']
+          const end = _['End']
+          const sessionID = _['Session']
           if (timeStamp > start && timeStamp < end) {
             _character.push(
               {
                 Start: start,
                 End: timeStamp,
-                Session: sessionID
+                Session: sessionID,
               },
               {
                 Start: timeStamp,
                 End: end,
-                Session: sessionID
+                Session: sessionID,
               }
-            );
+            )
           } else {
-            _character.push(_);
+            _character.push(_)
           }
-        });
-        characters[name] = _character;
+        })
+        characters[name] = _character
       }
     } else if (timeStamp > maxTimeStamp) {
       for (let character of characters) {
         character.push({
           Start: maxTimeStamp,
           End: timeStamp,
-          Session: this.getNewSessionID()
-        });
+          Session: this.getNewSessionID(),
+        })
       }
     }
-    console.log(storyJson);
-    parseJSONFile(storyJson, this);
+    parseJSONFile(storyJson, this)
   }
 
   /**
@@ -214,25 +213,25 @@ export class Story {
    */
   addCharacter(characterName, timeRange = []) {
     if (this._characters.indexOf(characterName) > -1) {
-      this.changeCharacter(characterName, timeRange);
+      this.changeCharacter(characterName, timeRange)
     } else {
-      const storyJson = generateJSONFile(this);
-      const sessionID = ++this._maxSessionID;
-      const locations = storyJson.Story.Locations;
-      const characters = storyJson.Story.Characters;
+      const storyJson = generateJSONFile(this)
+      const sessionID = ++this._maxSessionID
+      const locations = storyJson.Story.Locations
+      const characters = storyJson.Story.Characters
       if (locations.All) {
-        locations.All.push(sessionID);
+        locations.All.push(sessionID)
       } else {
-        locations["All"] = [sessionID];
+        locations['All'] = [sessionID]
       }
       characters[characterName] = timeRange.map(timeSpan => {
         return {
           Start: timeSpan[0],
           End: timeSpan[1],
-          Session: sessionID
-        };
-      });
-      parseJSONFile(storyJson, this);
+          Session: sessionID,
+        }
+      })
+      parseJSONFile(storyJson, this)
     }
   }
 
@@ -242,23 +241,23 @@ export class Story {
    */
   deleteCharacter(character) {
     const characterName =
-      typeof character === "number"
+      typeof character === 'number'
         ? this.getCharacterName(character)
-        : character;
+        : character
     if (characterName) {
-      const storyJson = generateJSONFile(this);
-      const locations = storyJson.Story.Locations;
-      const characters = storyJson.Story.Characters;
+      const storyJson = generateJSONFile(this)
+      const locations = storyJson.Story.Locations
+      const characters = storyJson.Story.Characters
       if (characters.hasOwnProperty(characterName)) {
-        const sessions = characters[characterName].map(span => span["Session"]);
+        const sessions = characters[characterName].map(span => span['Session'])
         // remove the sessions of the character
-        delete characters[characterName];
+        delete characters[characterName]
         for (let location in locations) {
           locations[location] = locations[location].filter(
             _id => sessions.indexOf(_id) < 0
-          );
+          )
         }
-        parseJSONFile(storyJson, this);
+        parseJSONFile(storyJson, this)
       }
     }
   }
@@ -270,12 +269,12 @@ export class Story {
    */
   changeCharacter(character, timeRange = []) {
     const characterName =
-      typeof character === "number"
+      typeof character === 'number'
         ? this.getCharacterName(character)
-        : character;
+        : character
     if (characterName) {
-      this.deleteCharacter(characterName);
-      this.addCharacter(characterName, timeRange);
+      this.deleteCharacter(characterName)
+      this.addCharacter(characterName, timeRange)
     }
   }
 
@@ -288,24 +287,24 @@ export class Story {
    */
   changeSession(sessionID, characters = [], timeSpan, isHardBoundary = false) {
     if (isHardBoundary) {
-      const [start, end] = timeSpan;
-      this.addTimeStamp(start);
-      this.addTimeStamp(end);
+      const [start, end] = timeSpan
+      this.addTimeStamp(start)
+      this.addTimeStamp(end)
     }
-    this._changeSessionSoft(sessionID, characters, timeSpan);
+    this._changeSessionSoft(sessionID, characters, timeSpan)
   }
 
   _changeSessionSoft(sessionID, characters = [], timeSpan) {
-    let timeSteps = this.getTimeSteps([timeSpan]);
-    let session = this.getTable("session");
+    let timeSteps = this.getTimeSteps([timeSpan])
+    let session = this.getTable('session')
     for (let i = 0; i < characters.length; i++) {
-      let character = characters[i];
-      if (typeof character === "string") {
-        character = this.getCharacterID(character);
+      let character = characters[i]
+      if (typeof character === 'string') {
+        character = this.getCharacterID(character)
       }
       if (character !== null) {
         for (let j = 0; j < timeSteps.length; j++) {
-          session.replace(character, timeSteps[j], sessionID);
+          session.replace(character, timeSteps[j], sessionID)
         }
       }
     }
@@ -318,17 +317,17 @@ export class Story {
    */
   changeLocation(location, sessions) {
     if (this._locations.indexOf(location) < 0) {
-      this._locations.push(location);
+      this._locations.push(location)
     }
-    let locationID = this.getLocationID(location);
-    if (locationID === null) return;
-    const locationTable = this.getTable("location");
-    const sessionTable = this.getTable("session");
+    let locationID = this.getLocationID(location)
+    if (locationID === null) return
+    const locationTable = this.getTable('location')
+    const sessionTable = this.getTable('session')
     for (let i = 0, len = this.getTableRows(); i < len; i++) {
       for (let j = 0, len = this.getTableCols(); j < len; j++) {
-        const sessionID = sessionTable.value(i, j);
+        const sessionID = sessionTable.value(i, j)
         if (sessions.indexOf(sessionID) > -1) {
-          locationTable.replace(i, j, locationID);
+          locationTable.replace(i, j, locationID)
         }
       }
     }
@@ -343,7 +342,7 @@ export class Story {
   getCharacterName(characterID) {
     return characterID < this._characters.length
       ? this._characters[characterID]
-      : null;
+      : null
   }
 
   /**
@@ -353,8 +352,8 @@ export class Story {
    * - ID: number | null
    */
   getCharacterID(characterName) {
-    const characterID = this._characters.indexOf(characterName);
-    return characterID > -1 ? characterID : null;
+    const characterID = this._characters.indexOf(characterName)
+    return characterID > -1 ? characterID : null
   }
 
   /**
@@ -365,18 +364,16 @@ export class Story {
    */
   getCharacterTimeRange(character) {
     character =
-      typeof character === "number"
-        ? character
-        : this.getCharacterID(character);
-    let timeRange = [];
+      typeof character === 'number' ? character : this.getCharacterID(character)
+    let timeRange = []
     if (character !== null) {
       for (let i = 0; i < this.getTableCols(); i++) {
-        if (this._tableMap.get("character").value(character, i) === 1) {
-          timeRange.push([this._timeStamps[i], this._timeStamps[i + 1]]);
+        if (this._tableMap.get('character').value(character, i) === 1) {
+          timeRange.push([this._timeStamps[i], this._timeStamps[i + 1]])
         }
       }
     }
-    return timeRange;
+    return timeRange
   }
 
   /**
@@ -387,19 +384,19 @@ export class Story {
    * - ID: number
    */
   getSessionID(timeStamp, characterName) {
-    let timeStep = this.getTimeStep(timeStamp);
-    let characterID = this.getCharacterID(characterName);
+    let timeStep = this.getTimeStep(timeStamp)
+    let characterID = this.getCharacterID(characterName)
     if (timeStep !== null && characterID !== null) {
-      return this.getTable("session").value(characterID, timeStep);
+      return this.getTable('session').value(characterID, timeStep)
     }
-    return null;
+    return null
   }
 
   /**
    * increment maxSessionID
    */
   getNewSessionID() {
-    return ++this._maxSessionID;
+    return ++this._maxSessionID
   }
 
   /**
@@ -409,19 +406,19 @@ export class Story {
    * - characterIDs: number[]
    */
   getSessionCharacters(sessionID) {
-    let characterIDs = new Set();
+    let characterIDs = new Set()
     for (let i = 0; i < this.getTableRows(); i++) {
       for (let j = 0; j < this.getTableCols(); j++) {
         if (
-          this.getTable("character").value(i, j) == 1 &&
-          this.getTable("session").value(i, j) === sessionID
+          this.getTable('character').value(i, j) == 1 &&
+          this.getTable('session').value(i, j) === sessionID
         ) {
-          characterIDs.add(i);
-          break;
+          characterIDs.add(i)
+          break
         }
       }
     }
-    return Array.from(characterIDs);
+    return Array.from(characterIDs)
   }
 
   /**
@@ -431,21 +428,21 @@ export class Story {
    * - timeRange: timeSpan[]
    */
   getSessionTimeRange(sessionID) {
-    let timeSteps = [];
+    let timeSteps = []
     for (let i = 0; i < this.getTableRows(); i++) {
       for (let j = 0; j < this.getTableCols(); j++) {
         if (
-          this.getTable("session").value(i, j) === sessionID &&
+          this.getTable('session').value(i, j) === sessionID &&
           timeSteps.indexOf(j) < 0
         ) {
-          timeSteps.push(j);
+          timeSteps.push(j)
         }
       }
     }
     return timeSteps.map(step => [
       this._timeStamps[step],
-      this._timeStamps[step + 1]
-    ]);
+      this._timeStamps[step + 1],
+    ])
   }
 
   /**
@@ -457,7 +454,7 @@ export class Story {
   getLocationName(locationID) {
     return locationID < this._locations.length
       ? this._locations[locationID]
-      : null;
+      : null
   }
 
   /**
@@ -467,8 +464,8 @@ export class Story {
    * - locationID: number
    */
   getLocationID(locationName) {
-    const locationID = this._locations.indexOf(locationName);
-    return locationID > -1 ? locationID : null;
+    const locationID = this._locations.indexOf(locationName)
+    return locationID > -1 ? locationID : null
   }
 
   /**
@@ -478,21 +475,21 @@ export class Story {
    * - characterIDs: number[]
    */
   getLocationCharacters(location) {
-    if (typeof location == "string") {
-      location = this.getLocationID(location);
+    if (typeof location == 'string') {
+      location = this.getLocationID(location)
     }
-    let characterIDs = new Set();
+    let characterIDs = new Set()
     for (let i = 0; i < this.getTableRows(); i++) {
       for (let j = 0; j < this.getTableCols(); j++) {
         if (
-          this._tableMap.get("character").value(i, j) == 1 &&
-          this._tableMap.get("location").value(i, j) === location
+          this._tableMap.get('character').value(i, j) == 1 &&
+          this._tableMap.get('location').value(i, j) === location
         ) {
-          characterIDs.add(i);
+          characterIDs.add(i)
         }
       }
     }
-    return Array.from(characterIDs);
+    return Array.from(characterIDs)
   }
 
   /**
@@ -502,25 +499,25 @@ export class Story {
    * - sessionIDs: number[]
    */
   getLocationSessions(location) {
-    if (typeof location == "string") {
-      location = this.getLocationID(location);
+    if (typeof location == 'string') {
+      location = this.getLocationID(location)
     }
     if (location !== null) {
-      let sessionIDs = new Set();
+      let sessionIDs = new Set()
       for (let i = 0; i < this.getTableRows(); i++) {
         for (let j = 0; j < this.getTableCols(); j++) {
           if (
-            this.getTable("character").value(i, j) == 1 &&
-            this.getTable("location").value(i, j) === location
+            this.getTable('character').value(i, j) == 1 &&
+            this.getTable('location').value(i, j) === location
           ) {
-            sessionIDs.add(this._tableMap.get("session").value(i, j));
+            sessionIDs.add(this._tableMap.get('session').value(i, j))
           }
         }
       }
-      let ans = Array.from(sessionIDs);
-      ans.sort((a, b) => a - b);
-      return ans;
+      let ans = Array.from(sessionIDs)
+      ans.sort((a, b) => a - b)
+      return ans
     }
-    return [];
+    return []
   }
 }
