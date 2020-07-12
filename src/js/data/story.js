@@ -24,6 +24,8 @@ export class Story {
     this._characters = []
     this._locations = []
     this._timeStamps = []
+    this._paths = []
+    this._positions = []
     this._maxSessionID = -1
   }
 
@@ -38,7 +40,12 @@ export class Story {
   get timeline() {
     return this._timeStamps
   }
-
+  get positions() {
+    return this._positions
+  }
+  get paths() {
+    return this._paths
+  }
   /**
    * read xml/json document
    * @param {string} fileUrl
@@ -519,5 +526,21 @@ export class Story {
       return ans
     }
     return []
+  }
+  cleanPaths() {
+    this._paths = []
+    this._paths.push('')
+  }
+  cleanPositions() {
+    this._positions = []
+    this._positions.push([-1, -1])
+  }
+  addPath(path) {
+    this._paths.push(path)
+    return this._paths.length - 1
+  }
+  addPosition(pos) {
+    this._positions.push(pos)
+    return this._positions.length - 1
   }
 }

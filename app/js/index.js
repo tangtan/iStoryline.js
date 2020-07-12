@@ -1,6 +1,14 @@
 import { Story } from '../../src/js/data/story'
+import iStoryline from '../../src/js'
+import { or } from 'mathjs'
+import Snap from 'snapsvg'
+import { greedySort } from '../../src/js/order/greedySort'
+import { greedyAlign } from '../../src/js/align/greedyAlign'
+import { greedySlotCompact } from '../../src/js/compact/greedySlotCompact'
+import { smoothRender } from '../../src/js/render/smoothRender'
+import { freeTransform } from '../../src/js/transform/freeTransform'
 
-const fileUrl = '../../data/json/JurassicPark.json'
+const fileUrl = '../../data/json/Redcap.json'
 
 async function main() {
   let story = new Story()
@@ -35,6 +43,40 @@ async function main() {
     `Session Table ${sessionTable.rows}x${sessionTable.cols}: ${sessionTable.mat}`
   )
   // story.dump('test', 'xml')
+  greedySort(story, [{}])
+  greedyAlign(story, [])
+  greedySlotCompact(story, [])
+  smoothRender(story, [{}])
+  const path = freeTransform(story, [])
+  const paths = story.paths
+  const character = story.getTable('character')
+  for (let i = 0, n = story.getTableRows(); i < n; i++) {
+    for (let j = 0, m = story.getTableCols(); j < m; j++) {
+      if (character.value(i, j)) drawInitial(paths[path.value(i, j)])
+    }
+  }
 }
-
+function drawInitial(pathStr) {
+  const svg = Snap('#mySvg')
+  const pathSvg = svg.path(pathStr)
+  pathSvg.hover(
+    () => {
+      pathSvg.attr({
+        stroke: 'blue',
+        'stroke-width': 4,
+      })
+    },
+    () => {
+      pathSvg.attr({
+        stroke: 'black',
+        'stroke-width': 1,
+      })
+    }
+  )
+  pathSvg.attr({
+    fill: 'none',
+    stroke: 'black',
+    'stroke-width': 1,
+  })
+}
 main()
