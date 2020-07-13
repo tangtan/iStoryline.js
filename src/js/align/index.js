@@ -1,11 +1,12 @@
-import { greedyAlign } from "./greedyAlign";
-import { logGeneratorError } from "../utils/logger";
+import { greedyAlign } from './greedyAlign'
+import { logGeneratorError } from '../utils/logger'
 
 export function storyAlign(generator, story, constraints) {
   switch (generator) {
-    case "GreedyAlign":
-      return greedyAlign(story, constraints);
+    case 'GreedyAlign':
+      greedyAlign(story, constraints)
+      break
     default:
-      logGeneratorError(generator);
+      logGeneratorError(generator)
   }
 }

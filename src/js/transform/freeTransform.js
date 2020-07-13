@@ -1,5 +1,5 @@
-import { notDeepStrictEqual } from 'assert'
 import { Table } from '../data/table'
+
 function bezierMapping(node, controlnodes) {
   let num = controlnodes[0].length - 1
   let ansx = 0
@@ -83,36 +83,13 @@ function transform(controlNodes, nodes) {
     for (let j = 0; j < nodes[i][0].length; j++)
       nodes[i][0][j] = bezierMapping(nodes[i][0][j], changedcontrolnodes)
   }
-  // let minx = 0;
-  // let miny = 0;
-  // nodes.forEach(x => {
-  //   x.forEach(y => {
-  //     if (y[0] < minx) minx = y[0];
-  //     if (y[1] < miny) miny = y[1];
-  //   });
-  // });
-  // for (let i = 0; i < nodes.length; i++) {
-  //   for (let j = 0; j < nodes[i].length; j++) {
-  //     nodes[i][j][0] += minx;
-  //     nodes[i][j][1] += miny;
-  //   }
-  // }
   return nodes
 }
 
-// function freeTransform(renderedGraph, upperPath, lowerPath) {
-//   let nodes = renderedGraph.renderNodes;
-//   if (upperPath.length < 2 && lowerPath.length < 2) return renderedGraph;
-//   let controlNodes = [upperPath, lowerPath];
-//   // transform(controlNodes,renderedGraph.nodes);
-//   transform(controlNodes, renderedGraph.renderNodes);
-//   transform(controlNodes, renderedGraph.sketchNodes);
-//   transform(controlNodes, renderedGraph.smoothNodes);
-//   return renderedGraph;
-// }
 function freeTransform(story, constraints) {
   return genPath(story)
 }
+
 function genPath(story) {
   story.cleanPaths()
   const position = story.getTable('position')
@@ -134,8 +111,8 @@ function genPath(story) {
       }
     }
   }
-  const paths = new Table(path)
-  story.setTable('path', paths)
-  return paths
+  const pathTable = new Table(path)
+  story.setTable('path', pathTable)
 }
+
 export { freeTransform }

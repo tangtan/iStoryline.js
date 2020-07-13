@@ -1,7 +1,7 @@
 /**
  * @types
  * Visual Space
- *  - Node: (x, y)
+ *  - Node: [x, y]
  *  - NodeID: Number
  *  - Segment: Node[]
  *  - SegmentID: Number
@@ -20,12 +20,34 @@
  */
 export class Graph {
   constructor(story) {
-    this._story = story;
+    this._story = story
+    this._storylines = []
+    this._positions = []
   }
 
-  get characters() {}
+  get characters() {
+    return this._story.characters
+  }
 
-  get storylines() {}
+  get storylines() {
+    return this._story.paths
+  }
+
+  get locations() {
+    return this._story.locations
+  }
+
+  getTable(tableName) {
+    return this._story.getTable(tableName)
+  }
+
+  getTableRows() {
+    return this._story.getTableRows()
+  }
+
+  getTableCols() {
+    return this._story.getTableCols()
+  }
 
   /**
    * Get the character ID according to the given position.

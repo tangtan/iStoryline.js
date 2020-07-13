@@ -17,6 +17,7 @@ export class Story {
    * init story
    */
   restore() {
+    this._maxSessionID = -1
     this._tableMap = new Map()
     this._tableMap.set('character', new Table())
     this._tableMap.set('session', new Table())
@@ -24,9 +25,8 @@ export class Story {
     this._characters = []
     this._locations = []
     this._timeStamps = []
-    this._paths = []
     this._positions = []
-    this._maxSessionID = -1
+    this._paths = []
   }
 
   get characters() {
@@ -40,12 +40,15 @@ export class Story {
   get timeline() {
     return this._timeStamps
   }
+
   get positions() {
     return this._positions
   }
+
   get paths() {
     return this._paths
   }
+
   /**
    * read xml/json document
    * @param {string} fileUrl
