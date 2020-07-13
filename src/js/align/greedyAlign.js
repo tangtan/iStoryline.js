@@ -9,9 +9,9 @@ const alpha = 0.1 //in storyflow paper, a param to measures how similar relative
  */
 export function greedyAlign(story, constraints) {
   //console.log(story.getTable("sort"))
-  let list1Length = 4
-  let list2Length = 3
-  let reward = [[1, 1, 100], [1, 1, 1], [1, 1, 1], [1, 1, 1]]
+  // let list1Length = 4
+  // let list2Length = 3
+  // let reward = [[1, 1, 100], [1, 1, 1], [1, 1, 1], [1, 1, 1]]
   //console.log(longestCommonSubstring(list1Length,list2Length,reward));
   const param = getParam(story, constraints)
   const alignTable = runAlgorithms(param)
@@ -21,8 +21,13 @@ export function greedyAlign(story, constraints) {
 function getParam(story, constraints) {
   let sortTable = story.getTable('sort')
   let sessionTable = story.getTable('session')
-  let [height, width] = sortTable.mat.size()
+  // let [height, width] = sortTable.mat.size()
+  let height = sortTable.rows
+  let width = sortTable.cols
   let characterIdInOrder = []
+  constraints = constraints.constraints.filter(constraint => {
+    return constraint.style === 'Align'
+  })
   //console.log(sessionTable)
   for (let time = 0; time < width; time++) {
     let num = []
@@ -48,9 +53,21 @@ function getParam(story, constraints) {
       ) {
         const id1 = characterIdInOrder[time][cha]
         const id2 = characterIdInOrder[time + 1][chaInNextTime]
-        rewardInEachCha.push(
-          solveReward(id1, id2, time, sessionTable, sortTable)
-        )
+        let isConstraint = false
+        for (let constraint of constraints) {
+          if (
+            constraint.names[0] === id1 &&
+            constraint.names[0] === id2 &&
+            constraint.timeSpan[0] <= time &&
+            constraint.timeSpan[1] >= time
+          )
+            isConstraint = true
+        }
+        if (isConstraint) rewardInEachCha.push(Number.MAX_SAFE_INTEGER)
+        else
+          rewardInEachCha.push(
+            solveReward(id1, id2, time, sessionTable, sortTable)
+          )
       }
       reward.push(rewardInEachCha)
     }
@@ -99,7 +116,9 @@ function solveReward(id1, id2, time, sessionTable, sortTable) {
   let reward = 0
   let sessionId1 = sessionTable.value(id1, time)
   let sessionId2 = sessionTable.value(id2, time + 1)
-  let [height, width] = sessionTable.mat.size()
+  // let [height, width] = sessionTable.mat.size()
+  let height = sessionTable.rows
+  let width = sessionTable.cols
   let session1 = findChaInSessionAtTime(
     sessionId1,
     time,
@@ -127,7 +146,9 @@ function solveReward(id1, id2, time, sessionTable, sortTable) {
 
 function findChaInSessionAtTime(sessionId, time, sessionTable, sortTable) {
   let ans = []
-  let [height, width] = sessionTable.mat.size()
+  // let [height, width] = sessionTable.mat.size()
+  let height = sessionTable.rows
+  let width = sessionTable.cols
   for (let id = 0; id < height; id++)
     if (sessionTable.value(id, time) === sessionId) ans.push(id)
   ans.sort((a, b) => {

@@ -2,6 +2,9 @@ import { Table } from '../data/table'
 import { i, or } from 'mathjs'
 import { constant } from 'lodash'
 import { DisjointSet } from '../utils/dataStruct'
+import { constants } from '../data/constraint'
+
+const ORDERTIME = 10
 
 /**
  * @param {Story} story
@@ -23,7 +26,9 @@ export function greedySort(story, constraints) {
 function getParam(story, constraints) {
   //console.log(story);
   let storySessionTable = story.getTable('session')
-  let [height, width] = storySessionTable.mat.size()
+  // let [height, width] = storySessionTable.mat.size()
+  let height = storySessionTable.rows
+  let width = storySessionTable.cols
   let charaterinSession = []
   //console.log(height,width)
   for (let time = 0; time < width; time++) {
@@ -44,14 +49,29 @@ function getParam(story, constraints) {
     }
   }
   //console.log(charaterinSession)
+  constraints = constraints.constraints
+  let constantSort = constraints.filter(constraint => {
+    return constraint.style === 'Sort'
+  })
+  let constraintAtAllTime = []
   for (let time = 0; time < width; time++) {
-    constraints.push([])
+    let constraintAtThisTime = []
+    for (let constraint of constantSort) {
+      if (time >= constraint.timeSpan[0] && time <= constraint.timeSpan[1]) {
+        let names = constraint.names
+        constraintAtThisTime.push([
+          story.getCharacterID(names[0]),
+          story.getCharacterID(names[1]),
+        ])
+      }
+    }
+    constraintAtAllTime.push(constraintAtThisTime)
   }
   return {
     charaterinSession,
     height,
     width,
-    constraints,
+    constraints: constraintAtAllTime,
     //TODO:TODOTODOTODOTODO
   }
 }
@@ -83,7 +103,8 @@ function runAlgorithms(param) {
   ans.resize(height, width)
   let initOrder = constrainedCrossingReduction(
     charaterinSession[0],
-    charaterinSession[0]
+    charaterinSession[0],
+    constraints[0]
   )
   let initOrderMat = order2mat(initOrder, height)
   //console.log(initOrder)
@@ -93,15 +114,31 @@ function runAlgorithms(param) {
   ans.replace(replaceIndex, 0, initOrderMat)
   //console.log(ans)
   let lastTimeOrder = initOrder
-  for (let time = 1; time < width; time++) {
-    let thisTimeOrder = constrainedCrossingReduction(
-      charaterinSession[time],
-      lastTimeOrder
-    )
-    let thisTimeOrderMat = order2mat(thisTimeOrder, height)
-    //console.log("time",time,thisTimeOrderMat)
-    ans.replace(replaceIndex, time, thisTimeOrderMat)
-    lastTimeOrder = thisTimeOrder
+  for (let ordertime = 0; ordertime < ORDERTIME; ordertime++) {
+    //from the beginning to the end
+    for (let time = 1; time < width; time++) {
+      let thisTimeOrder = constrainedCrossingReduction(
+        charaterinSession[time],
+        lastTimeOrder,
+        constraints[time]
+      )
+      let thisTimeOrderMat = order2mat(thisTimeOrder, height)
+      //console.log("time",time,thisTimeOrderMat)
+      ans.replace(replaceIndex, time, thisTimeOrderMat)
+      lastTimeOrder = thisTimeOrder
+    }
+    //from the end to the beginning
+    for (let time = width - 2; time >= 0; time--) {
+      let thisTimeOrder = constrainedCrossingReduction(
+        charaterinSession[time],
+        lastTimeOrder,
+        constraints[time]
+      )
+      let thisTimeOrderMat = order2mat(thisTimeOrder, height)
+      //console.log("time",time,thisTimeOrderMat)
+      ans.replace(replaceIndex, time, thisTimeOrderMat)
+      lastTimeOrder = thisTimeOrder
+    }
   }
   //console.log(ans)
   return ans
@@ -218,6 +255,7 @@ export function dealSetConstraints(list, constraints, listWeight) {
 }
 
 export function getWeight(id, list2) {
+  if (list2.indexOf(id) === -1) return 0
   return list2.indexOf(id)
 }
 

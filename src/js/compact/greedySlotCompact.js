@@ -15,7 +15,9 @@ function getParam(story, constraints) {
   //console.log(sessionTable);
   let sortTable = story.getTable('sort')
   //console.log(sortTable)
-  let [height, width] = sortTable.mat.size()
+  // let [height, width] = sortTable.mat.size()
+  let height = sessionTable.rows
+  let width = sessionTable.cols
   let characterIdInOrder = []
   ////console.log(sessionTable)
   for (let time = 0; time < width; time++) {
