@@ -1,14 +1,8 @@
 import { Story } from '../../src/js/data/story'
 import iStoryline from '../../src/js'
-import { or } from 'mathjs'
 import Snap from 'snapsvg'
-import { greedySort } from '../../src/js/order/greedySort'
-import { greedyAlign } from '../../src/js/align/greedyAlign'
-import { greedySlotCompact } from '../../src/js/compact/greedySlotCompact'
-import { smoothRender } from '../../src/js/render/smoothRender'
-import { freeTransform } from '../../src/js/transform/freeTransform'
 
-const fileUrl = '../../data/json/Redcap.json'
+const fileUrl = '../../data/json/JurassicPark.json'
 
 async function main() {
   let story = new Story()
@@ -43,15 +37,13 @@ async function main() {
     `Session Table ${sessionTable.rows}x${sessionTable.cols}: ${sessionTable.mat}`
   )
   // story.dump('test', 'xml')
-  greedySort(story, [{}])
-  greedyAlign(story, [])
-  greedySlotCompact(story, [])
-  smoothRender(story, [{}])
-  const path = freeTransform(story, [])
-  const paths = story.paths
-  const character = story.getTable('character')
-  for (let i = 0, n = story.getTableRows(); i < n; i++) {
-    for (let j = 0, m = story.getTableCols(); j < m; j++) {
+  const iStorylineInstance = new iStoryline()
+  const graph = await iStorylineInstance.load(fileUrl, 'json')
+  const paths = graph.storylines
+  const path = graph.getTable('path')
+  const character = graph.getTable('character')
+  for (let i = 0, n = graph.getTableRows(); i < n; i++) {
+    for (let j = 0, m = graph.getTableCols(); j < m; j++) {
       if (character.value(i, j)) drawInitial(paths[path.value(i, j)])
     }
   }
@@ -79,4 +71,5 @@ function drawInitial(pathStr) {
     'stroke-width': 1,
   })
 }
+
 main()
