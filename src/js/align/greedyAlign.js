@@ -20,6 +20,7 @@ export function greedyAlign(story, constraints) {
 
 function getParam(story, constraints) {
   let sortTable = story.getTable('sort')
+  let chaTable = story.getTable('character')
   let sessionTable = story.getTable('session')
   // let [height, width] = sortTable.mat.size()
   let height = sortTable.rows
@@ -78,12 +79,13 @@ function getParam(story, constraints) {
     rewardArr,
     width,
     height,
+    chaTable,
   }
 }
 function runAlgorithms(param) {
   //console.log(param)
   let ans = new Table(-1)
-  let { height, width, rewardArr, characterIdInOrder } = param
+  let { chaTable, height, width, rewardArr, characterIdInOrder } = param
   ans.resize(height, width, -1)
   for (let time = 0; time < width - 1; time++) {
     let alignAns
@@ -100,6 +102,10 @@ function runAlgorithms(param) {
       ans.replace(characterIdInOrder[time][idOrder], time, alignId)
     }
   }
+  // //double check
+  // for (let chaId=0;chaId<height;chaId++)
+  //   for (let time=0;time<width;time++)
+  //     if (chaTable.value(chaId,time)===0) ans.replace(chaId,time,-1)
   //console.log(ans);
   return ans
 }
