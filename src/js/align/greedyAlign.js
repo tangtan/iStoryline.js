@@ -25,7 +25,7 @@ function getParam(story, constraints) {
   let height = sortTable.rows
   let width = sortTable.cols
   let characterIdInOrder = []
-  constraints = constraints.constraints.filter(constraint => {
+  constraints = constraints.filter(constraint => {
     return constraint.style === 'Align'
   })
   //console.log(sessionTable)

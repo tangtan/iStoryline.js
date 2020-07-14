@@ -49,7 +49,7 @@ function getParam(story, constraints) {
     }
   }
   //console.log(charaterinSession)
-  constraints = constraints.constraints
+  // constraints = constraints.constraints
   let constantSort = constraints.filter(constraint => {
     return constraint.style === 'Sort'
   })
