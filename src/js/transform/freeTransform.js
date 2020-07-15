@@ -1,98 +1,86 @@
 import { Table } from '../data/table'
 
-function bezierMapping(node, controlnodes) {
-  let num = controlnodes[0].length - 1
-  let ansx = 0
-  let ansy = 0
-  let t
-  for (let i = 0; i < controlnodes[0].length; i++) {
-    t = node[0]
-    ansx +=
-      node[1] *
-      combination(i, num) *
-      power(t, i) *
-      power(1 - t, num - i) *
-      controlnodes[1][i][0]
-    ansx +=
-      (1 - node[1]) *
-      combination(i, num) *
-      power(t, i) *
-      power(1 - t, num - i) *
-      controlnodes[0][i][0]
-    t = node[0]
-    ansy +=
-      50 *
-      (1 - node[1]) *
-      combination(i, num) *
-      power(t, i) *
-      power(1 - t, num - i) *
-      controlnodes[0][i][1] //左
-    ansy +=
-      50 *
-      node[1] *
-      combination(i, num) *
-      power(t, i) *
-      power(1 - t, num - i) *
-      controlnodes[1][i][1] //右
-  }
-  node = [ansx, ansy]
-  return node
-}
-
-function combination(a, n) {
-  let ans = 1
-  for (let i = 1; i <= a; i++) {
-    ans = ans * (n - i + 1)
-    ans = ans / i
-  }
-  return ans
-}
-
-function power(a, n) {
-  let ans = 1
-  for (let i = 1; i <= n; i++) ans *= a
-  return ans
-}
-
-function transform(controlNodes, nodes) {
-  let maxx = 0
-  let maxy = 0
-  nodes.forEach(x => {
-    x.forEach(y => {
-      // if (y[0] > maxx) maxx = y[0];
-      // if (y[1] > maxy) maxy = y[1];
-      let yx = y.map(_ => _[0])
-      maxx = Math.max(maxx, ...yx)
-      let yy = y.map(_ => _[1])
-      maxy = Math.max(maxy, ...yy)
-    })
+export function scale(story, constraints) {
+  const ctrs = constraints.filter(ctr => {
+    return ctr.style === 'Scale'
   })
-  nodes.forEach(x => {
-    x.forEach(node => {
-      node.forEach(point => {
-        point[0] /= maxx
-        point[1] /= maxy
-      })
-      // node[0] /= maxx;
-      // node[1] /= maxy;
-    })
-  })
-  let changedcontrolnodes
-  changedcontrolnodes = controlNodes
-  for (let i = 0; i < nodes.length; i++) {
-    for (let j = 0; j < nodes[i][0].length; j++)
-      nodes[i][0][j] = bezierMapping(nodes[i][0][j], changedcontrolnodes)
+  const position = story.getTable('position')
+  const character = story.getTable('character')
+  const positions = story.positions
+  if (ctrs.length < 1) return position
+  const { x0, y0, width, height, reserveRatio } = ctrs[0].param
+  const { minX, maxX, minY, maxY } = getBoundary(story)
+  let pos = []
+  let ratio = (maxY - minY) / (maxX - minX)
+  // ratio = ratio < thres ? idealRatio : ratio;
+  for (let i = 0, n = story.getTableRows(); i < n; i++) {
+    pos[i] = []
+    for (let j = 0, m = story.getTableCols(); j < m; j++) {
+      pos[i][j] = []
+      if (character.value(i, j)) {
+        const storySegment = positions[position.value(i, j)]
+        storySegment.forEach(node => {
+          pos[i][j].push([
+            ((node[0] - minX) / (maxX - minX)) * width + x0,
+            ((node[1] - minY) / (maxY - minY)) *
+              (reserveRatio ? ratio / width : height) +
+              y0,
+          ])
+        })
+      }
+    }
   }
-  return nodes
+  const newPosition = genNewPosition(story, pos)
+  return newPosition
+}
+export function genNewPosition(story, pos) {
+  story.cleanPositions()
+  const character = story.getTable('character')
+  let tpos = []
+  for (let i = 0; i < pos.length; i++) {
+    tpos[i] = []
+    for (let j = 0; j < pos[i].length; j++) {
+      tpos[i][j] = null
+      if (character.value(i, j)) tpos[i][j] = story.addPosition(pos[i][j])
+    }
+  }
+  const newPosition = new Table(tpos)
+  return newPosition
+}
+export function getBoundary(story) {
+  const position = story.getTable('position')
+  const character = story.getTable('character')
+  const positions = story.positions
+  let minX = 1e9,
+    maxX = -1e9,
+    minY = 1e9,
+    maxY = -1e9
+  for (let i = 0, n = story.getTableRows(); i < n; i++) {
+    for (let j = 0, m = story.getTableCols(); j < m; j++) {
+      if (character.value(i, j)) {
+        const storySegment = positions[position.value(i, j)]
+        storySegment.forEach(node => {
+          minX = Math.min(minX, node[0])
+          maxX = Math.max(maxX, node[0])
+          minY = Math.min(minY, node[1])
+          maxY = Math.max(maxY, node[1])
+        })
+      }
+    }
+  }
+  return { minX, maxX, minY, maxY }
 }
 
 function freeTransform(story, constraints) {
-  return genPath(story)
+  const pathTable = genPath(story, constraints)
+  story.setTable('path', pathTable)
+  return pathTable
 }
 
-function genPath(story) {
+function genPath(story, constraints) {
   story.cleanPaths()
-  const position = story.getTable('position')
+  // const position = story.getTable('position')
+  const position = scale(story, constraints)
   const character = story.getTable('character')
   const positions = story.positions
   let path = []
@@ -112,7 +100,7 @@ function genPath(story) {
     }
   }
   const pathTable = new Table(path)
-  story.setTable('path', pathTable)
+  return pathTable
 }
 
 export { freeTransform }

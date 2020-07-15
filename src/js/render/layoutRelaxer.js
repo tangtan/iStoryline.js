@@ -1,10 +1,8 @@
 import { TIME_UNIT, TIME_GAP, INNERGAPS, SCALE_GAP } from '../utils/CONSTANTS'
-import { Table } from '../data/table'
-import { sort, abs, compare } from 'mathjs'
 
 export class LayoutRelaxer {
-  constructor(story) {
-    const { origX, renderX } = this.layoutRelax(story)
+  constructor(story, constraints) {
+    const { origX, renderX } = this.layoutRelax(story, constraints)
     this._origX = origX
     this._renderX = renderX
   }
@@ -35,9 +33,7 @@ export class LayoutRelaxer {
         }
       }
     }
-    // const origX = new Table(originX);
     const origX = originX
-    // const renderX = origX;
     const renderX = this._getRenderX(originX, story)
     return { origX, renderX }
   }
@@ -112,7 +108,6 @@ export class LayoutRelaxer {
       }
     }
     return renderX
-    // return new Table(renderX);
   }
   newArray(n, m) {
     let ret = []

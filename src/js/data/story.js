@@ -532,11 +532,9 @@ export class Story {
   }
   cleanPaths() {
     this._paths = []
-    this._paths.push('')
   }
   cleanPositions() {
     this._positions = []
-    this._positions.push([-1, -1])
   }
   addPath(path) {
     this._paths.push(path)

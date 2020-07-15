@@ -25,20 +25,18 @@ export class StyleConfiger {
   }
   genStyle(story, oConstraints) {
     const constraints = this.ctrsFilter(oConstraints)
-    const tstyle = this.newArray(story.getTableCols(), story.getTableRows())
-    const tstyleFlag = this.newArray(story.getTableCols(), story.getTableRows())
-    const tmoveMark = this.newArray(story.getTableCols(), story.getTableRows())
-    const tstyleY = this.newArray(story.getTableCols(), story.getTableRows())
+    const tstyle = this.newArray(story.getTableRows(), story.getTableCols())
+    const tstyleFlag = this.newArray(story.getTableRows(), story.getTableCols())
+    const tmoveMark = this.newArray(story.getTableRows(), story.getTableCols())
+    const tstyleY = this.newArray(story.getTableRows(), story.getTableCols())
     constraints.forEach(ctr => {
       this._changeStyle(ctr, story, tstyle, tmoveMark)
       this._changeStyleY(ctr, story, tstyleFlag, tstyleY)
     })
-    // const style = new Table(tstyle), styleFlag = new Table(tstyleFlag), moveMark = new Table(tmoveMark), styleY = new Table(tstyleY);
-    const style = tstyle,
-      styleFlag = tstyleFlag,
+    const style = new Table(tstyle)
+    const styleFlag = tstyleFlag,
       moveMark = tmoveMark,
       styleY = tstyleY
-    story.setTable('style', style)
     return { style, styleFlag, moveMark, styleY }
   }
   ctrsFilter(octrs) {
@@ -78,25 +76,29 @@ export class StyleConfiger {
         if (style[id][timestep] >= this.getStyleId('Twine')) {
           if (i === 0) moveMark[id][timestep] |= 1
           if (i === timesteps.length - 1) moveMark[id][timestep] |= 2
+          if (!moveMark[id][timestep]) moveMark[id][timestep] = 4
         }
       }
     })
   }
-  _changeStyleFlag(ctr, story, styleFlag, styleY) {
+  _changeStyleY(ctr, story, styleFlag, styleY) {
     const timesteps = story.getTimeSteps([ctr.timeSpan])
     if (timesteps.length <= 0) return
     const layout = story.getTable('layout')
+    let avgY = 0,
+      tot = 0
     ctr.names.forEach(name => {
       const id = story.getCharacterID(name)
       avgY += layout.value(id, timesteps[0])
+      tot += 1
     })
-    if (id.length > 0) {
-      avgY /= id.length
+    if (tot > 0) {
+      avgY /= tot
       ctr.names.forEach(name => {
         const id = story.getCharacterID(name)
         const y = layout.value(id, timesteps[0])
         timesteps.forEach(timestep => {
-          styleFlag[id][timestep] = y > avgY //下1上0
+          styleFlag[id][timestep] = y > avgY ? 1 : 0
           styleY[id][timestep] = avgY
         })
       })
