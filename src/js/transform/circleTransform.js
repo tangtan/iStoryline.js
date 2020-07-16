@@ -48,6 +48,7 @@ function transform(story, constraints) {
   const newPosition = genNewPosition(story, pos)
   return newPosition
 }
+
 function circleTransform(story, constraints) {
   const tPosition = transform(story, constraints)
   story.setTable('position', tPosition)
@@ -55,4 +56,5 @@ function circleTransform(story, constraints) {
   story.setTable('path', pathTable)
   return position
 }
+
 export { circleTransform }

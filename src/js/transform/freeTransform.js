@@ -33,6 +33,7 @@ export function scale(story, constraints) {
   const newPosition = genNewPosition(story, pos)
   return newPosition
 }
+
 export function genNewPosition(story, pos) {
   story.cleanPositions()
   const character = story.getTable('character')
@@ -47,6 +48,7 @@ export function genNewPosition(story, pos) {
   const newPosition = new Table(tpos)
   return newPosition
 }
+
 export function getBoundary(story) {
   const position = story.getTable('position')
   const character = story.getTable('character')

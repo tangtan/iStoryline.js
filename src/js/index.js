@@ -79,28 +79,40 @@ export default class iStoryline {
     this._story.dump(fileName, fileType)
   }
 
-  addCharacter(characterName, timeRange) {
-    this._story.addCharacter(characterName, timeRange)
+  addCharacter(character, timeRange) {
+    this._story.addCharacter(character, timeRange)
+    return this._layout()
   }
 
-  removeCharacter(character) {
+  changeCharacter(character, timeRange) {
+    this._story.changeCharacter(character, timeRange)
+    return this._layout()
+  }
+
+  deleteCharacter(character) {
     this._story.deleteCharacter(character)
+    return this._layout()
   }
 
   addSession(characters, timeSpan) {
-    this._story.addSession(characters, timeSpan)
+    const newSessionID = this._story.getNewSessionID()
+    this._story.changeSession(newSessionID, characters, timeSpan)
+    return this._layout()
   }
 
   removeSession(sessionID) {
     this._story.deleteSession(sessionID)
+    return this._layout()
   }
 
   addLocation(location, characters, timeRange) {
     this._story.changeLocation(location, characters, timeRange)
+    return this._layout()
   }
 
   removeLocation(location) {
     this._story.changeLocation(location)
+    return this._layout()
   }
 
   /**

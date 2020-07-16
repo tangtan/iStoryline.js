@@ -1,18 +1,11 @@
-import { thomsonCrossSectionDependencies } from 'mathjs'
 import { Table } from '../data/table'
-
-const alpha = 0.1 //in storyflow paper, a param to measures how similar relative positions are in two frames
+import { ALPHA } from '../utils/CONSTANTS'
 
 /**
  * @param {Story} story
  * @param {constraints} Object
  */
 export function greedyAlign(story, constraints) {
-  //console.log(story.getTable("sort"))
-  // let list1Length = 4
-  // let list2Length = 3
-  // let reward = [[1, 1, 100], [1, 1, 1], [1, 1, 1], [1, 1, 1]]
-  //console.log(longestCommonSubstring(list1Length,list2Length,reward));
   const param = getParam(story, constraints)
   const alignTable = runAlgorithms(param)
   story.setTable('align', alignTable)
@@ -22,14 +15,12 @@ function getParam(story, constraints) {
   let sortTable = story.getTable('sort')
   let chaTable = story.getTable('character')
   let sessionTable = story.getTable('session')
-  // let [height, width] = sortTable.mat.size()
   let height = sortTable.rows
   let width = sortTable.cols
   let characterIdInOrder = []
   constraints = constraints.filter(constraint => {
     return constraint.style === 'Align'
   })
-  //console.log(sessionTable)
   for (let time = 0; time < width; time++) {
     let num = []
     for (let id = 0; id < height; id++) {
@@ -40,10 +31,8 @@ function getParam(story, constraints) {
     })
     characterIdInOrder.push(num)
   }
-  //console.log(characterIdInOrder);
   let rewardArr = []
   for (let time = 0; time < width - 1; time++) {
-    //the last time do not have to align
     let reward = []
     for (let cha = 0; cha < characterIdInOrder[time].length; cha++) {
       let rewardInEachCha = []
@@ -82,10 +71,10 @@ function getParam(story, constraints) {
     chaTable,
   }
 }
+
 function runAlgorithms(param) {
-  //console.log(param)
   let ans = new Table(-1)
-  let { chaTable, height, width, rewardArr, characterIdInOrder } = param
+  let { height, width, rewardArr, characterIdInOrder } = param
   ans.resize(height, width, -1)
   for (let time = 0; time < width - 1; time++) {
     let alignAns
@@ -94,7 +83,6 @@ function runAlgorithms(param) {
       characterIdInOrder[time + 1].length,
       rewardArr[time]
     )
-    //console.log("alighAns",alignAns)
     for (let idOrder = 0; idOrder < alignAns.length; idOrder++) {
       let alignId = alignAns[idOrder]
       if (alignAns[idOrder] === undefined) alignId = -1
@@ -102,15 +90,16 @@ function runAlgorithms(param) {
       ans.replace(characterIdInOrder[time][idOrder], time, alignId)
     }
   }
-  // //double check
+  // double check
   // for (let chaId=0;chaId<height;chaId++)
   //   for (let time=0;time<width;time++)
   //     if (chaTable.value(chaId,time)===0) ans.replace(chaId,time,-1)
-  //console.log(ans);
+  // console.log(ans);
   return ans
 }
+
 /**
- *
+ * Calculate dynamic programming rewards
  * @param {Number} id1 first character ID
  * @param {Number} id2 second character ID
  * @param {Number} time first time
@@ -122,9 +111,6 @@ function solveReward(id1, id2, time, sessionTable, sortTable) {
   let reward = 0
   let sessionId1 = sessionTable.value(id1, time)
   let sessionId2 = sessionTable.value(id2, time + 1)
-  // let [height, width] = sessionTable.mat.size()
-  let height = sessionTable.rows
-  let width = sessionTable.cols
   let session1 = findChaInSessionAtTime(
     sessionId1,
     time,
@@ -141,7 +127,7 @@ function solveReward(id1, id2, time, sessionTable, sortTable) {
     if (session2.indexOf(chaId) !== -1) reward += 1
   }
   reward +=
-    alpha *
+    ALPHA *
     (1 -
       Math.abs(
         session1.indexOf(id1) / session1.length -
@@ -152,9 +138,7 @@ function solveReward(id1, id2, time, sessionTable, sortTable) {
 
 function findChaInSessionAtTime(sessionId, time, sessionTable, sortTable) {
   let ans = []
-  // let [height, width] = sessionTable.mat.size()
   let height = sessionTable.rows
-  let width = sessionTable.cols
   for (let id = 0; id < height; id++)
     if (sessionTable.value(id, time) === sessionId) ans.push(id)
   ans.sort((a, b) => {
@@ -162,14 +146,17 @@ function findChaInSessionAtTime(sessionId, time, sessionTable, sortTable) {
   })
   return ans
 }
+
 /**
+ * Calculate LCS from two sequences
  * @param {Number[]} list1
  * @param {Number[]} list2
  * @param {Number[][]} reward
  * @return {Number[]} longestCommonSubstring  list1中元素对齐的是第几个list2中元素
- * @example     let list1Length=4;
- *              let list2Length=3
- *              let reward=[[1,1,1],[1,1,1],[1,1,1],[1,1,1]]
+ * @example
+ * let list1Length=4;
+ * let list2Length=3
+ * let reward=[[1,1,1],[1,1,1],[1,1,1],[1,1,1]]
  */
 
 export function longestCommonSubstring(list1Length, list2Length, reward) {
@@ -179,6 +166,7 @@ export function longestCommonSubstring(list1Length, list2Length, reward) {
     totalReward.push([])
     direction.push([])
   })
+  // Init
   for (let i = 0; i < list1Length; i++) {
     reward[i][-1] = 0
   }
@@ -191,15 +179,15 @@ export function longestCommonSubstring(list1Length, list2Length, reward) {
     for (let j = -1; j < list2Length; j++) {
       totalReward[i][j] = 0
     }
-  //above things are init arrays
+  // Transition functions
   for (let i = 0; i < list1Length; i++) {
     for (let j = 0; j < list2Length; j++) {
-      //edge condition
+      // Boundary conditions
       let valueList = [
         totalReward[i - 1][j],
         totalReward[i][j - 1],
         totalReward[i - 1][j - 1] + reward[i][j],
-      ] //0:left,1:right,2:align
+      ] // 0:left, 1:right, 2:align
       let maxListArg = maxArg(valueList)
       direction[i][j] = maxListArg
       totalReward[i][j] = valueList[maxListArg]
