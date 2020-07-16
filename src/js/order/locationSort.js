@@ -1,3 +1,1 @@
-export function locationSort(){
-
-}
+export function locationSort() {}

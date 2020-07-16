@@ -1,79 +1,60 @@
-/**
- * change the coordinates from polar into rectangular coordinates.
- *
- * @param
- *   node
- *     int[2]
- *
- * @return
- *   coordinates
- *      int[2]
- */
-function polar(x) {
-  return [x[1] * Math.sin(x[0]), x[1] * Math.cos(x[0])];
-}
+import { getBoundary, genNewPosition, genPath } from './freeTransform.js'
 
-/**
- * show the Storyline in a Sector layout
- *
- * @param
- *   node
- *     int[][][]
- *   R,r
- *     the larger radius, the smaller radius
- *   range
- *     the Sector angle(in radian like 0.6Π)
- *
- * @return
- *   node
- *     int[][][]
- */
-function transform(node, R, r, range) {
-  let biggestX = 0,
-    biggestY = 0,
-    smallestX = Number.MAX_VALUE,
-    smallestY = Number.MAX_VALUE;
-  for (let [line] of node) {
-    biggestX = Math.max(biggestX, ...line.map(x => x[0]));
-    smallestX = Math.min(smallestX, ...line.map(x => x[0]));
-    biggestY = Math.max(biggestY, ...line.map(x => x[1]));
-    smallestY = Math.min(smallestY, ...line.map(x => x[1]));
-  }
-  let initNode = [];
-  biggestX -= smallestX;
-  biggestY -= smallestY;
-  for (let [line] of node) {
-    initNode.push(
-      line.map(x => [
-        ((x[0] - smallestX - biggestX / 2) * range) / biggestX,
-        ((x[1] - smallestY) / biggestY) * (R - r) + r
-      ])
-    );
-  }
-  let ansNode = [];
-  initNode.forEach(line => {
-    let ansLine = [];
-    for (let node of line) ansLine.push(polar(node));
-    ansNode.push(ansLine);
-  });
-  smallestX = Number.MAX_VALUE;
-  smallestY = Number.MAX_VALUE;
-  for (let line of ansNode) {
-    smallestY = Math.min(smallestY, ...line.map(x => x[1]));
-    smallestX = Math.min(smallestX, ...line.map(x => x[0]));
-  }
-  for (let line of ansNode)
-    for (let node of line) {
-      node[0] -= smallestX * 2;
-      node[1] -= smallestY;
+function transform(story, constraints) {
+  const ctrs = constraints.filter(ctr => {
+    return ctr.style === 'Reshape'
+  })
+  const position = story.getTable('position')
+  const character = story.getTable('character')
+  const positions = story.positions
+  if (ctrs.length < 1) return position
+  const { upperPath, lowerPath } = ctrs[ctrs.length - 1].param
+  const { minX, maxX, minY, maxY } = getBoundary(story)
+  let pos = [],
+    tpos = []
+  for (let i = 0, n = story.getTableRows(); i < n; i++) {
+    pos[i] = []
+    tpos[i] = []
+    for (let j = 0, m = story.getTableCols(); j < m; j++) {
+      pos[i][j] = []
+      tpos[i][j] = null
+      if (character.value(i, j)) {
+        const storySegment = positions[position.value(i, j)]
+        for (let k = 0, len = storySegment.length; k < len; k++) {
+          const rY = (storySegment[k][1] - minY) / (maxY - minY)
+          const rX =
+            (storySegment[k][0] - storySegment[0][0]) /
+            (storySegment[len - 1][0] - storySegment[0][0])
+          const sNode = [
+            upperPath[j << 1] + (lowerPath[j << 1] - upperPath[j << 1]) * rY,
+            upperPath[(j << 1) | 1] +
+              (lowerPath[(j << 1) | 1] - upperPath[(j << 1) | 1]) * rY,
+          ]
+          const eNode = [
+            upperPath[(j + 1) << 1] +
+              (lowerPath[(j + 1) << 1] - upperPath[(j + 1) << 1]) * rY,
+            upperPath[((j + 1) << 1) | 1] +
+              (lowerPath[((j + 1) << 1) | 1] - upperPath[((j + 1) << 1) | 1]) *
+                rY,
+          ]
+          pos[i][j].push([
+            sNode[0] + (eNode[0] - sNode[0]) * rX,
+            sNode[1] + (eNode[1] - sNode[1]) * rX,
+          ])
+        }
+      }
     }
-  // line.forEach(x=>[x[0]-smallestX,x[1]-smallestY]);
-  return ansNode.map(x => [x]);
+  }
+  const newPosition = genNewPosition(story, pos)
+  return newPosition
 }
 
-function circleTransform(Graph, R, r, range) {
-  let node = Graph.paths;
-  Graph.paths = transform(node, R, r, range);
+function circleTransform(story, constraints) {
+  const tPosition = transform(story, constraints)
+  story.setTable('position', tPosition)
+  const pathTable = genPath(story, constraints)
+  story.setTable('path', pathTable)
+  return position
 }
 
-export { circleTransform };
+export { circleTransform }

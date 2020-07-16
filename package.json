@@ -1,5 +1,5 @@
 {
-  "name": "iStoryline",
+  "name": "iStoryline.js",
   "version": "0.0.1",
   "description": "Implementation of [iStoryline](http://www.tantang.org/publication/2018_infovis_istoryline/2018_infovis_istoryline.pdf)",
   "keywords": [
@@ -17,7 +17,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tangtan/istoryline"
+    "url": "https://github.com/tangtan/iStoryline.js"
   },
   "eslintConfig": {
     "env": {
@@ -26,7 +26,8 @@
   },
   "scripts": {
     "build": "babel src -d build",
-    "start": "webpack-dev-server"
+    "start": "webpack-dev-server",
+    "test": "mocha -r esm --recursive"
   },
   "husky": {
     "hooks": {
@@ -36,21 +37,28 @@
   "dependencies": {
     "d3-fetch": "^1.1.2",
     "d3-scale": "^3.2.0",
+    "lodash": "^4.17.18",
+    "mathjs": "^7.0.0",
     "quadprog": "^1.5.1",
     "simplify-js": "git+https://github.com/mourner/simplify-js.git",
-    "snapsvg": "^0.5.1"
+    "snapsvg": "^0.5.1",
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.0",
     "@babel/core": "^7.7.2",
-    "babel-preset-env": "^1.7.0",
+    "@babel/preset-env": "^7.9.6",
+    "chai": "^4.2.0",
+    "eslint-config-prettier": "^6.11.0",
+    "esm": "^3.2.25",
     "html-webpack-plugin": "^3.2.0",
-    "imports-loader": "^0.8.0",
-    "prettier": "1.18.2",
     "husky": "^3.0.9",
+    "imports-loader": "^0.8.0",
+    "mocha": "^7.1.2",
+    "prettier": "1.18.2",
     "pretty-quick": "^2.0.1",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10",
-    "webpack-dev-server": "^3.9.0"
+    "webpack-dev-server": "^3.11.0"
   }
 }

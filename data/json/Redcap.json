@@ -1,0 +1,134 @@
+{
+  "Story": {
+    "Locations": {
+      "Red cap's Home": [1],
+      "Forest": [2],
+      "Grandmother's Home": [3]
+    },
+    "Characters": {
+      "Red cap": [
+        {
+          "Start": 1,
+          "End": 5,
+          "Session": 1
+        },
+        {
+          "Start": 5,
+          "End": 6,
+          "Session": 2
+        },
+        {
+          "Start": 6,
+          "End": 10,
+          "Session": 2
+        },
+        {
+          "Start": 10,
+          "End": 11,
+          "Session": 2
+        },
+        {
+          "Start": 11,
+          "End": 15,
+          "Session": 2
+        },
+        {
+          "Start": 15,
+          "End": 18,
+          "Session": 2
+        },
+        {
+          "Start": 18,
+          "End": 22,
+          "Session": 3
+        }
+      ],
+      "Mother": [
+        {
+          "Start": 1,
+          "End": 5,
+          "Session": 1
+        },
+        {
+          "Start": 5,
+          "End": 6,
+          "Session": 1
+        },
+        {
+          "Start": 6,
+          "End": 10,
+          "Session": 1
+        },
+        {
+          "Start": 10,
+          "End": 11,
+          "Session": 1
+        },
+        {
+          "Start": 11,
+          "End": 15,
+          "Session": 1
+        },
+        {
+          "Start": 15,
+          "End": 18,
+          "Session": 1
+        },
+        {
+          "Start": 18,
+          "End": 22,
+          "Session": 1
+        },
+        {
+          "Start": 22,
+          "End": 25,
+          "Session": 1
+        }
+      ],
+      "Grandmother": [
+        {
+          "Start": 10,
+          "End": 11,
+          "Session": 3
+        },
+        {
+          "Start": 11,
+          "End": 15,
+          "Session": 3
+        }
+      ],
+      "Wolf": [
+        {
+          "Start": 6,
+          "End": 10,
+          "Session": 2
+        },
+        {
+          "Start": 10,
+          "End": 11,
+          "Session": 2
+        },
+        {
+          "Start": 11,
+          "End": 15,
+          "Session": 3
+        },
+        {
+          "Start": 15,
+          "End": 18,
+          "Session": 3
+        },
+        {
+          "Start": 18,
+          "End": 22,
+          "Session": 3
+        },
+        {
+          "Start": 22,
+          "End": 25,
+          "Session": 3
+        }
+      ]
+    }
+  }
+}

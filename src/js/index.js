@@ -1,72 +1,125 @@
-import { CharacterStore } from "./data/character";
-import { storyOrder } from "./order/index";
-import { storyAlign } from "./align/index";
-import { storyCompact } from "./compact/index";
-import { storyRender } from "./render/index";
-import { storyTransform } from "./transform/index";
-import { CtrInfo } from "./data/constraint";
-import { Graph } from "./data/graph";
-import { logNameError, logTimeError } from "./utils";
+// Generators
+import { storyOrder } from './order/index'
+import { storyAlign } from './align/index'
+import { storyCompact } from './compact/index'
+import { storyRender } from './render/index'
+import { storyTransform } from './transform/index'
+// Data structure
+import { ConstraintStore } from './data/constraint'
+import { Graph } from './data/graph'
+import { Story } from './data/story'
+// Utils
+import { logConstraintError } from './utils/logger'
 
-export default class iStoryline extends CharacterStore {
+export default class iStoryline {
   /**
-   * Construct the iStoryline generator for a story.
+   * Construct a iStoryline generator for a story.
    * Once the story changed, the generator should be re-constructed.
    *
    * @param {Array} pipeline
-   * - ['GreedyOrder', 'GreedyAlign', 'GreedyCompact', 'Render', 'FreeTransform']
+   * - ['GreedyOrder', 'GreedyAlign', 'GreedySlotCompact', 'SmoothRender', 'FreeTransform']
    */
-  constructor(pipeline = []) {
-    super();
-    // Pipeline configuration
-    this.orderModule = pipeline[0] || "GreedyOrder";
-    this.alignModule = pipeline[1] || "GreedyAlign";
-    this.compactModule = pipeline[2] || "GreedySlotCompact";
-    this.renderModule = pipeline[3] || "SmoothRender";
-    this.transformModule = pipeline[4] || "FreeTransform";
-    // Constraints for opimization models
-    this.ctrInfo = new CtrInfo();
+  constructor(
+    pipeline = [
+      'GreedyOrder',
+      'GreedyAlign',
+      'GreedySlotCompact',
+      'SmoothRender',
+      'FreeTransform',
+    ]
+  ) {
+    this._pipeline = pipeline
+    this._story = new Story()
+    this._constraintStore = new ConstraintStore()
   }
 
   /**
    * Generate storyline visualizations from the input file.
    *
-   * @param {String} fileSrc
+   * @param {String} fileUrl
    * - "./data/JurassicPark.xml"
    */
-  async readFile(fileSrc) {
-    await this.readXMLFile(fileSrc);
-    return this._layout();
+  async load(fileUrl, fileType = 'xml') {
+    await this._story.load(fileUrl, fileType)
+    return this._layout()
+  }
+
+  _layout() {
+    const { _story, _constraintStore, _pipeline } = this
+    const _constraints = _constraintStore.constraints
+    // Order
+    this.orderGenerator = _pipeline[0] || null
+    if (this.orderGenerator) {
+      storyOrder(this.orderGenerator, _story, _constraints)
+    }
+    // Align
+    this.alignGenerator = _pipeline[1] || null
+    if (this.alignGenerator) {
+      storyAlign(this.alignGenerator, _story, _constraints)
+    }
+    // Compact
+    this.compactGenerator = _pipeline[2] || null
+    if (this.compactGenerator) {
+      storyCompact(this.compactGenerator, _story, _constraints)
+    }
+    // Render
+    this.renderGenerator = _pipeline[3] || null
+    if (this.renderGenerator) {
+      storyRender(this.renderGenerator, _story, _constraints)
+    }
+    // Transform
+    this.transformGenerator = _pipeline[4] || null
+    if (this.transformGenerator) {
+      storyTransform(this.transformGenerator, _story, _constraints)
+    }
+    return new Graph(_story)
+  }
+
+  dump(fileName, fileType) {
+    this._story.dump(fileName, fileType)
+  }
+
+  addCharacter(character, timeRange) {
+    this._story.addCharacter(character, timeRange)
+    return this._layout()
+  }
+
+  changeCharacter(character, timeRange) {
+    this._story.changeCharacter(character, timeRange)
+    return this._layout()
+  }
+
+  deleteCharacter(character) {
+    this._story.deleteCharacter(character)
+    return this._layout()
+  }
+
+  addSession(characters, timeSpan) {
+    const newSessionID = this._story.getNewSessionID()
+    this._story.changeSession(newSessionID, characters, timeSpan)
+    return this._layout()
+  }
+
+  removeSession(sessionID) {
+    this._story.deleteSession(sessionID)
+    return this._layout()
+  }
+
+  addLocation(location, characters, timeRange) {
+    this._story.changeLocation(location, characters, timeRange)
+    return this._layout()
+  }
+
+  removeLocation(location) {
+    this._story.changeLocation(location)
+    return this._layout()
   }
 
   /**
-   * Generate storyline visualization
-   *
-   * @return graph
-   */
-  _layout() {
-    let story = this.data;
-    delete story.initialNodes;
-    delete story.sequence;
-    delete story.sketchNodes;
-    delete story.alignedSessions;
-    delete story.renderNodes;
-    delete story.smoothNodes;
-    let constraints = this.ctrInfo.ctrs;
-    storyOrder(this.orderModule, story, constraints);
-    storyAlign(this.alignModule, story, constraints);
-    storyCompact(this.compactModule, story, constraints);
-    storyRender(this.renderModule, story, constraints);
-    storyTransform(this.transformModule, story, constraints);
-    let graph = new Graph(story);
-    return graph;
-  }
-  /**
-   * Rearrange the order of lines
+   * Rearrange the order of characters
    *
    * @param {String[]} names
-   * @param {Number[]} span
-   * @param {Array} constraints
+   * @param {Number[]} timeSpan
    *
    * @example
    * - constraint: {
@@ -78,27 +131,20 @@ export default class iStoryline extends CharacterStore {
    *
    * @return graph
    */
-  sort(names, span, ctrs = []) {
-    // Update constraints
-    if (ctrs.length > 0) {
-      this.ctrInfo.addCtrs(ctrs);
-    } else if (logNameError("Sort", names, 2) && logTimeError("Sort", span)) {
-      this.ctrInfo.addCtr({
-        names: names,
-        timeSpan: span,
-        style: "Sort",
-        param: {}
-      });
+  sort(names, timeSpan) {
+    if (names.length > 1 && timeSpan.length === 2) {
+      this._constraintStore.add(names, timeSpan, 'Sort', {})
+    } else {
+      logConstraintError('Sort')
     }
-    return this._layout();
+    return this._layout()
   }
 
   /**
-   * Bend a line
+   * Bend character lines
    *
    * @param {String[]} names
-   * @param {Number[]} span
-   * @param {Array} constraints
+   * @param {Number[]} timeSpan
    *
    * @example
    * - constraint: {
@@ -110,28 +156,24 @@ export default class iStoryline extends CharacterStore {
    *
    * @return graph
    */
-  bend(names, span, ctrs = []) {
-    // Update constraints
-    if (ctrs.length > 0) {
-      this.ctrInfo.addCtrs(ctrs);
-    } else if (logNameError("Bend", names, 1) && logTimeError("Bend", span)) {
-      this._addKeytimeframe(span[0]);
-      this.ctrInfo.addCtr({
-        names: names,
-        timeSpan: span,
-        style: "Bend",
-        param: {}
-      });
+  bend(names, timeSpan) {
+    if (
+      names.length === 1 &&
+      timeSpan.length === 2 &&
+      timeSpan[0] === timeSpan[1]
+    ) {
+      this._constraintStore.add(names, timeSpan, 'Bend', {})
+    } else {
+      logConstraintError('Bend')
     }
-    return this._layout();
+    return this._layout()
   }
 
   /**
-   * Straighten a line
+   * Straighten character lines
    *
    * @param {String[]} names
-   * @param {Number[]} span
-   * @param {Array} constraints
+   * @param {Number[]} timeSpan
    *
    * @example
    * - constraint: {
@@ -143,31 +185,25 @@ export default class iStoryline extends CharacterStore {
    *
    * @return graph
    */
-  straighten(names, span, ctrs = []) {
-    // Update constraints
-    if (ctrs.length > 0) {
-      this.ctrInfo.addCtrs(ctrs);
-    } else if (
-      logNameError("Straighten", names, 1) &&
-      logTimeError("Straighten", span)
+  straighten(names, timeSpan) {
+    if (
+      names.length === 1 &&
+      timeSpan.length === 2 &&
+      timeSpan[0] !== timeSpan[1]
     ) {
-      this.ctrInfo.addCtr({
-        names: names,
-        timeSpan: span,
-        style: "Straighten",
-        param: {}
-      });
+      this._constraintStore.add(names, timeSpan, 'Straighten', {})
+    } else {
+      logConstraintError('Straighten')
     }
-    return this._layout();
+    return this._layout()
   }
 
   /**
    * Remove white space
    *
    * @param {String[]} names
-   * @param {Number[]} span
+   * @param {Number[]} timepan
    * @param {Number} scale
-   * @param {Array} constraints
    *
    * @example
    * - scale: 0<<1
@@ -180,31 +216,21 @@ export default class iStoryline extends CharacterStore {
    *
    * @return graph
    */
-  compress(names, span, scale = 0.5, ctrs = []) {
-    // Update constraints
-    if (ctrs.length > 0) {
-      this.ctrInfo.addCtrs(ctrs);
-    } else if (
-      logNameError("Compress", names) &&
-      logTimeError("Compress", span)
-    ) {
-      this.ctrInfo.addCtr({
-        names: names,
-        timeSpan: span,
-        style: "Compress",
-        param: { scale: scale }
-      });
+  compress(names, timeSpan, scale = 0.5) {
+    if (names.length === 2 && timeSpan.length === 2) {
+      this._constraintStore.add(names, timeSpan, 'Compress', { scale: scale })
+    } else {
+      logConstraintError('Compress')
     }
-    return this._layout();
+    return this._layout()
   }
 
   /**
    * Expand white space
    *
    * @param {String[]} names
-   * @param {Number[]} span
+   * @param {Number[]} timeSpan
    * @param {Number} scale
-   * @param {Array} constraints
    *
    * @example
    * - scale: >1
@@ -217,19 +243,13 @@ export default class iStoryline extends CharacterStore {
    *
    * @return graph
    */
-  expand(names, span, scale = 2, ctrs = []) {
-    // Update constraints
-    if (ctrs.length > 0) {
-      this.ctrInfo.addCtrs(ctrs);
-    } else if (logNameError("Expand", names) && logTimeError("Expand", span)) {
-      this.ctrInfo.addCtr({
-        names: names,
-        timeSpan: span,
-        style: "Expand",
-        param: { scale: scale }
-      });
+  expand(names, timeSpan, scale = 2) {
+    if (names.length === 2 && timeSpan.length === 2) {
+      this._constraintStore.add(names, timeSpan, 'Expand', { scale: scale })
+    } else {
+      logConstraintError('Expand')
     }
-    return this._layout();
+    return this._layout()
   }
 
   /**
@@ -241,87 +261,18 @@ export default class iStoryline extends CharacterStore {
    * @return graph
    */
   space(intraSep, interSep) {
-    this.ctrInfo.updateCtr({
-      names: [],
-      timeSpan: [],
-      style: "Scale",
-      param: {
-        intraSep: intraSep,
-        interSep: interSep
-      }
-    });
-    return this._layout();
-  }
-
-  /**
-   * Merge lines
-   *
-   * @param {String[]} names
-   * @param {Number[]} span
-   * @param {Array} constraints
-   *
-   * @example
-   * - constraint: {
-   *   "names": ['name1', 'name2', ...],
-   *   "timeSpan": [t1, t2],
-   *   "style": 'Merge',
-   *   "param": {}
-   * }
-   *
-   * @return graph
-   */
-  merge(names, span, ctrs = []) {
-    // Update constraints
-    if (ctrs.length > 0) {
-      this.ctrInfo.addCtrs(ctrs);
-    } else if (logNameError("Merge", names, 2) && logTimeError("Merge", span)) {
-      this.ctrInfo.addCtr({
-        names: names,
-        timeSpan: span,
-        style: "Merge",
-        param: {}
-      });
-    }
-    return this._layout();
-  }
-
-  /**
-   * Split merged lines
-   *
-   * @param {String[]} names
-   * @param {Number[]} span
-   * @param {Array} constraints
-   *
-   * @example
-   * - constraint: {
-   *   "names": ['name1', 'name2', ...],
-   *   "timeSpan": [t1, t2],
-   *   "style": 'Split',
-   *   "param": {}
-   * }
-   *
-   * @return graph
-   */
-  split(names, span, ctrs = []) {
-    // Update constraints
-    if (ctrs.length > 0) {
-      this.ctrInfo.addCtrs(ctrs);
-    } else if (logNameError("Split", names, 2) && logTimeError("Split", span)) {
-      this.ctrInfo.addCtr({
-        names: names,
-        timeSpan: span,
-        style: "Split",
-        param: {}
-      });
-    }
-    return this._layout();
+    this._constraintStore.add([], [], 'Space', {
+      intraSep: intraSep,
+      interSep: interSep,
+    })
+    return this._layout()
   }
 
   /**
    * Change line paths
    *
    * @param {String[]} names
-   * @param {Number[]} span
+   * @param {Number[]} timeSpan
    * @param {Point[]} path
    * @param {Array} constraints
    *
@@ -330,32 +281,29 @@ export default class iStoryline extends CharacterStore {
    *   "names": ['name'],
    *   "timeSpan": [t1, t2],
    *   "style": 'Adjust',
-   *   "param": {'path': [[x1, y1], [x2, y2], ...]}
+   *   "param": {'path': [x1, y1, x2, y2, ...]}
    * }
-   * - point: [x, y]
    *
    * @return graph
    */
-  adjust(names, span, path, ctrs = []) {
-    // Update constraints
-    if (ctrs.length > 0) {
-      this.ctrInfo.addCtrs(ctrs);
-    } else if (logNameError("Adjust", names) && logTimeError("Adjust", span)) {
-      this.ctrInfo.addCtr({
-        names: names,
-        timeSpan: span,
-        style: "Adjust",
-        param: { path: path }
-      });
+  adjust(names, timeSpan, path) {
+    if (
+      names.length === 1 &&
+      timeSpan.length === 2 &&
+      timeSpan[1] > timeSpan[0]
+    ) {
+      this._constraintStore.add(names, timeSpan, 'Adjust', { path: path })
+    } else {
+      logConstraintError('Adjust')
     }
-    return this._layout();
+    return this._layout()
   }
 
   /**
    * Relate lines acccording to the semantic connections
    *
    * @param {String[]} names
-   * @param {Number[]} span
+   * @param {Number[]} timeSpan
    * @param {String} style
    * @param {Array} constraints
    *
@@ -363,37 +311,27 @@ export default class iStoryline extends CharacterStore {
    * - constraint: {
    *   "names": ['name1', 'name2'],
    *   "timeSpan": [t1, t2],
-   *   "style": 'Twine' | 'Knot' | 'Collide',
+   *   "style": 'Twine' | 'Knot' | 'Collide' | 'Merge' | 'Split',
    *   "param": {}
    * }
    *
    * @return graph
    */
-  relate(names, span, style, ctrs = []) {
-    // Update constraints
-    if (ctrs.length > 0) {
-      this.ctrInfo.addCtrs(ctrs);
-    } else if (
-      logNameError("Relate", names, 2) &&
-      logTimeError("Relate", span)
-    ) {
-      this.ctrInfo.addCtr({
-        names: names,
-        timeSpan: span,
-        style: style,
-        param: {}
-      });
+  relate(names, timeSpan, style) {
+    if (names.length === 2 && timeSpan.length === 2) {
+      this._constraintStore.add(names, timeSpan, style, {})
+    } else {
+      logConstraintError('Relate')
     }
-    return this._layout();
+    return this._layout()
   }
 
   /**
    * Set the style of lines
    *
    * @param {String[]} names
-   * @param {Number[]} span
+   * @param {Number[]} timeSpan
    * @param {String} style
-   * @param {Array} constraints
    *
    * @example
    * - constraint: {
@@ -405,59 +343,32 @@ export default class iStoryline extends CharacterStore {
    *
    * @return graph
    */
-  stylish(names, span, style, ctrs = []) {
-    // Update constraints
-    if (ctrs.length > 0) {
-      this.ctrInfo.addCtrs(ctrs);
-    } else if (
-      logNameError("Stylish", names, 2) &&
-      logTimeError("Stylish", span)
-    ) {
-      this.ctrInfo.addCtr({
-        names: names,
-        timeSpan: span,
-        style: style,
-        param: {}
-      });
+  stylish(names, timeSpan, style) {
+    if (names.length === 1 && timeSpan.length === 2) {
+      this._constraintStore.add(names, timeSpan, style, {})
+    } else {
+      logConstraintError('Stylish')
     }
-    return this._layout();
+    return this._layout()
   }
 
   /**
-   * Reshape the layout of storyline visualization
+   * Reshape the layout.
    *
-   * @param {Point[]} upperPath
-   * @param {Point[]} lowerPath
-   * @param {Number} innerRadius
-   * @param {Number} outerRadius
-   * @param {Number} range
-   * -----
+   * @param {Number[]} upperPath
+   * @param {Number[]} lowerPath
    *
    * @example
-   * - points: [[x1, y1], [x2, y2], ...]
+   * - path: [x1, y1, x2, y2, ...]
    *
    * @return graph
    */
-  reshape(
-    upperPath = [],
-    lowerPath = [],
-    range = 2.16,
-    innerRadius = 100,
-    outerRadius = 200
-  ) {
-    this.ctrInfo.updateCtr({
-      names: [],
-      timeSpan: [],
-      style: "Reshape",
-      param: {
-        upperPath: upperPath,
-        lowerPath: lowerPath,
-        innerRadius: innerRadius,
-        outerRadius: outerRadius,
-        range: range
-      }
-    });
-    return this._layout();
+  reshape(upperPath = [], lowerPath = []) {
+    this._constraintStore.add([], [], 'Reshape', {
+      upperPath: upperPath,
+      lowerPath: lowerPath,
+    })
+    return this._layout()
   }
 
   /**
@@ -471,19 +382,14 @@ export default class iStoryline extends CharacterStore {
    *
    * @return graph
    */
-  scale(x0, y0, width, height, reserveRatio) {
-    this.ctrInfo.updateCtr({
-      names: [],
-      timeSpan: [],
-      style: "Scale",
-      param: {
-        x0: x0 || 0,
-        y0: y0 || 0,
-        width: width || 1000,
-        height: height || 372,
-        reserveRatio: reserveRatio || false
-      }
-    });
-    return this._layout();
+  scale(x0 = 0, y0 = 0, width = 1000, height = 372, reserveRatio = false) {
+    this._constraintStore.add([], [], 'Reshape', {
+      x0: x0,
+      y0: y0,
+      width: width,
+      height: height,
+      reserveRatio: reserveRatio,
+    })
+    return this._layout()
   }
 }

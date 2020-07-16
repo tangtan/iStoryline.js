@@ -1,15 +1,12 @@
-import { greedyAlign } from "./greedyAlign";
-import { alignModelError } from "../utils";
+import { greedyAlign } from './greedyAlign'
+import { logGeneratorError } from '../utils/logger'
 
-export function storyAlign(alignModule, sequence, constraints) {
-  switch (alignModule) {
-    case "GreedyAlign":
-      return greedyAlign(
-        sequence,
-        constraints.filter(ctrs => ctrs.style === "Straighten"),
-        constraints.filter(ctrs => ctrs.style === "Bend")
-      );
+export function storyAlign(generator, story, constraints) {
+  switch (generator) {
+    case 'GreedyAlign':
+      greedyAlign(story, constraints)
+      break
     default:
-      alignModelError(alignModule);
+      logGeneratorError(generator)
   }
 }
