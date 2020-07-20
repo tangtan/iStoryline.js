@@ -24,7 +24,7 @@ function getParam(story, constraints) {
       if (sortTable.value(id, time) !== 0) num.push(id)
     }
     num.sort((a, b) => {
-      sortTable.value(a, time) - sortTable.value(b, time)
+      return sortTable.value(a, time) - sortTable.value(b, time)
     })
     characterIdInOrder.push(num)
     let sessionInOrderSet = new Set()
@@ -109,7 +109,7 @@ function calculateSlotHeight(slots, slotId, characterIdInOrder, sessionTable) {
 }
 
 function insert2Array(pos, array, element) {
-  array.splice(number, 0, element)
+  array.splice(pos, 0, element)
 }
 
 function sessionIdTime2SlotId(slots, sessionId, time) {

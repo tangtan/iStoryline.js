@@ -18,16 +18,19 @@ function getParam(story, constraints) {
   let height = sortTable.rows
   let width = sortTable.cols
   let characterIdInOrder = []
-  constraints = constraints.filter(constraint => {
+  let constraintsAlign = constraints.filter(constraint => {
     return constraint.style === 'Align'
   })
+  let constraintsBend = constraints.filter(
+    constraint => constraint.style == 'Bend'
+  )
   for (let time = 0; time < width; time++) {
     let num = []
     for (let id = 0; id < height; id++) {
       if (sortTable.value(id, time) !== 0) num.push(id)
     }
     num.sort((a, b) => {
-      sortTable.value(a, time) - sortTable.value(b, time)
+      return sortTable.value(a, time) - sortTable.value(b, time)
     })
     characterIdInOrder.push(num)
   }
@@ -43,17 +46,28 @@ function getParam(story, constraints) {
       ) {
         const id1 = characterIdInOrder[time][cha]
         const id2 = characterIdInOrder[time + 1][chaInNextTime]
-        let isConstraint = false
-        for (let constraint of constraints) {
+        let isConstraint = 0
+        for (let constraint of constraintsAlign) {
           if (
             constraint.names[0] === id1 &&
             constraint.names[0] === id2 &&
             constraint.timeSpan[0] <= time &&
             constraint.timeSpan[1] >= time
           )
-            isConstraint = true
+            isConstraint = 1
         }
-        if (isConstraint) rewardInEachCha.push(Number.MAX_SAFE_INTEGER)
+        for (let constraint of constraintsBend) {
+          if (
+            constraint.names[0] === id1 &&
+            constraint.names[0] === id2 &&
+            constraint.timeSpan[0] <= time &&
+            constraint.timeSpan[1] >= time
+          )
+            isConstraint = 2
+        }
+        if (isConstraint == 1) rewardInEachCha.push(Number.MAX_SAFE_INTEGER)
+        else if (isConstraint == 2)
+          rewardInEachCha.push(-Number.MAX_SAFE_INTEGER)
         else
           rewardInEachCha.push(
             solveReward(id1, id2, time, sessionTable, sortTable)
@@ -86,6 +100,7 @@ function runAlgorithms(param) {
     for (let idOrder = 0; idOrder < alignAns.length; idOrder++) {
       let alignId = alignAns[idOrder]
       if (alignAns[idOrder] === undefined) alignId = -1
+      else alignId = characterIdInOrder[time + 1][alignId]
 
       ans.replace(characterIdInOrder[time][idOrder], time, alignId)
     }
