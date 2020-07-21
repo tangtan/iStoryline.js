@@ -270,7 +270,7 @@ export function dealElementConstraints(list, constraints, listWeight) {
     let [first, second] = constraint
     let firstSetId = getSetId(first, list)
     let secondSetId = getSetId(second, list)
-    if (firstSetId === secondSetId) {
+    if (firstSetId === secondSetId && firstSetId !== -1) {
       setArr.union(
         listAllElement.indexOf(first),
         listAllElement.indexOf(second)

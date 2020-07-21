@@ -18,8 +18,9 @@ function getParam(story, constraints) {
   let height = sortTable.rows
   let width = sortTable.cols
   let characterIdInOrder = []
+  // debugger
   let constraintsAlign = constraints.filter(constraint => {
-    return constraint.style === 'Align'
+    return constraint.style === 'Straighten'
   })
   let constraintsBend = constraints.filter(
     constraint => constraint.style == 'Bend'
@@ -49,8 +50,8 @@ function getParam(story, constraints) {
         let isConstraint = 0
         for (let constraint of constraintsAlign) {
           if (
-            constraint.names[0] === id1 &&
-            constraint.names[0] === id2 &&
+            story.getCharacterID(constraint.names[0]) === id1 &&
+            story.getCharacterID(constraint.names[0]) === id2 &&
             constraint.timeSpan[0] <= time &&
             constraint.timeSpan[1] >= time
           )
@@ -58,8 +59,8 @@ function getParam(story, constraints) {
         }
         for (let constraint of constraintsBend) {
           if (
-            constraint.names[0] === id1 &&
-            constraint.names[0] === id2 &&
+            story.getCharacterID(constraint.names[0]) === id1 &&
+            story.getCharacterID(constraint.names[0]) === id2 &&
             constraint.timeSpan[0] <= time &&
             constraint.timeSpan[1] >= time
           )
