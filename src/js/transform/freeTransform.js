@@ -6,6 +6,7 @@ export function scale(story, constraints) {
   })
   const position = story.getTable('position')
   const character = story.getTable('character')
+  const layout = story.getTable('layout')
   const positions = story.positions
   if (ctrs.length < 1) return position
   const { x0, y0, width, height, reserveRatio } = ctrs[0].param
@@ -17,7 +18,7 @@ export function scale(story, constraints) {
     pos[i] = []
     for (let j = 0, m = story.getTableCols(); j < m; j++) {
       pos[i][j] = []
-      if (character.value(i, j)) {
+      if (character.value(i, j) && layout.value(i, j) >= 0) {
         const storySegment = positions[position.value(i, j)]
         storySegment.forEach(node => {
           pos[i][j].push([
@@ -30,6 +31,7 @@ export function scale(story, constraints) {
       }
     }
   }
+  console.log('oldpos', JSON.stringify(story.positions[0]))
   const newPosition = genNewPosition(story, pos)
   return newPosition
 }
@@ -37,14 +39,17 @@ export function scale(story, constraints) {
 export function genNewPosition(story, pos) {
   story.cleanPositions()
   const character = story.getTable('character')
+  const layout = story.getTable('layout')
   let tpos = []
   for (let i = 0; i < pos.length; i++) {
     tpos[i] = []
     for (let j = 0; j < pos[i].length; j++) {
       tpos[i][j] = null
-      if (character.value(i, j)) tpos[i][j] = story.addPosition(pos[i][j])
+      if (character.value(i, j) && layout.value(i, j) >= 0)
+        tpos[i][j] = story.addPosition(pos[i][j])
     }
   }
+  console.log('newpos', pos[0][0])
   const newPosition = new Table(tpos)
   return newPosition
 }
@@ -52,6 +57,7 @@ export function genNewPosition(story, pos) {
 export function getBoundary(story) {
   const position = story.getTable('position')
   const character = story.getTable('character')
+  const layout = story.getTable('layout')
   const positions = story.positions
   let minX = 1e9,
     maxX = -1e9,
@@ -59,7 +65,7 @@ export function getBoundary(story) {
     maxY = -1e9
   for (let i = 0, n = story.getTableRows(); i < n; i++) {
     for (let j = 0, m = story.getTableCols(); j < m; j++) {
-      if (character.value(i, j)) {
+      if (character.value(i, j) && layout.value(i, j) >= 0) {
         const storySegment = positions[position.value(i, j)]
         storySegment.forEach(node => {
           minX = Math.min(minX, node[0])
@@ -79,17 +85,18 @@ function freeTransform(story, constraints) {
   return pathTable
 }
 
-function genPath(story, constraints) {
+export function genPath(story, constraints) {
   story.cleanPaths()
   // const position = story.getTable('position')
   const position = scale(story, constraints)
   const character = story.getTable('character')
+  const layout = story.getTable('layout')
   const positions = story.positions
   let path = []
   for (let i = 0, n = story.getTableRows(); i < n; i++) {
     path[i] = []
     for (let j = 0, m = story.getTableCols(); j < m; j++) {
-      if (character.value(i, j)) {
+      if (character.value(i, j) && layout.value(i, j) >= 0) {
         const segment = positions[position.value(i, j)]
         let pathStr = `M ${segment[0][0]} ${segment[0][1]} `
         for (let k = 1, len = segment.length; k < len; k++) {

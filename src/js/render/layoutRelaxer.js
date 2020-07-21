@@ -21,11 +21,12 @@ export class LayoutRelaxer {
   layoutRelax(story) {
     const timeline = story.timeline
     const character = story.getTable('character')
+    const layout = story.getTable('layout')
     let originX = this.newArray(story.getTableRows(), story.getTableCols())
     for (let i = 0, len = story.getTableRows(); i < len; i++) {
       for (let j = 0, len = story.getTableCols(); j < len; j++) {
         originX[i][j] = []
-        if (character.value(i, j) === 0) {
+        if (character.value(i, j) === 0 || layout.value(i, j) < 0) {
           originX[i][j] = [-1, -1]
         } else {
           originX[i][j][0] = this.time2origX(timeline[j], 0)
@@ -40,6 +41,7 @@ export class LayoutRelaxer {
   _getRenderX(originX, story) {
     const layout = story.getTable('layout')
     const character = story.getTable('character')
+
     let renderX = []
     for (let i = 0, n = story.getTableRows(); i < n; i++) {
       renderX[i] = []
@@ -49,15 +51,19 @@ export class LayoutRelaxer {
     for (let j = 0, m = story.getTableCols(); j < m; j++) {
       let oriY = []
       for (let i = 0, n = story.getTableRows(); i < n; i++) {
-        if (character.value(i, j) === 1)
+        if (character.value(i, j) === 1 && layout.value(i, j) >= 0)
           oriY.push({
             y: layout.value(i, j),
             ny:
-              j === m - 1 || !character.value(i, j + 1)
+              j === m - 1 ||
+              !character.value(i, j + 1) ||
+              layout.value(i, j + 1) < 0
                 ? -1
                 : layout.value(i, j + 1),
             py:
-              j === 0 || !character.value(i, j - 1)
+              j === 0 ||
+              !character.value(i, j - 1) ||
+              layout.value(i, j - 1) < 0
                 ? -1
                 : layout.value(i, j - 1),
             id: i,
