@@ -1,7 +1,5 @@
 import { Table } from '../data/table'
 import { DISTANCE_IN, DISTANCE_OUT } from '../utils/CONSTANTS'
-import { number } from 'mathjs'
-import { constant } from 'lodash'
 
 export function greedySlotCompact(story, constraints) {
   const param = getParam(story, constraints)
@@ -121,6 +119,7 @@ function calculateSlotHeight(slots, slotId, characterIdInOrder, sessionTable) {
 }
 
 function insert2Array(pos, array, element) {
+  //splice没有insert2Array的意思直接
   array.splice(pos, 0, element)
 }
 
@@ -135,7 +134,6 @@ function runAlgorithms(param) {
   let {
     story,
     sessionTable,
-    sortTable,
     alignTable,
     height,
     width,
@@ -219,6 +217,7 @@ function runAlgorithms(param) {
         firstAlignCharacter++
       ) {
         let Id = thisSlot[firstAlignCharacter]
+        if (Id === -1) continue
         let alignCharacterId = alignTable.value(Id, time)
         if (nextSlot.indexOf(alignCharacterId) !== -1) {
           firstAlignCharacterNum = firstAlignCharacter
