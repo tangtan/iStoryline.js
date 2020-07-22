@@ -2,15 +2,15 @@
 <Story>
   <Locations>
     <Location Name="火车" Color="#E9F0E5" Visible="true" Sessions="23" />
-    <Location Name="鹅城" Color="#EAE7F1" Visible="true" Sessions="25,29,30,74,75,7,  55,56,57,39,28,79,81,69,78" />
-    <Location Name="碉楼" Color="#E2DFE9" Visible="true" Sessions="61, 62, 63, 12 ,13, 42,43,44,73" />
+    <Location Name="鹅城" Color="#EAE7F1" Visible="true" Sessions="25,29,30,74,75,7,55,56,57,39,28,79,81,69,78" />
+    <Location Name="碉楼" Color="#E2DFE9" Visible="true" Sessions="61,62,63,12,13,42,43,44,73" />
     <Location Name="城外" Color="#FFF0E8" Visible="true" Sessions="9" />
     <Location Name="上海" Color="#EDEDED" Visible="true" Sessions="48, 49, 50" />
-    <Location Name="All" Color="#FFFFFF" Visible="false" Sessions="0, 1, 2, 3, 4, 5,6, 8, 10, 11, 15, 14, 16, 17, 18, 19, 22, 21, 20, 24, 26, 27, 32, 34, 33, 35, 36, 37, 38, 40, 41, 46, 45, 47, 51, 52, 53, 54, 58, 59, 60, 64, 65, 66, 67, 68, 70, 71, 72, 76, 77, 80, 82, 83, 84" />
+    <Location Name="All" Color="#FFFFFF" Visible="false" Sessions="1, 2, 3, 4, 5,6, 8, 10, 11, 15, 14, 16, 17, 18, 19, 22, 21, 20, 24, 26, 27, 32, 34, 33, 35, 36, 37, 38, 40, 41, 46, 45, 47, 51, 52, 53, 54, 58, 59, 60, 64, 65, 66, 67, 68, 70, 71, 72, 76, 77, 80, 82, 83, 84, 85" />
   </Locations>
   <Characters>
     <Character Name="黄四郎" Color="#1acad5" Weight="4">
-      <Span Start="0" End="32" Session="0"/>
+      <Span Start="0" End="32" Session="85"/>
       <Span Start="32" End="43" Session="1"/>
       <Span Start="43" End="50" Session="2"/>
       <Span Start="50" End="75" Session="3"/>

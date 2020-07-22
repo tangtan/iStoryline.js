@@ -7,7 +7,6 @@
       "城外": [9],
       "上海": [48, 49, 50],
       "All": [
-        0,
         1,
         2,
         3,
@@ -60,15 +59,16 @@
         80,
         82,
         83,
-        84
+        84,
+        85
       ]
     },
     "Characters": {
       "黄四郎": [
-        { "Start": 0, "End": 15, "Session": 0 },
-        { "Start": 15, "End": 20, "Session": 0 },
-        { "Start": 20, "End": 28, "Session": 0 },
-        { "Start": 28, "End": 32, "Session": 0 },
+        { "Start": 0, "End": 15, "Session": 85 },
+        { "Start": 15, "End": 20, "Session": 85 },
+        { "Start": 20, "End": 28, "Session": 85 },
+        { "Start": 28, "End": 32, "Session": 85 },
         { "Start": 32, "End": 37, "Session": 1 },
         { "Start": 37, "End": 42, "Session": 1 },
         { "Start": 42, "End": 43, "Session": 1 },

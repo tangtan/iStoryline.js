@@ -1,18 +1,17 @@
 <Story>
   <Locations>
-  	
 		<Location Name="DAGOBAH" Color="#E8EFE4" Visible="true" Sessions="45,49,57,77" />
-		<Location Name="DEATH STAR" Color="#EDEDED" Visible="true" Sessions="0,9,18,19,16,17,20,23,26,27,28,61,81,87,84,88,89,90,91" />
+		<Location Name="DEATH STAR" Color="#EDEDED" Visible="true" Sessions="93,9,18,19,16,17,20,23,26,27,28,61,81,87,84,88,89,90,91" />
 		<Location Name="HOTH" Color="#D9F2FC" Visible="true" Sessions="32,34,35,36,38" />
 		<Location Name="YAVIN 4" Color="#E1EFEF" Visible="true" Sessions="22,21,24,30,31,33" />
 		<Location Name="CLOUD CITY" Color="#DFE4F1" Visible="true" Sessions="40,42,43,44,47,48,50,51,53,54,59,58,62,63" />
 		<Location Name="ENDOR" Color="#E2DFE9" Visible="true" Sessions="82,85,92" />
 		<Location Name="TATOOINE" Color="#FFF0E8" Visible="true" Sessions="4,5,6,3,10,12,11,13,14,15,52,60,65,66,68,69,70,72,73,74,75,79,83" />
-  <Location Name="All" Color="#000000" Visible="false" Sessions="1,2,8,7,25,29,37,41,39,46,56,55,64,67,71,76,78,80,86"/>
+    <Location Name="All" Color="#000000" Visible="false" Sessions="1,2,8,7,25,29,37,41,39,46,56,55,64,67,71,76,78,80,86"/>
   </Locations>
   <Characters>
     <Character Id="0" Name="VADER" Color="#000000" Weight="1">
-      <Span Start="0" End="7" Session="0" />
+      <Span Start="0" End="7" Session="93" />
       <Span Start="7" End="22" Session="9" />
       <Span Start="22" End="33" Session="16" />
       <Span Start="33" End="35" Session="20" />

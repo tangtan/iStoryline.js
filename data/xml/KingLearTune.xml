@@ -1,11 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Story>
   <Locations>
-    <Location Name="All" Visible="False" Color="Black" Sessions="55,58, 59,60,63,68,73,75,78,79,80,81,82,84,87,94,99">           
-      
-      <Location Name="King Lear's palace" Visible="True" Color="#fab688" Sessions="0,1,2,3,4, 51" >
+    <Location Name="All" Visible="False" Color="Black" Sessions="55,58,59,60,63,68,73,75,78,79,80,81,82,84,87,94,99">
+      <Location Name="King Lear's palace" Visible="True" Color="#fab688" Sessions="103,1,2,3,4,51" >
       </Location>
-      <Location Name="Albany's palace" Visible="True" Color="#f3d2aa" Sessions="7, 52, 53, 76, 77,95" >
+      <Location Name="Albany's palace" Visible="True" Color="#f3d2aa" Sessions="7, 52, 53, 76, 77, 95" >
         <Location Name="Hall" Visible="True" Color="#fb8794" Sessions="8, 9, 10, 11, 12, 13" >
         </Location>
         <Location Name="Court" Visible="True" Color="#cef370" Sessions="14" >
@@ -90,7 +89,7 @@
       <Span Start="150" End="155" Session="30"/>
     </Character>
     <Character Name="KENT" Color="#42c3ec">
-      <Span Start="0" End="5" Session="0"/>
+      <Span Start="0" End="5" Session="103"/>
       <Span Start="5" End="10" Session="1"/>
       <Span Start="45" End="50" Session="9"/>
       <Span Start="50" End="55" Session="10"/>
@@ -121,7 +120,7 @@
       <Span Start="250" End="255" Session="50"/>
     </Character>
     <Character Name="GLOUCESTER" Color="#0e5e89">
-      <Span Start="0" End="5" Session="0"/>
+      <Span Start="0" End="5" Session="103"/>
       <Span Start="5" End="10" Session="1"/>
       <Span Start="10" End="15" Session="2"/>
       <Span Start="15" End="25" Session="97"/>
@@ -148,7 +147,7 @@
       <Span Start="195" End="200" Session="39"/>
     </Character>
     <Character Name="EDMUND" Color="#f16878" Weight="4">
-      <Span Start="0" End="5" Session="0"/>
+      <Span Start="0" End="5" Session="103"/>
       <Span Start="5" End="25" Session="90"/>
       <Span Start="25" End="30" Session="5"/>
       <Span Start="30" End="35" Session="6"/>

@@ -3,7 +3,6 @@
     "Locations": {
       "INSIDE SMITH": [60, 61],
       "THE MATRIX": [
-        0,
         2,
         3,
         4,
@@ -50,7 +49,8 @@
         57,
         59,
         62,
-        64
+        64,
+        67
       ],
       "NEBAKANEZER": [
         1,
@@ -74,7 +74,7 @@
     },
     "Characters": {
       "TRINITY": [
-        { "Start": 0, "End": 3, "Session": 0 },
+        { "Start": 0, "End": 3, "Session": 67 },
         { "Start": 3, "End": 6, "Session": 1 },
         { "Start": 6, "End": 10, "Session": 1 },
         { "Start": 10, "End": 14, "Session": 4 },
@@ -118,7 +118,7 @@
         { "Start": 98, "End": 100, "Session": 66 }
       ],
       "BROWN": [
-        { "Start": 0, "End": 3, "Session": 0 },
+        { "Start": 0, "End": 3, "Session": 67 },
         { "Start": 3, "End": 6, "Session": 2 },
         { "Start": 6, "End": 10, "Session": 2 },
         { "Start": 10, "End": 14, "Session": 2 },
@@ -161,7 +161,7 @@
         { "Start": 98, "End": 100, "Session": 64 }
       ],
       "SMITH": [
-        { "Start": 0, "End": 3, "Session": 0 },
+        { "Start": 0, "End": 3, "Session": 67 },
         { "Start": 3, "End": 6, "Session": 2 },
         { "Start": 6, "End": 10, "Session": 2 },
         { "Start": 10, "End": 14, "Session": 2 },
@@ -199,7 +199,7 @@
         { "Start": 88, "End": 90, "Session": 60 }
       ],
       "JONES": [
-        { "Start": 0, "End": 3, "Session": 0 },
+        { "Start": 0, "End": 3, "Session": 67 },
         { "Start": 3, "End": 6, "Session": 2 },
         { "Start": 6, "End": 10, "Session": 2 },
         { "Start": 10, "End": 14, "Session": 2 },

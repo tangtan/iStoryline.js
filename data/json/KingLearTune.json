@@ -1,33 +1,8 @@
 {
   "Story": {
     "Locations": {
-      "All": [
-        19,
-        20,
-        21,
-        22,
-        23,
-        24,
-        55,
-        59,
-        60,
-        65,
-        68,
-        73,
-        78,
-        79,
-        80,
-        82,
-        83,
-        84,
-        87,
-        94,
-        98,
-        99,
-        103,
-        104
-      ],
-      "King Lear's palace": [0, 1, 2, 3, 4, 51, 105],
+      "All": [55, 59, 60, 68, 73, 78, 79, 80, 82, 84, 87, 94, 99],
+      "King Lear's palace": [1, 2, 3, 4, 51, 103],
       "Albany's palace": [7, 52, 53, 76, 77, 95],
       "Hall": [8, 9, 10, 11, 12, 13],
       "Court": [14],
@@ -68,12 +43,10 @@
     },
     "Characters": {
       "King Lear": [
-        { "Start": 5, "End": 7, "Session": 105 },
-        { "Start": 7, "End": 10, "Session": 105 },
+        { "Start": 5, "End": 10, "Session": 1 },
         { "Start": 10, "End": 15, "Session": 2 },
         { "Start": 15, "End": 20, "Session": 51 },
-        { "Start": 20, "End": 22, "Session": 51 },
-        { "Start": 22, "End": 25, "Session": 51 },
+        { "Start": 20, "End": 25, "Session": 51 },
         { "Start": 25, "End": 30, "Session": 51 },
         { "Start": 30, "End": 35, "Session": 52 },
         { "Start": 35, "End": 40, "Session": 52 },
@@ -144,10 +117,8 @@
         { "Start": 150, "End": 155, "Session": 30 }
       ],
       "KENT": [
-        { "Start": 0, "End": 1, "Session": 0 },
-        { "Start": 1, "End": 5, "Session": 105 },
-        { "Start": 5, "End": 7, "Session": 105 },
-        { "Start": 7, "End": 10, "Session": 105 },
+        { "Start": 0, "End": 5, "Session": 103 },
+        { "Start": 5, "End": 10, "Session": 1 },
         { "Start": 45, "End": 50, "Session": 9 },
         { "Start": 50, "End": 55, "Session": 10 },
         { "Start": 55, "End": 60, "Session": 11 },
@@ -192,14 +163,11 @@
         { "Start": 250, "End": 255, "Session": 50 }
       ],
       "GLOUCESTER": [
-        { "Start": 0, "End": 1, "Session": 0 },
-        { "Start": 1, "End": 5, "Session": 105 },
-        { "Start": 5, "End": 7, "Session": 105 },
-        { "Start": 7, "End": 10, "Session": 105 },
+        { "Start": 0, "End": 5, "Session": 103 },
+        { "Start": 5, "End": 10, "Session": 1 },
         { "Start": 10, "End": 15, "Session": 2 },
         { "Start": 15, "End": 20, "Session": 97 },
-        { "Start": 20, "End": 22, "Session": 97 },
-        { "Start": 22, "End": 25, "Session": 97 },
+        { "Start": 20, "End": 25, "Session": 97 },
         { "Start": 25, "End": 30, "Session": 5 },
         { "Start": 30, "End": 35, "Session": 96 },
         { "Start": 35, "End": 40, "Session": 96 },
@@ -237,14 +205,11 @@
         { "Start": 195, "End": 200, "Session": 39 }
       ],
       "EDMUND": [
-        { "Start": 0, "End": 1, "Session": 0 },
-        { "Start": 1, "End": 5, "Session": 0 },
-        { "Start": 5, "End": 7, "Session": 90 },
-        { "Start": 7, "End": 10, "Session": 90 },
+        { "Start": 0, "End": 5, "Session": 103 },
+        { "Start": 5, "End": 10, "Session": 90 },
         { "Start": 10, "End": 15, "Session": 90 },
         { "Start": 15, "End": 20, "Session": 90 },
-        { "Start": 20, "End": 22, "Session": 90 },
-        { "Start": 22, "End": 25, "Session": 90 },
+        { "Start": 20, "End": 25, "Session": 90 },
         { "Start": 25, "End": 30, "Session": 5 },
         { "Start": 30, "End": 35, "Session": 6 },
         { "Start": 35, "End": 40, "Session": 91 },
@@ -328,8 +293,7 @@
         { "Start": 250, "End": 255, "Session": 50 }
       ],
       "CORDELIA": [
-        { "Start": 5, "End": 7, "Session": 1 },
-        { "Start": 7, "End": 10, "Session": 1 },
+        { "Start": 5, "End": 10, "Session": 1 },
         { "Start": 10, "End": 15, "Session": 2 },
         { "Start": 15, "End": 20, "Session": 3 },
         { "Start": 180, "End": 185, "Session": 36 },
@@ -347,12 +311,10 @@
         { "Start": 240, "End": 245, "Session": 57 }
       ],
       "REGAN ": [
-        { "Start": 5, "End": 7, "Session": 1 },
-        { "Start": 7, "End": 10, "Session": 1 },
+        { "Start": 5, "End": 10, "Session": 1 },
         { "Start": 10, "End": 15, "Session": 2 },
         { "Start": 15, "End": 20, "Session": 3 },
-        { "Start": 20, "End": 22, "Session": 4 },
-        { "Start": 22, "End": 25, "Session": 4 },
+        { "Start": 20, "End": 25, "Session": 4 },
         { "Start": 25, "End": 30, "Session": 73 },
         { "Start": 30, "End": 35, "Session": 73 },
         { "Start": 35, "End": 40, "Session": 73 },
@@ -397,12 +359,10 @@
         { "Start": 230, "End": 235, "Session": 46 }
       ],
       "GONERIL": [
-        { "Start": 5, "End": 7, "Session": 1 },
-        { "Start": 7, "End": 10, "Session": 1 },
+        { "Start": 5, "End": 10, "Session": 1 },
         { "Start": 10, "End": 15, "Session": 2 },
         { "Start": 15, "End": 20, "Session": 3 },
-        { "Start": 20, "End": 22, "Session": 4 },
-        { "Start": 22, "End": 25, "Session": 4 },
+        { "Start": 20, "End": 25, "Session": 4 },
         { "Start": 25, "End": 30, "Session": 76 },
         { "Start": 30, "End": 35, "Session": 76 },
         { "Start": 35, "End": 40, "Session": 7 },
@@ -448,12 +408,10 @@
         { "Start": 235, "End": 240, "Session": 47 }
       ],
       "ALBANY  ": [
-        { "Start": 5, "End": 7, "Session": 1 },
-        { "Start": 7, "End": 10, "Session": 1 },
+        { "Start": 5, "End": 10, "Session": 1 },
         { "Start": 10, "End": 15, "Session": 2 },
         { "Start": 15, "End": 20, "Session": 3 },
-        { "Start": 20, "End": 22, "Session": 4 },
-        { "Start": 22, "End": 25, "Session": 4 },
+        { "Start": 20, "End": 25, "Session": 4 },
         { "Start": 25, "End": 30, "Session": 76 },
         { "Start": 30, "End": 35, "Session": 76 },
         { "Start": 35, "End": 40, "Session": 7 },
@@ -550,19 +508,7 @@
         { "Start": 10, "End": 15, "Session": 2 },
         { "Start": 15, "End": 20, "Session": 3 }
       ],
-      "CURAN": [{ "Start": 75, "End": 80, "Session": 15 }],
-      "TT": [
-        { "Start": 1, "End": 5, "Session": 103 },
-        { "Start": 5, "End": 7, "Session": 103 },
-        { "Start": 7, "End": 10, "Session": 103 }
-      ],
-      "TT3": [
-        { "Start": 1, "End": 5, "Session": 104 },
-        { "Start": 7, "End": 10, "Session": 104 },
-        { "Start": 10, "End": 15, "Session": 104 },
-        { "Start": 15, "End": 20, "Session": 104 },
-        { "Start": 20, "End": 22, "Session": 104 }
-      ]
+      "CURAN": [{ "Start": 75, "End": 80, "Session": 15 }]
     }
   }
 }

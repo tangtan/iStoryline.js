@@ -55,7 +55,9 @@ export class Story {
    * @param {string} fileType
    * @returns
    */
-  async load(fileUrl, fileType) {
+  async load(fileUrl) {
+    const fileSeps = fileUrl.split('.')
+    const fileType = fileSeps[fileSeps.length - 1]
     if (fileType === 'xml') {
       const xml = await d3Fetch.xml(fileUrl)
       parseXMLFile(xml, this)

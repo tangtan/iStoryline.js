@@ -22,19 +22,49 @@ export class Graph {
   constructor(story) {
     this._story = story
     this._storylines = []
-    this._positions = []
+    this._storylinePaths = []
+    const characterTable = this.getTable('character')
+    const positionTable = this.getTable('position')
+    const pathTable = this.getTable('path')
+    const rows = this.getTableRows()
+    const cols = this.getTableCols()
+    for (let row = 0; row < rows; row++) {
+      let segments = []
+      let segmentPaths = []
+      for (let col = 0; col < cols; col++) {
+        let characterStatus = characterTable.value(row, col)
+        if (characterStatus > 0) {
+          let positionId = positionTable.value(row, col)
+          let segment = this._story._positions[positionId]
+          segments.push(segment)
+          let pathId = pathTable.value(row, col)
+          let path = this._story._paths[pathId]
+          segmentPaths.push(path)
+        }
+      }
+      if (segments.length > 0) {
+        this._storylines.push(segments)
+      }
+      if (segmentPaths.length > 0) {
+        this._storylinePaths.push(segmentPaths)
+      }
+    }
   }
 
   get characters() {
     return this._story.characters
   }
 
-  get storylines() {
-    return this._story.paths
-  }
-
   get locations() {
     return this._story.locations
+  }
+
+  get storylines() {
+    return this._storylines
+  }
+
+  get storylinePaths() {
+    return this._storylinePaths
   }
 
   getTable(tableName) {

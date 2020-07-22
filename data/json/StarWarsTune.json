@@ -3,7 +3,6 @@
     "Locations": {
       "DAGOBAH": [45, 49, 57, 77],
       "DEATH STAR": [
-        0,
         9,
         16,
         17,
@@ -21,7 +20,8 @@
         88,
         89,
         90,
-        91
+        91,
+        93
       ],
       "HOTH": [32, 34, 35, 36, 38],
       "YAVIN 4": [21, 22, 24, 30, 31, 33],
@@ -75,8 +75,8 @@
     },
     "Characters": {
       "VADER": [
-        { "Start": 0, "End": 2, "Session": 0 },
-        { "Start": 2, "End": 7, "Session": 0 },
+        { "Start": 0, "End": 2, "Session": 93 },
+        { "Start": 2, "End": 7, "Session": 93 },
         { "Start": 7, "End": 12, "Session": 9 },
         { "Start": 12, "End": 15, "Session": 9 },
         { "Start": 15, "End": 17, "Session": 9 },

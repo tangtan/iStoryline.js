@@ -1,14 +1,12 @@
 <Story>
   <Locations>
     <Location Name="INSIDE SMITH" Color="#e7f7de" Visible="true" Sessions="60, 61" />
-    <Location Name="THE MATRIX" Color="#EEEEEE" Visible="true" Sessions="0, 2, 3, 4, 6, 5, 7, 9, 8, 10, 11, 15, 14, 17, 18, 22, 21, 20, 24, 23, 26, 25, 27, 28, 29, 32, 31, 30, 34, 33, 37, 38, 41, 43, 46, 45, 47, 48, 49, 50, 51, 52, 56, 55, 57, 59, 62, 64" />
-
+    <Location Name="THE MATRIX" Color="#EEEEEE" Visible="true" Sessions="67, 2, 3, 4, 6, 5, 7, 9, 8, 10, 11, 15, 14, 17, 18, 22, 21, 20, 24, 23, 26, 25, 27, 28, 29, 32, 31, 30, 34, 33, 37, 38, 41, 43, 46, 45, 47, 48, 49, 50, 51, 52, 56, 55, 57, 59, 62, 64" />
     <Location Name="NEBAKANEZER" Color="#e3e2f8" Visible="true" Sessions="1, 12, 13, 16, 19, 35, 36, 39, 40, 42, 44, 53, 54, 58, 63, 65, 66" />
-
   </Locations>
   <Characters>
     <Character Id="0" Name="TRINITY" Color="#ff5d70">
-      <Span Start="0" End="3" Session="0" />
+      <Span Start="0" End="3" Session="67" />
       <Span Start="3" End="10" Session="1" />
       <Span Start="10" End="14" Session="4" />
       <Span Start="14" End="20" Session="5" />
@@ -42,7 +40,7 @@
       <Span Start="98" End="100" Session="66" />
     </Character>
     <Character Id="1" Name="BROWN" Color="#a1a897">
-      <Span Start="0" End="3" Session="0" />
+      <Span Start="0" End="3" Session="67" />
       <Span Start="3" End="16" Session="2" />
       <Span Start="16" End="17" Session="7" />
       <Span Start="17" End="30" Session="8" />
@@ -63,7 +61,7 @@
       <Span Start="96" End="100" Session="64" />
     </Character>
     <Character Id="2" Name="SMITH" Color="#5A5A5A">
-      <Span Start="0" End="3" Session="0" />
+      <Span Start="0" End="3" Session="67" />
       <Span Start="3" End="16" Session="2" />
       <Span Start="16" End="17" Session="7" />
       <Span Start="17" End="30" Session="8" />
@@ -82,7 +80,7 @@
       <Span Start="88" End="90" Session="60" />
     </Character>
     <Character Id="3" Name="JONES" Color="#7a816f">
-      <Span Start="0" End="3" Session="0" />
+      <Span Start="0" End="3" Session="67" />
       <Span Start="3" End="16" Session="2" />
       <Span Start="16" End="17" Session="7" />
       <Span Start="17" End="30" Session="8" />
