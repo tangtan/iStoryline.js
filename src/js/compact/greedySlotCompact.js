@@ -1,6 +1,5 @@
 import { Table } from '../data/table'
 import { DISTANCE_IN, DISTANCE_OUT } from '../utils/CONSTANTS'
-import { number } from 'mathjs'
 
 export function greedySlotCompact(story, constraints) {
   const param = getParam(story, constraints)
@@ -24,7 +23,7 @@ function getParam(story, constraints) {
       if (sortTable.value(id, time) !== 0) num.push(id)
     }
     num.sort((a, b) => {
-      sortTable.value(a, time) - sortTable.value(b, time)
+      return sortTable.value(a, time) - sortTable.value(b, time)
     })
     characterIdInOrder.push(num)
     let sessionInOrderSet = new Set()
@@ -55,7 +54,16 @@ function getParam(story, constraints) {
     sessionAlignMaps.push(sessionAlignMap)
   }
 
+  let constraintsCompress = constraints.filter(
+    constraint => constraint.style == 'Compress'
+  )
+
+  let constraintsExpand = constraints.filter(
+    constraint => constraint.style == 'Expand'
+  )
+
   return {
+    story,
     alignTable,
     sessionTable,
     sortTable,
@@ -64,6 +72,8 @@ function getParam(story, constraints) {
     characterIdInOrder,
     sessionAlignMaps,
     sessionInOrder,
+    constraintsExpand,
+    constraintsCompress,
   }
 }
 
@@ -109,7 +119,8 @@ function calculateSlotHeight(slots, slotId, characterIdInOrder, sessionTable) {
 }
 
 function insert2Array(pos, array, element) {
-  array.splice(number, 0, element)
+  //splice没有insert2Array的意思直接
+  array.splice(pos, 0, element)
 }
 
 function sessionIdTime2SlotId(slots, sessionId, time) {
@@ -121,14 +132,16 @@ function sessionIdTime2SlotId(slots, sessionId, time) {
 
 function runAlgorithms(param) {
   let {
+    story,
     sessionTable,
-    sortTable,
     alignTable,
     height,
     width,
     characterIdInOrder,
     sessionInOrder,
     sessionAlignMaps,
+    constraintsExpand,
+    constraintsCompress,
   } = param
   let ans = new Table()
   ans.resize(height, width, -1)
@@ -190,7 +203,44 @@ function runAlgorithms(param) {
         slots[slotsId][time]
       )
     }
-  //TODO align character
+  for (let slotsId = 0; slotsId < slots.length; slotsId++)
+    for (let time = 0; time < width - 1; time++) {
+      if (slots[slotsId][time] === -1) continue
+      let thisSlot = slotsOfCharacter[slotsId][time]
+      let nextSlot = slotsOfCharacter[slotsId][time + 1]
+      if (nextSlot === undefined) continue
+      let firstAlignCharacterNum = -1
+      let alignCharacterNumInNextTime = -1
+      for (
+        let firstAlignCharacter = 0;
+        firstAlignCharacter < thisSlot.length;
+        firstAlignCharacter++
+      ) {
+        let Id = thisSlot[firstAlignCharacter]
+        if (Id === -1) continue
+        let alignCharacterId = alignTable.value(Id, time)
+        if (nextSlot.indexOf(alignCharacterId) !== -1) {
+          firstAlignCharacterNum = firstAlignCharacter
+          alignCharacterNumInNextTime = nextSlot.indexOf(alignCharacterId)
+          break
+        }
+      }
+      if (firstAlignCharacterNum === -1) continue
+      //在前面所有的加-1，在后面这个加-1
+      if (firstAlignCharacterNum > alignCharacterNumInNextTime) {
+        let loss = firstAlignCharacterNum - alignCharacterNumInNextTime
+        for (; loss > 0; loss--) nextSlot.unshift(-1)
+      }
+      if (firstAlignCharacterNum < alignCharacterNumInNextTime) {
+        let loss = alignCharacterNumInNextTime - firstAlignCharacterNum
+        for (let lastTime = 0; lastTime <= time; lastTime++) {
+          for (let lossnum = 0; lossnum < loss; lossnum++) {
+            if (slotsOfCharacter[slotsId][lastTime] !== undefined)
+              slotsOfCharacter[slotsId][lastTime].unshift(-1)
+          }
+        }
+      }
+    }
   let baseHeightArray = new Array(slots.length)
   for (
     let slotsOfCharacterId = 0;
@@ -214,7 +264,45 @@ function runAlgorithms(param) {
         characterI++
       ) {
         const characterId = charactersInThisSlot[characterI]
-        const Height = baseHeight + characterI * DISTANCE_IN
+        if (characterId === -1) continue
+        let scale = 1
+        let idNum = 0
+        let isCompress = false
+        let isExpand = false
+        if (constraintsCompress && constraintsCompress.length > 0)
+          isCompress = constraintsCompress.some(constraint => {
+            idNum = constraint.names.indexOf(
+              story.getCharacterName(characterId)
+            )
+            if (
+              idNum !== -1 &&
+              constraint.timeSpan[0] <= time &&
+              constraint.timeSpan[1] >= time
+            ) {
+              scale = constraint.param.scale
+              return true
+            }
+            return false
+          })
+        if (constraintsExpand && constraintsExpand.length > 0)
+          isExpand = constraintsExpand.some(constraint => {
+            idNum = constraint.names.indexOf(
+              story.getCharacterName(characterId)
+            )
+            if (
+              idNum !== -1 &&
+              constraint.timeSpan[0] <= time &&
+              constraint.timeSpan[1] >= time
+            ) {
+              scale = constraint.param.scale
+              return true
+            }
+            return false
+          })
+        let Height = baseHeight + characterI * DISTANCE_IN
+        if (isExpand) Height += idNum * DISTANCE_IN * (scale - 1)
+        else if (isCompress) Height -= idNum * DISTANCE_IN * (1 - scale)
+
         ans.replace(characterId, time, Height)
       }
     }

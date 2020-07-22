@@ -222,6 +222,7 @@ export function dealSetConstraints(list, constraints, listWeight) {
     let [first, second] = constraint
     let firstSetId = getSetId(first, list)
     let secondSetId = getSetId(second, list)
+    if (firstSetId === -1 || secondSetId === -1) continue
     if (firstSetId !== secondSetId) {
       setArr.union(firstSetId, secondSetId)
       let sumWeight = 0
@@ -248,7 +249,7 @@ export function getSetId(element, setArr) {
       return setArr.indexOf(set)
     }
   }
-  console.error("Can't find this element in any set!")
+  // console.error("Can't find this element in any set!")
   return -1
 }
 
@@ -269,7 +270,7 @@ export function dealElementConstraints(list, constraints, listWeight) {
     let [first, second] = constraint
     let firstSetId = getSetId(first, list)
     let secondSetId = getSetId(second, list)
-    if (firstSetId === secondSetId) {
+    if (firstSetId === secondSetId && firstSetId !== -1) {
       setArr.union(
         listAllElement.indexOf(first),
         listAllElement.indexOf(second)

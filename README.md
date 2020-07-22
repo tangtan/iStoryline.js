@@ -7,11 +7,12 @@
 
 iStoryline.js is a JavaScript library for producing storyline visualizations with diverse sketchy styles. [Storyline visualization](https://xkcd.com/657/) is a fancy way to tell a story. Lines represent characters in the story. This fancy visualization naturally has some advantages in explaining the story:
 
-- The undulations of the lines can vividly represent the evolution of the plot.
-- The interval between the lines can also display the relation of the characters in a concise and quick manner.
+- The overall trend of the lines can vividly represent the evolution of the plot.
+- The interval between the lines can also display the relation of the characters.
 
-The abundant messages of the textual stories are usually hard to be received by appreciators in a short time. As a result, storyline visualizations have become prevalent recently. Many automatic methods have been developed to generate storylines. However, these methods cannot always capture the inherent features of stories (e.g., actor mode, plot evolution). Thus, iStoryline aims to provide various interactions for users to design storyline visualizations with their design talents while minimizing the design efforts through an automatic layout module.
+![storylines](https://user-images.githubusercontent.com/18184786/88198333-2cea9600-cc76-11ea-83fa-bbf2676fc61d.png)
 
+Example storyline visualizations created using iStoryline.js. The styles and visual labels are customized manually to embellish the storylines.
 For more information, please check [our paper](http://www.tantang.org/publication/2018_infovis_istoryline/2018_infovis_istoryline.pdf) and the [supplement material](https://istoryline.github.io/).
 
 ## Installation
@@ -35,16 +36,16 @@ import iStoryline from "iStoryline.js"
 let iStoryliner = new iStoryline();
 
 // generate storyline visualizations from the story script
-let storyScriptUrl = './data/Redcap.xml';
+let storyScriptUrl = './data/xml/Redcap.xml';
 
 // graph can be drawed using any canvas or svg libraries
-let graph = iStoryliner.load(storyScriptUrl, fileType='xml');
+let graph = iStoryliner.load(storyScriptUrl);
 
 // obtain the characters names
 console.log(graph.characters);  // ['Red cap', 'Mother', 'Wolf', 'GrandMa']
 
 // obtain the paths of the characters
-console.log(graph.storylines);  // [[x1, y1, x2, y2, ...], ...]
+console.log(graph.storylines);  // [[[x1, y1], [x2, y2], ...], ...]
 ```
 
 ### TODO

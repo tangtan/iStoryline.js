@@ -28,7 +28,7 @@ export class PathSmoother {
     for (let i = 0, n = story.getTableRows(); i < n; i++) {
       let curFlags = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
       for (let j = 0, m = story.getTableCols(); j < m; j++) {
-        if (!charater.value(i, j)) continue
+        if (!charater.value(i, j) || layout.value(i, j) < 0) continue
         const { lineNodes, curFlag } = this.linkLine(
           [
             [

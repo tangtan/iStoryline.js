@@ -6,6 +6,7 @@ function transform(story, constraints) {
   })
   const position = story.getTable('position')
   const character = story.getTable('character')
+  const layout = story.getTable('layout')
   const positions = story.positions
   if (ctrs.length < 1) return position
   const { upperPath, lowerPath } = ctrs[ctrs.length - 1].param
@@ -18,7 +19,7 @@ function transform(story, constraints) {
     for (let j = 0, m = story.getTableCols(); j < m; j++) {
       pos[i][j] = []
       tpos[i][j] = null
-      if (character.value(i, j)) {
+      if (character.value(i, j) && layout.value(i, j) >= 0) {
         const storySegment = positions[position.value(i, j)]
         for (let k = 0, len = storySegment.length; k < len; k++) {
           const rY = (storySegment[k][1] - minY) / (maxY - minY)

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Story>
+  <Locations>    
+    <Location Name="All" Id="0" Visible="False" Color="Black" Sessions="0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16"/>
+  </Locations>
+  <Characters>
+    <Character Name="荣国">
+      <Span Start="1" End="2" Session="1" />
+      <Span Start="2" End="3" Session="7" />
+      <Span Start="3" End="4" Session="9" />
+      <Span Start="4" End="5" Session="10" />
+    </Character>
+    <Character Name="尚华">
+      <Span Start="1" End="2" Session="2" />
+      <Span Start="2" End="3" Session="7" />
+      <Span Start="3" End="4" Session="9" />
+      <Span Start="4" End="5" Session="10" />
+      <Span Start="5" End="6" Session="11" />
+    </Character>
+    <Character Name="石宇">
+      <Span Start="1" End="2" Session="3" />
+      <Span Start="2" End="3" Session="7" />
+      <Span Start="3" End="4" Session="9" />
+      <Span Start="4" End="5" Session="10" />
+      <Span Start="5" End="6" Session="11" />
+      <Span Start="6" End="7" Session="13" />
+      <Span Start="7" End="8" Session="15" />
+    </Character>
+    <Character Name="秀宇">
+      <Span Start="1" End="2" Session="4" />
+      <Span Start="2" End="3" Session="8" />
+      <Span Start="3" End="4" Session="9" />
+      <Span Start="4" End="5" Session="10" />
+      <Span Start="5" End="6" Session="11" />
+      <Span Start="6" End="7" Session="13" />
+      <Span Start="7" End="8" Session="14" />
+      <Span Start="8" End="9" Session="16" />
+    </Character>
+    <Character Name="盛京">
+      <Span Start="1" End="2" Session="5" />
+      <Span Start="2" End="3" Session="8" />
+      <Span Start="3" End="4" Session="9" />
+      <Span Start="4" End="5" Session="10" />
+      <Span Start="5" End="6" Session="11" />
+      <Span Start="6" End="7" Session="13" />
+      <Span Start="7" End="8" Session="14" />
+      <Span Start="8" End="9" Session="16" />
+    </Character>
+    <Character Name="金常务">
+      <Span Start="1" End="4" Session="6" />
+      <Span Start="4" End="5" Session="10" />
+      <Span Start="5" End="6" Session="12" />
+      <Span Start="6" End="7" Session="13" />
+      <Span Start="7" End="8" Session="15" />
+    </Character>
+
+  </Characters>
+</Story>

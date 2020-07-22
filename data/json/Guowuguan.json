@@ -1,0 +1,56 @@
+{
+  "Story": {
+    "Locations": { "All": [1, 2, 3, 4, 5, 6] },
+    "Characters": {
+      "关羽": [
+        { "Start": 1, "End": 2, "Session": 1 },
+        { "Start": 2, "End": 3, "Session": 1 },
+        { "Start": 3, "End": 4, "Session": 2 },
+        { "Start": 4, "End": 5, "Session": 3 },
+        { "Start": 5, "End": 6, "Session": 4 },
+        { "Start": 6, "End": 7, "Session": 5 },
+        { "Start": 7, "End": 8, "Session": 6 }
+      ],
+      "孔秀": [
+        { "Start": 1, "End": 2, "Session": 2 },
+        { "Start": 2, "End": 3, "Session": 2 },
+        { "Start": 3, "End": 4, "Session": 2 }
+      ],
+      "韩福": [
+        { "Start": 1, "End": 2, "Session": 3 },
+        { "Start": 2, "End": 3, "Session": 3 },
+        { "Start": 3, "End": 4, "Session": 3 },
+        { "Start": 4, "End": 5, "Session": 3 }
+      ],
+      "孟坦": [
+        { "Start": 2, "End": 3, "Session": 3 },
+        { "Start": 3, "End": 4, "Session": 3 },
+        { "Start": 4, "End": 5, "Session": 3 }
+      ],
+      "卞喜": [
+        { "Start": 1, "End": 2, "Session": 4 },
+        { "Start": 2, "End": 3, "Session": 4 },
+        { "Start": 3, "End": 4, "Session": 4 },
+        { "Start": 4, "End": 5, "Session": 4 },
+        { "Start": 5, "End": 6, "Session": 4 }
+      ],
+      "王植": [
+        { "Start": 1, "End": 2, "Session": 5 },
+        { "Start": 2, "End": 3, "Session": 5 },
+        { "Start": 3, "End": 4, "Session": 5 },
+        { "Start": 4, "End": 5, "Session": 5 },
+        { "Start": 5, "End": 6, "Session": 5 },
+        { "Start": 6, "End": 7, "Session": 5 }
+      ],
+      "秦琪": [
+        { "Start": 1, "End": 2, "Session": 6 },
+        { "Start": 2, "End": 3, "Session": 6 },
+        { "Start": 3, "End": 4, "Session": 6 },
+        { "Start": 4, "End": 5, "Session": 6 },
+        { "Start": 5, "End": 6, "Session": 6 },
+        { "Start": 6, "End": 7, "Session": 6 },
+        { "Start": 7, "End": 8, "Session": 6 }
+      ]
+    }
+  }
+}

@@ -383,7 +383,7 @@ export default class iStoryline {
    * @return graph
    */
   scale(x0 = 0, y0 = 0, width = 1000, height = 372, reserveRatio = false) {
-    this._constraintStore.add([], [], 'Reshape', {
+    this._constraintStore.add([], [], 'Scale', {
       x0: x0,
       y0: y0,
       width: width,
