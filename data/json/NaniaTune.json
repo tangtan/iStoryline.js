@@ -1,0 +1,132 @@
+{
+  "Story": {
+    "Locations": {
+      "All": [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 100, 101, 102]
+    },
+    "Characters": {
+      "阿斯兰": [
+        { "Start": 11, "End": 12, "Session": 7 },
+        { "Start": 12, "End": 13, "Session": 7 },
+        { "Start": 13, "End": 14, "Session": 12 },
+        { "Start": 14, "End": 15, "Session": 12 },
+        { "Start": 15, "End": 16, "Session": 10 }
+      ],
+      "海狸": [
+        { "Start": 8, "End": 9, "Session": 5 },
+        { "Start": 9, "End": 10, "Session": 5 },
+        { "Start": 10, "End": 11, "Session": 5 },
+        { "Start": 11, "End": 12, "Session": 7 },
+        { "Start": 12, "End": 13, "Session": 7 },
+        { "Start": 13, "End": 14, "Session": 8 },
+        { "Start": 14, "End": 15, "Session": 8 },
+        { "Start": 15, "End": 16, "Session": 8 }
+      ],
+      "人羊": [
+        { "Start": 2, "End": 3, "Session": 2 },
+        { "Start": 3, "End": 4, "Session": 2 },
+        { "Start": 4, "End": 5, "Session": 100 },
+        { "Start": 5, "End": 6, "Session": 102 },
+        { "Start": 6, "End": 7, "Session": 102 },
+        { "Start": 7, "End": 8, "Session": 102 },
+        { "Start": 8, "End": 9, "Session": 102 },
+        { "Start": 9, "End": 10, "Session": 5 },
+        { "Start": 10, "End": 11, "Session": 5 },
+        { "Start": 11, "End": 12, "Session": 7 },
+        { "Start": 12, "End": 13, "Session": 7 },
+        { "Start": 13, "End": 14, "Session": 8 },
+        { "Start": 14, "End": 15, "Session": 8 },
+        { "Start": 15, "End": 16, "Session": 8 }
+      ],
+      "露西": [
+        { "Start": 1, "End": 2, "Session": 1 },
+        { "Start": 2, "End": 3, "Session": 2 },
+        { "Start": 3, "End": 4, "Session": 1 },
+        { "Start": 4, "End": 5, "Session": 100 },
+        { "Start": 5, "End": 6, "Session": 101 },
+        { "Start": 6, "End": 7, "Session": 1 },
+        { "Start": 7, "End": 8, "Session": 3 },
+        { "Start": 8, "End": 9, "Session": 3 },
+        { "Start": 9, "End": 10, "Session": 5 },
+        { "Start": 10, "End": 11, "Session": 5 },
+        { "Start": 11, "End": 12, "Session": 7 },
+        { "Start": 12, "End": 13, "Session": 7 },
+        { "Start": 13, "End": 14, "Session": 9 },
+        { "Start": 14, "End": 15, "Session": 9 },
+        { "Start": 15, "End": 16, "Session": 9 },
+        { "Start": 16, "End": 17, "Session": 11 },
+        { "Start": 17, "End": 18, "Session": 13 }
+      ],
+      "爱德蒙": [
+        { "Start": 1, "End": 2, "Session": 1 },
+        { "Start": 2, "End": 3, "Session": 1 },
+        { "Start": 3, "End": 4, "Session": 1 },
+        { "Start": 4, "End": 5, "Session": 14 },
+        { "Start": 5, "End": 6, "Session": 101 },
+        { "Start": 6, "End": 7, "Session": 1 },
+        { "Start": 7, "End": 8, "Session": 3 },
+        { "Start": 8, "End": 9, "Session": 3 },
+        { "Start": 9, "End": 10, "Session": 5 },
+        { "Start": 10, "End": 11, "Session": 6 },
+        { "Start": 11, "End": 12, "Session": 6 },
+        { "Start": 12, "End": 13, "Session": 7 },
+        { "Start": 13, "End": 14, "Session": 10 },
+        { "Start": 14, "End": 15, "Session": 10 },
+        { "Start": 15, "End": 16, "Session": 10 },
+        { "Start": 16, "End": 17, "Session": 11 },
+        { "Start": 17, "End": 18, "Session": 13 }
+      ],
+      "彼得": [
+        { "Start": 1, "End": 2, "Session": 1 },
+        { "Start": 2, "End": 3, "Session": 1 },
+        { "Start": 3, "End": 4, "Session": 1 },
+        { "Start": 4, "End": 5, "Session": 1 },
+        { "Start": 5, "End": 6, "Session": 1 },
+        { "Start": 6, "End": 7, "Session": 1 },
+        { "Start": 7, "End": 8, "Session": 3 },
+        { "Start": 8, "End": 9, "Session": 3 },
+        { "Start": 9, "End": 10, "Session": 5 },
+        { "Start": 10, "End": 11, "Session": 5 },
+        { "Start": 11, "End": 12, "Session": 7 },
+        { "Start": 12, "End": 13, "Session": 7 },
+        { "Start": 13, "End": 14, "Session": 10 },
+        { "Start": 14, "End": 15, "Session": 10 },
+        { "Start": 15, "End": 16, "Session": 10 },
+        { "Start": 16, "End": 17, "Session": 11 },
+        { "Start": 17, "End": 18, "Session": 13 }
+      ],
+      "苏姗": [
+        { "Start": 1, "End": 2, "Session": 1 },
+        { "Start": 2, "End": 3, "Session": 1 },
+        { "Start": 3, "End": 4, "Session": 1 },
+        { "Start": 4, "End": 5, "Session": 1 },
+        { "Start": 5, "End": 6, "Session": 1 },
+        { "Start": 6, "End": 7, "Session": 1 },
+        { "Start": 7, "End": 8, "Session": 3 },
+        { "Start": 8, "End": 9, "Session": 3 },
+        { "Start": 9, "End": 10, "Session": 5 },
+        { "Start": 10, "End": 11, "Session": 5 },
+        { "Start": 11, "End": 12, "Session": 7 },
+        { "Start": 12, "End": 13, "Session": 7 },
+        { "Start": 13, "End": 14, "Session": 9 },
+        { "Start": 14, "End": 15, "Session": 9 },
+        { "Start": 15, "End": 16, "Session": 9 },
+        { "Start": 16, "End": 17, "Session": 11 },
+        { "Start": 17, "End": 18, "Session": 13 }
+      ],
+      "白女巫": [
+        { "Start": 4, "End": 5, "Session": 14 },
+        { "Start": 5, "End": 6, "Session": 6 },
+        { "Start": 6, "End": 7, "Session": 6 },
+        { "Start": 7, "End": 8, "Session": 6 },
+        { "Start": 8, "End": 9, "Session": 6 },
+        { "Start": 9, "End": 10, "Session": 6 },
+        { "Start": 10, "End": 11, "Session": 6 },
+        { "Start": 11, "End": 12, "Session": 6 },
+        { "Start": 12, "End": 13, "Session": 6 },
+        { "Start": 13, "End": 14, "Session": 12 },
+        { "Start": 14, "End": 15, "Session": 10 },
+        { "Start": 15, "End": 16, "Session": 10 }
+      ]
+    }
+  }
+}

@@ -2,7 +2,7 @@ import { logStoryInfo } from '../../src/js/utils/logger'
 import { drawInitial } from '../../src/js/utils/drawer'
 import iStoryline from '../../src/js'
 
-const filePath = '../../data/'
+const filePath = '../../data/xml/'
 const fileName = 'ChasingDragon.xml'
 
 async function main() {
