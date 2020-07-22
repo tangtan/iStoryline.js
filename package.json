@@ -37,7 +37,7 @@
   "dependencies": {
     "d3-fetch": "^1.1.2",
     "d3-scale": "^3.2.0",
-    "lodash": "^4.17.18",
+    "lodash": "^4.17.19",
     "mathjs": "^7.0.0",
     "quadprog": "^1.5.1",
     "simplify-js": "git+https://github.com/mourner/simplify-js.git",
