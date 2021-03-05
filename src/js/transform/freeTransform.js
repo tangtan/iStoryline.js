@@ -9,7 +9,7 @@ export function scale(story, constraints) {
   const layout = story.getTable('layout')
   const positions = story.positions
   if (ctrs.length < 1) return position
-  const { x0, y0, width, height, reserveRatio } = ctrs[0].param
+  const { x0, y0, width, height, reserveRatio } = ctrs[ctrs.length - 1].param
   const { minX, maxX, minY, maxY } = getBoundary(story)
   let pos = []
   let ratio = (maxY - minY) / (maxX - minX)
@@ -31,7 +31,6 @@ export function scale(story, constraints) {
       }
     }
   }
-  console.log('oldpos', JSON.stringify(story.positions[0]))
   const newPosition = genNewPosition(story, pos)
   return newPosition
 }
@@ -49,7 +48,6 @@ export function genNewPosition(story, pos) {
         tpos[i][j] = story.addPosition(pos[i][j])
     }
   }
-  console.log('newpos', pos[0][0])
   const newPosition = new Table(tpos)
   return newPosition
 }

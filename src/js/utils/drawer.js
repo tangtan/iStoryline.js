@@ -1,26 +1,26 @@
 import Snap from 'snapsvg'
 
-export function drawSegmentPath(pathStr) {
+export function drawSegmentPath(pathStr, defaultWidth = 2, hoverWidth = 4) {
   const svg = Snap('#mySvg')
   const pathSvg = svg.path(pathStr)
   pathSvg.hover(
     () => {
       pathSvg.attr({
         stroke: 'blue',
-        'stroke-width': 4,
+        'stroke-width': hoverWidth,
       })
     },
     () => {
       pathSvg.attr({
         stroke: 'black',
-        'stroke-width': 1,
+        'stroke-width': defaultWidth,
       })
     }
   )
   pathSvg.attr({
     fill: 'none',
     stroke: 'black',
-    'stroke-width': 1,
+    'stroke-width': defaultWidth,
   })
 }
 

@@ -1,6 +1,7 @@
 export class ConstraintStore {
   constructor() {
     this._constraints = []
+    // Default scale constraint
     this.add([], [], 'Scale', {
       x0: 100,
       y0: 100,
