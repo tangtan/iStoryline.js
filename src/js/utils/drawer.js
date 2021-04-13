@@ -28,9 +28,18 @@ export function drawStorylinePath(storylinePath) {
   storylinePath.forEach(segmentPath => drawSegmentPath(segmentPath))
 }
 
-export function drawStoryline(storyline) {
+export function drawStoryline(storyline, type = 'bezier') {
+  console.log(storyline)
   storyline.forEach(segment => {
-    const segmentPath = generateSimplePath(segment)
+    let segmentPath = ''
+    switch (type) {
+      case 'bezier':
+        segmentPath = generateBezierPath(segment)
+        break
+      default:
+        segmentPath = generateSmoothPath(segment)
+        break
+    }
     drawSegmentPath(segmentPath)
   })
 }
@@ -41,5 +50,23 @@ function generateSimplePath(points) {
   for (let i = 1, len = points.length; i < len; i++) {
     pathStr += `L ${points[i][0]} ${points[i][1]}`
   }
+  return pathStr
+}
+
+function generateBezierPath(points) {
+  if (points.length < 4) return generateSimplePath(points)
+  const pointsNum = points.length
+  let i = 0
+  let pathStr = `M ${points[i][0]} ${points[i][1]} C ${points[i + 1][0]} ${
+    points[i + 1][1]
+  } ${points[i + 2][0]} ${points[i + 2][1]} ${points[i + 3][0]} ${
+    points[i + 3][1]
+  }`
+  for (i = 4; i < pointsNum - 2; i += 2) {
+    pathStr += `S ${points[i][0]} ${points[i][1]} ${points[i + 1][0]} ${
+      points[i + 1][1]
+    }`
+  }
+  pathStr += ` L ${points[pointsNum - 1][0]} ${points[pointsNum - 1][1]}`
   return pathStr
 }

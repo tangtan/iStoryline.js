@@ -1,5 +1,5 @@
 {
-  "name": "iStoryline.js",
+  "name": "istorylinejs",
   "version": "0.0.1",
   "description": "Implementation of [iStoryline](http://www.tantang.org/publication/2018_infovis_istoryline/2018_infovis_istoryline.pdf)",
   "keywords": [
@@ -35,6 +35,7 @@
     }
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "d3-fetch": "^1.1.2",
     "d3-scale": "^3.2.0",
     "lodash": "^4.17.19",

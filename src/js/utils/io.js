@@ -134,11 +134,13 @@ export function parseJSONFile(json, story) {
   }
 }
 
+// @deprecated
 export function dumpXMLFile(fileName, story) {
   if (fileName.indexOf('.xml') == -1) fileName += '.xml '
   const JSONFile = generateJSONFile(story)
+  const xmlObj = json2xml(JSONFile)
   let builder = new xml2js.Builder()
-  let xml = builder.buildObject(JSONFile)
+  let xml = builder.buildObject(xmlObj)
   downloadFile(fileName, xml)
 }
 
@@ -184,6 +186,11 @@ function dumpJsonCharacters(story) {
     charactersJson[character] = spansJson
   }
   return charactersJson
+}
+
+// https://github.com/Leonidas-from-XIV/node-xml2js
+function json2xml(jsonFile) {
+  return jsonFile
 }
 
 function downloadFile(fileName, content) {

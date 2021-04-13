@@ -55,7 +55,7 @@ export class Story {
    * @param {string} fileType
    * @returns
    */
-  async load(fileUrl) {
+  async loadFile(fileUrl) {
     const fileSeps = fileUrl.split('.')
     const fileType = fileSeps[fileSeps.length - 1]
     if (fileType === 'xml') {
@@ -67,6 +67,15 @@ export class Story {
     } else {
       console.error('Wrong fileType!')
     }
+  }
+
+  /**
+   * load json object
+   * @param {Object} json
+   * @returns
+   */
+  loadJson(json) {
+    parseJSONFile(json, this)
   }
 
   /**

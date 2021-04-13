@@ -39,8 +39,19 @@ export default class iStoryline {
    * @param {String} fileUrl
    * - "./data/JurassicPark.xml"
    */
-  async load(fileUrl, fileType = 'xml') {
-    await this._story.load(fileUrl, fileType)
+  async loadFile(fileUrl, fileType = 'xml') {
+    await this._story.loadFile(fileUrl, fileType)
+    return this._layout()
+  }
+
+  /**
+   * Generate storyline visualizations from the input json.
+   *
+   * @param {Object} storyJson
+   * - https://github.com/tangtan/iStoryline.js/wiki/Story-Script
+   */
+  load(storyJson) {
+    this._story.loadJson(storyJson)
     return this._layout()
   }
 
@@ -75,8 +86,9 @@ export default class iStoryline {
     return new Graph(_story)
   }
 
-  dump(fileName, fileType) {
-    this._story.dump(fileName, fileType)
+  // Only enable download json file.
+  dump(fileName) {
+    this._story.dump(fileName, 'json')
   }
 
   addCharacter(character, timeRange) {
