@@ -6,12 +6,12 @@ import { ALPHA } from '../utils/CONSTANTS'
  * @param {constraints} Object
  */
 export function greedyAlign(story, constraints) {
-  const param = getParam(story, constraints)
-  const alignTable = runAlgorithms(param)
+  const params = getParams(story, constraints)
+  const alignTable = runAlgorithm(params)
   story.setTable('align', alignTable)
 }
 
-function getParam(story, constraints) {
+function getParams(story, constraints) {
   let sortTable = story.getTable('sort')
   let chaTable = story.getTable('character')
   let sessionTable = story.getTable('session')
@@ -87,7 +87,7 @@ function getParam(story, constraints) {
   }
 }
 
-function runAlgorithms(param) {
+function runAlgorithm(param) {
   let ans = new Table(-1)
   let { height, width, rewardArr, characterIdInOrder } = param
   ans.resize(height, width, -1)
@@ -106,11 +106,6 @@ function runAlgorithms(param) {
       ans.replace(characterIdInOrder[time][idOrder], time, alignId)
     }
   }
-  // double check
-  // for (let chaId=0;chaId<height;chaId++)
-  //   for (let time=0;time<width;time++)
-  //     if (chaTable.value(chaId,time)===0) ans.replace(chaId,time,-1)
-  // console.log(ans);
   return ans
 }
 

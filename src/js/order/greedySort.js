@@ -1,291 +1,178 @@
 import { Table } from '../data/table'
-import { DisjointSet } from '../utils/dataStruct'
 import { ORDER_TIMES } from '../utils/CONSTANTS'
 
-/**
- * @param {Story} story
- * @param {Number[][]} constraints
- */
-
 export function greedySort(story, constraints) {
-  const param = getParam(story, constraints)
-  const sortTable = runAlgorithms(param)
+  const params = getParams(story, constraints)
+  const sortTable = runAlgorithm(params, story.characters)
   story.setTable('sort', sortTable)
 }
 
 /**
+ * Convert story data into algorithm params
  * @param {Story} story
- * @param {Number[][]} constraints
- * @returns {Object}
+ * @param {Constraint[]} constraints
+ * @return [V, C][]
  */
-function getParam(story, constraints) {
-  let storySessionTable = story.getTable('session')
-  let height = storySessionTable.rows
-  let width = storySessionTable.cols
-  let charaterinSession = []
-  for (let time = 0; time < width; time++) {
-    charaterinSession.push([])
-    // Add a timeStamp
-    let sessionMap = new Map()
-    let sessionHash = 0
-    for (let characterID = 0; characterID < height; characterID++) {
-      let sessionID = storySessionTable.value(characterID, time)
-      if (sessionID !== 0 && !sessionMap.has(sessionID)) {
-        sessionMap.set(sessionID, sessionHash)
-        sessionHash += 1
-        charaterinSession[time].push([characterID])
-        // Add a session at this timeStamp
-      } else if (sessionID !== 0) {
-        charaterinSession[time][sessionMap.get(sessionID)].push(characterID)
+function getParams(story, constraints) {
+  const sessionTable = story.getTable('session')
+  const charactersLength = story.getTableRows()
+  const timeStepsLength = story.getTableCols()
+  const params = []
+  // Trasverse sessions
+  for (let _step = 0; _step < timeStepsLength; _step++) {
+    const vertexs = []
+    for (let _char = 0; _char < charactersLength; _char++) {
+      const sessionID = sessionTable.value(_char, _step)
+      const charName = story.characters[_char]
+      if (sessionID > 0) {
+        const _vertex = new Vertex(charName, sessionID, _char)
+        let flag = true
+        for (let i = 0; i < vertexs.length; i++) {
+          if (vertexs[i].sessionID === sessionID) {
+            vertexs[i].list.push(_vertex)
+            flag = false
+            break
+          }
+        }
+        if (flag) {
+          vertexs.push(_vertex)
+        }
       }
     }
+    params.push([vertexs, []]) // [V, C]
   }
-  let constantSort = constraints.filter(constraint => {
-    return constraint.style === 'Sort'
+  // Trasverse constraints
+  constraints.forEach(ctr => {
+    if (ctr.style === 'Sort') {
+      const [srcCharName, endCharName] = ctr.names
+      const [startTimeStamp, endTimeStamp] = ctr.timeSpan
+      const startTimeStep = story.getTimeStep(startTimeStamp)
+      const endTimeStep = story.getTimeStep(endTimeStamp)
+      if (startTimeStep && endTimeStep && endTimeStep >= startTimeStep) {
+        for (let _step = startTimeStep; _step < endTimeStep; _step++) {
+          const paramsInStep = params[_step]
+          const vertexs = paramsInStep[0]
+          const vertexPair = new VertexPair(srcCharName, endCharName, vertexs)
+          paramsInStep[1].push(vertexPair)
+        }
+      }
+    }
   })
-  let constraintAtAllTime = []
-  for (let time = 0; time < width; time++) {
-    let constraintAtThisTime = []
-    for (let constraint of constantSort) {
-      if (time >= constraint.timeSpan[0] && time <= constraint.timeSpan[1]) {
-        let names = constraint.names
-        constraintAtThisTime.push([
-          story.getCharacterID(names[0]),
-          story.getCharacterID(names[1]),
-        ])
-      }
-    }
-    constraintAtAllTime.push(constraintAtThisTime)
-  }
-  return {
-    charaterinSession,
-    height,
-    width,
-    constraints: constraintAtAllTime,
-  }
+  return params
 }
 
 /**
- *
- * @param {Number[]} order
- * @param {Number} height 多少人
- * @returns {Number[]}
+ * Invoke algorithm module
+ * @param {[V, C][]} params
+ * @param {string[]} characters
+ * @return {Table} sortTable
  */
-function order2mat(order, height) {
+function runAlgorithm(params, characters) {
+  for (let orderTime = 0; orderTime < ORDER_TIMES; orderTime++) {
+    // forward sorting
+    for (let i = 0; i < params.length - 1; i++) {
+      const V1 = params[i][0]
+      const V2 = params[i + 1][0]
+      const C = params[i + 1][1]
+      constrainedCrossingReduction(V1, V2, C)
+    }
+    // backward sorting
+    for (let i = params.length - 1; i > 0; i--) {
+      const V1 = params[i][0]
+      const V2 = params[i - 1][0]
+      const C = params[i - 1][1]
+      constrainedCrossingReduction(V1, V2, C)
+    }
+  }
+  // update permutation
+  const ans = []
+  characters.forEach(charName => {
+    const charOrders = []
+    for (let col = 0; col < params.length; col++) {
+      const vertexs = params[col][0]
+      const _vertex = findCharacterVertex(charName, vertexs)
+      if (_vertex) {
+        charOrders.push(_vertex.order + 1) // 0 is invalid in sortTable
+      } else {
+        charOrders.push(0)
+      }
+    }
+    ans.push(charOrders)
+  })
+  return new Table(ans)
+}
+
+/**
+ * CONSTRAINED-CROSSING-REDUCTION
+ * https://link.springer.com/chapter/10.1007/978-3-540-31843-9_22
+ * @param {Vertex[]} V1 anchored vertex list (position fixed)
+ * @param {Vertex[]} V2 vertex list to be reordered
+ * @param {VertexPair[]} C constrained orders of V2
+ * @return {Vertex[]} permutation of V2
+ */
+function constrainedCrossingReduction(V1, V2, C) {
   let ans = []
-  for (let ID = 0; ID < height; ID++) {
-    let orderID = order.indexOf(ID) + 1
-    ans.push(orderID) // 0代表不存在
-  }
-  return ans
-}
-
-/**
- * @param {Object} param
- * @returns {Table}
- */
-function runAlgorithms(param) {
-  let ans = new Table()
-  let { height, width, charaterinSession, constraints } = param
-  ans.resize(height, width)
-  let initOrder = constrainedCrossingReduction(
-    charaterinSession[0],
-    charaterinSession[0],
-    constraints[0]
-  )
-  let initOrderMat = order2mat(initOrder, height)
-  let replaceIndex = []
-  for (let i = 0; i < height; i++) replaceIndex.push(i)
-  ans.replace(replaceIndex, 0, initOrderMat)
-  let lastTimeOrder = initOrder
-  for (let ordertime = 0; ordertime < ORDER_TIMES; ordertime++) {
-    // Scan from the begin to the end
-    for (let time = 1; time < width; time++) {
-      let thisTimeOrder = constrainedCrossingReduction(
-        charaterinSession[time],
-        lastTimeOrder,
-        constraints[time]
-      )
-      let thisTimeOrderMat = order2mat(thisTimeOrder, height)
-      ans.replace(replaceIndex, time, thisTimeOrderMat)
-      lastTimeOrder = thisTimeOrder
-    }
-    // Scan from the end to the begin
-    for (let time = width - 2; time >= 0; time--) {
-      let thisTimeOrder = constrainedCrossingReduction(
-        charaterinSession[time],
-        lastTimeOrder,
-        constraints[time]
-      )
-      let thisTimeOrderMat = order2mat(thisTimeOrder, height)
-      ans.replace(replaceIndex, time, thisTimeOrderMat)
-      lastTimeOrder = thisTimeOrder
-    }
-  }
-  return ans
-}
-
-/**
- * @param {Number[][]} list1 第一个维度是集合，第二个维度是集合的元素
- * @param {Number[]} list2 元素的权重顺序
- * @param {Number[][]} constraints  元素的顺序约束
- * @return {Number[]} orderList  元素的顺序
- * @example
- * list1 = [[1,2,3],[5,6,4],[55,63]];
- * list2 = [4,63,55,3,5,6,2,1];
- * constraints = [[5,1],[1,55],[3,2],[1,3]];
- */
-
-export function constrainedCrossingReduction(list1, list2, constraints = []) {
-  let list1Weight = []
-  for (let arr of list1) {
-    let sumWeight = 0
-    for (let element of arr) {
-      sumWeight += getWeight(element, list2)
-    }
-    list1Weight.push(sumWeight / arr.length)
-  }
-  let [mapSetArr, setInDegree] = dealSetConstraints(
-    list1,
-    constraints,
-    list1Weight
-  )
-  let order = topoSort(mapSetArr, setInDegree, list1Weight)
-  list1.sort((a, b) => {
-    const indexA = list1.indexOf(a)
-    const indexB = list1.indexOf(b)
-    return order.indexOf(indexA) - order.indexOf(indexB)
+  V2.sort((a, b) => a.getBarycenterRoot(V1) - b.getBarycenterRoot(V1))
+  V2.forEach(vertex => {
+    vertex.list.sort(
+      (a, b) => a.getBarycenterLeaf(V1) - b.getBarycenterLeaf(V1)
+    )
+    ans = ans.concat(vertex.list)
   })
-  let allElementWeight = []
-  let allElement = []
-  list1.forEach(set => {
-    set.forEach(id => {
-      allElement.push(id)
-      allElementWeight.push(getWeight(id, list2))
+  ans.forEach((vertex, idx) => (vertex.order = idx))
+}
+
+function findViolatedContraint(V, C) {}
+
+class Vertex {
+  constructor(name, sessionID, order) {
+    this.name = name || 'dummy' // storyline character name, only valid when list.length === 1
+    this.sessionID = sessionID || 0 // storyline sessionID (must be positive)
+    this.order = order || 0 // permutation starts from 0
+    this.list = [this] // vertex list at least contain one vertex
+  }
+
+  // The way to calculate Barycenter has a significant impact on sorting results.
+  getBarycenterRoot(vertexs) {
+    const _list = this.list.map(_ => findCharacterVertex(_.name, vertexs))
+    let barycenter = 0
+    _list.forEach(vertex => {
+      if (vertex) barycenter += vertex.order
     })
-  })
-  let [mapElementArr, elementInDegree] = dealElementConstraints(
-    list1,
-    constraints,
-    allElementWeight
-  )
-  let elementOrder = topoSort(mapElementArr, elementInDegree, allElementWeight)
-  for (let arr of list1) {
-    arr.sort((a, b) => {
-      const indexA = allElement.indexOf(a)
-      const indexB = allElement.indexOf(b)
-      return elementOrder.indexOf(indexA) - elementOrder.indexOf(indexB)
-    })
+    return barycenter / this.degree
   }
-  let ans = []
-  list1.forEach(session => ans.push(...session))
-  return ans
+
+  getBarycenterLeaf(vertexs) {
+    const vertex = findCharacterVertex(this.name, vertexs)
+    return vertex ? vertex.order : this.order
+  }
+
+  get degree() {
+    return this.list.length
+  }
 }
 
-/**
- * Topological sort functions
- */
-export function topoSort(mapSetArr, inDegree, listWeight) {
-  let order = []
-  for (let i = 0; i < inDegree.length; i++) {
-    let minWeight = Number.MAX_SAFE_INTEGER
-    let pos = -1
-    for (let j = 0; j < inDegree.length; j++) {
-      if (inDegree[j] == 0 && listWeight[j] < minWeight) {
-        pos = j
-        minWeight = listWeight[j]
-      }
-    }
-    order.push(pos)
-    inDegree[pos] = -1
-    // Add to the order array
-    for (let i = 0; i < mapSetArr[pos].length; i++) {
-      if (mapSetArr[pos][i] !== undefined) {
-        inDegree[i] -= 1
+// src vertex must be ahead of end vertex
+class VertexPair {
+  constructor(srcCharName, endCharName, V) {
+    this.srcVertex = findCharacterVertex(srcCharName, V)
+    this.endVertex = findCharacterVertex(endCharName, V)
+  }
+}
+
+function findCharacterVertex(char, V) {
+  for (let i = 0; i < V.length; i++) {
+    for (let j = 0; j < V[i].list.length; j++) {
+      if (V[i].list[j].name === char) {
+        return V[i].list[j]
       }
     }
   }
-  return order
+  return null
 }
 
-export function dealSetConstraints(list, constraints, listWeight) {
-  let mapSetArr = []
-  // Transform constraint to edges in a graph
-  let inDegree = []
-  let setArr = new DisjointSet(list.length)
-  // Binding sets
-  list.forEach(x => {
-    mapSetArr.push([])
-    inDegree.push(0)
+function sum(arr) {
+  return arr.reduce(function(prev, curr) {
+    return prev + curr
   })
-  for (let constraint of constraints) {
-    let [first, second] = constraint
-    let firstSetId = getSetId(first, list)
-    let secondSetId = getSetId(second, list)
-    if (firstSetId === -1 || secondSetId === -1) continue
-    if (firstSetId !== secondSetId) {
-      setArr.union(firstSetId, secondSetId)
-      let sumWeight = 0
-      let allElement = setArr.allElementInSet(firstSetId)
-      allElement.forEach(id => (sumWeight += listWeight[id]))
-      for (let i = 0; i < allElement.length; i++) {
-        listWeight[allElement[i]] = sumWeight / allElement.length
-      }
-      mapSetArr[firstSetId][secondSetId] = 1
-      inDegree[secondSetId] += 1
-    }
-  }
-  return [mapSetArr, inDegree]
-}
-
-export function getWeight(id, list2) {
-  if (list2.indexOf(id) === -1) return 0
-  return list2.indexOf(id)
-}
-
-export function getSetId(element, setArr) {
-  for (let set of setArr) {
-    if (set.indexOf(element) !== -1) {
-      return setArr.indexOf(set)
-    }
-  }
-  // console.error("Can't find this element in any set!")
-  return -1
-}
-
-export function dealElementConstraints(list, constraints, listWeight) {
-  let listAllElement = []
-  list.forEach(x => {
-    listAllElement = [...listAllElement, ...x]
-  })
-  let mapElementArr = []
-  let inDegree = []
-  let setArr = new DisjointSet(listAllElement.length)
-
-  listAllElement.forEach(x => {
-    mapElementArr.push([])
-    inDegree.push(0)
-  })
-  for (let constraint of constraints) {
-    let [first, second] = constraint
-    let firstSetId = getSetId(first, list)
-    let secondSetId = getSetId(second, list)
-    if (firstSetId === secondSetId && firstSetId !== -1) {
-      setArr.union(
-        listAllElement.indexOf(first),
-        listAllElement.indexOf(second)
-      )
-      let allElement = setArr.allElementInSet(listAllElement.indexOf(first))
-      let sumWeight = 0
-      allElement.forEach(id => (sumWeight += listWeight[id]))
-      for (let i = 0; i < allElement.length; i++) {
-        listWeight[allElement[i]] = sumWeight / allElement.length
-      }
-      mapElementArr[listAllElement.indexOf(first)][
-        listAllElement.indexOf(second)
-      ] = 1
-      inDegree[listAllElement.indexOf(second)] += 1
-    }
-  }
-  return [mapElementArr, inDegree]
 }
