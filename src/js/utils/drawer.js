@@ -22,25 +22,28 @@ export function drawSegmentPath(pathStr, defaultWidth = 2, hoverWidth = 4) {
     stroke: 'black',
     'stroke-width': defaultWidth,
   })
+  return pathSvg
 }
 
 export function drawStorylinePath(storylinePath) {
   storylinePath.forEach(segmentPath => drawSegmentPath(segmentPath))
 }
 
-export function drawStoryline(storyline, type = 'bezier') {
-  console.log(storyline)
-  storyline.forEach(segment => {
+export function drawStoryline(character, storyline, type = 'simple') {
+  storyline.forEach((segment, idx) => {
     let segmentPath = ''
     switch (type) {
       case 'bezier':
         segmentPath = generateBezierPath(segment)
         break
       default:
-        segmentPath = generateSmoothPath(segment)
+        segmentPath = generateSimplePath(segment)
         break
     }
-    drawSegmentPath(segmentPath)
+    const segmentPathSvg = drawSegmentPath(segmentPath)
+    segmentPathSvg.click(() => {
+      console.log(character, idx)
+    })
   })
 }
 

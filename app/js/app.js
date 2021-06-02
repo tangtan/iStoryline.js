@@ -13,9 +13,12 @@ async function main(fileName) {
   graph = iStorylineInstance.scale(10, 10, windowW * 0.8, windowH / 2)
   logStoryInfo(iStorylineInstance._story)
   const storylines = graph.storylines
-  storylines.forEach(storyline => drawStoryline(storyline))
+  const characters = graph.characters
+  storylines.forEach((storyline, idx) =>
+    drawStoryline(characters[idx], storyline)
+  )
 }
-main('TrainToBusan.json')
+main('Coco.json')
 
 // function main2() {
 //   const iStoryliner = new iStoryline()

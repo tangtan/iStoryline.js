@@ -12,10 +12,7 @@ export const STYLE_LABELS = [
   'Merge',
   'Collide',
 ]
-export const TIME_UNIT = 100
-export const TIME_GAP = 80
-export const INNERGAPS = 10
-export const SCALE_GAP = 5
+
 export const RENDER_MODE = 'Smooth'
 
 // GreedyLayout Module

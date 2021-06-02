@@ -1,4 +1,7 @@
-import { TIME_UNIT, TIME_GAP, INNERGAPS, SCALE_GAP } from '../utils/CONSTANTS'
+const TIME_UNIT = 100
+const TIME_GAP_RATIO = 0.8
+const INNERGAPS = 10
+const SCALE_GAP = 5
 
 export class LayoutRelaxer {
   constructor(story, constraints) {
@@ -29,8 +32,10 @@ export class LayoutRelaxer {
         if (character.value(i, j) === 0 || layout.value(i, j) < 0) {
           originX[i][j] = [-1, -1]
         } else {
-          originX[i][j][0] = this.time2origX(timeline[j], 0)
-          originX[i][j][1] = this.time2origX(timeline[j + 1], 1)
+          originX[i][j][0] = timeline[j] * TIME_UNIT
+          originX[i][j][1] =
+            timeline[j + 1] * TIME_UNIT -
+            (timeline[j + 1] - timeline[j]) * TIME_UNIT * TIME_GAP_RATIO
         }
       }
     }
