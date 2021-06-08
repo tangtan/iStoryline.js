@@ -1,7 +1,7 @@
 import { StyleConfiger } from './styleConfiger'
 import { LayoutRelaxer } from './layoutRelaxer'
 import { Table } from '../data/table'
-import { STYLE_LABELS, RENDER_MODE } from '../utils/CONSTANTS'
+import { STYLE_LABELS, BEZIER_SAMPLE_NODES } from '../utils/CONSTANTS'
 
 export class PathSmoother {
   constructor(story, constraints) {
@@ -93,23 +93,27 @@ export class PathSmoother {
     return position
   }
   linkLine(nodes, flag, styleId) {
-    if (STYLE_LABELS[styleId] === 'Zigzag')
-      return this.zigzagLinker(nodes, flag)
-    if (STYLE_LABELS[styleId] === 'Wave') return this.waveLinker(nodes, flag)
-    if (STYLE_LABELS[styleId] === 'Bump') return this.bumpLinker(nodes, flag)
-    if (STYLE_LABELS[styleId] === 'Twine') return this.twineLinker(nodes, flag)
-    if (STYLE_LABELS[styleId] === 'Collide')
-      return this.collideLinker(nodes, flag)
-    if (RENDER_MODE === 'Smooth') return this.normalLinker(nodes, flag)
-    else return this.sketchLinker(nodes, flag)
+    switch (STYLE_LABELS[styleId]) {
+      case 'Zigzag':
+        return this.zigzagLinker(nodes, flag)
+      case 'Wave':
+        return this.waveLinker(nodes, flag)
+      case 'Bump':
+        return this.bumpLinker(nodes, flag)
+      case 'Twine':
+        return this.twineLinker(nodes, flag)
+      case 'Collide':
+        return this.collideLinker(nodes, flag)
+      default:
+        return this.normalLinker(nodes, flag)
+    }
   }
   linkGap(nodes, styles, flags, curFlags) {
     let gapANodes = []
     let gapBNodes = []
     if (nodes[0][1] !== nodes[1][1]) {
       let tmpNodes = []
-      if (RENDER_MODE === 'Smooth') tmpNodes = this.bezierLinker(nodes)
-      else tmpNodes = this.sketchLinker(nodes).lineNodes
+      tmpNodes = this.bezierLinker(nodes)
       for (let k = 0; k < tmpNodes.length; k++) {
         if (k <= tmpNodes.length >> 1)
           gapANodes.push([tmpNodes[k][0], tmpNodes[k][1]])
@@ -127,7 +131,7 @@ export class PathSmoother {
     }
     return { gapANodes, gapBNodes }
   }
-  bezierLinker(nodes, SAMPLERATE = 5) {
+  bezierLinker(nodes, sampleRate = BEZIER_SAMPLE_NODES) {
     let lineNodes = [],
       p = []
     if (nodes.length === 2) {
@@ -138,88 +142,18 @@ export class PathSmoother {
     } else {
       for (let i = 0; i < 4; i++) p[i] = [nodes[i][0], nodes[i][1]]
     }
-    if (SAMPLERATE < 2) SAMPLERATE = 2 //ensure that the number of nodes is odd
-    if (SAMPLERATE & 1) SAMPLERATE += 1 //thus, we can divide nodes into two groups evenly
-    for (let i = 0; i <= SAMPLERATE; i++) {
+    if (sampleRate < 2) sampleRate = 2 //ensure that the number of nodes is odd
+    if (sampleRate & 1) sampleRate += 1 //thus, we can divide nodes into two groups evenly
+    for (let i = 0; i <= sampleRate; i++) {
       lineNodes[i] = []
-      lineNodes[i][0] = this.calcBezier(p, i / SAMPLERATE, 0)
-      lineNodes[i][1] = this.calcBezier(p, i / SAMPLERATE, 1)
+      lineNodes[i][0] = this.calcBezier(p, i / sampleRate, 0)
+      lineNodes[i][1] = this.calcBezier(p, i / sampleRate, 1)
     }
     return lineNodes
   }
   normalLinker(nodes, flag = 1) {
     const lineNodes = nodes
     let curFlag = 0
-    return { lineNodes, curFlag }
-  }
-  sketchLinker(
-    nodes,
-    flag = 1,
-    sampleling = 5,
-    sketchN = 3,
-    height = 0.03,
-    length = 10,
-    shakeX = 0.02,
-    shakeY = 0.02
-  ) {
-    let lineNodes = [],
-      endNodes = [],
-      p = [],
-      curFlag = 0
-    let tmpLength = nodes[1][0] - nodes[0][0]
-    let tmpHeight = nodes[1][1] - nodes[0][1]
-    if (nodes[0][1] === nodes[1][1]) {
-      lineNodes.push([nodes[0][0], nodes[0][1]])
-      endNodes.push([nodes[0][0] + tmpLength / sampleling, nodes[0][1]])
-      endNodes.push([nodes[1][0] - tmpLength / sampleling, nodes[1][1]])
-      p.push(endNodes[0])
-      p.push([
-        (endNodes[0][0] * (sketchN - 1)) / sketchN + endNodes[1][0] / sketchN,
-        endNodes[0][1] +
-          (Math.random() > 0.5 ? -1 : 1) * Math.random() * tmpLength * height,
-      ])
-      p.push([
-        endNodes[0][0] / sketchN + (endNodes[1][0] * (sketchN - 1)) / sketchN,
-        endNodes[1][1] +
-          (Math.random() > 0.5 ? -1 : 1) * Math.random() * tmpLength * height,
-      ])
-      p.push(endNodes[1])
-      for (let i = 0, curFlag = 6; i <= curFlag; i++)
-        lineNodes.push([
-          this.calcBezier(p, i / curFlag, 0),
-          this.calcBezier(p, i / curFlag, 1),
-        ])
-      lineNodes.push([nodes[1][0], nodes[1][1]])
-    } else {
-      let smoothNodes = this.bezierLinker(nodes)
-      for (let i = 1; i < smoothNodes.length - 1; i++) {
-        smoothNodes[i][0] +=
-          (Math.random() > 0.5 ? -1 : 1) * Math.random() * tmpLength * shakeX
-        smoothNodes[i][1] +=
-          (Math.random() > 0.5 ? -1 : 1) * Math.random() * tmpHeight * shakeY
-      }
-      let ctrlNode = [
-        smoothNodes[0][0] - (smoothNodes[1][0] - smoothNodes[0][0]) / 2,
-        smoothNodes[0][1],
-      ]
-      for (let i = 0; i < smoothNodes.length - 1; i++) {
-        ctrlNode[0] = 2 * smoothNodes[i][0] - ctrlNode[0]
-        ctrlNode[1] = 2 * smoothNodes[i][1] - ctrlNode[1]
-        p[0] = smoothNodes[i]
-        p[1] = ctrlNode
-        p[2] = ctrlNode
-        p[3] = smoothNodes[i + 1]
-        for (let j = 0, curFlag = 4; j < curFlag; j++)
-          lineNodes.push([
-            this.calcBezier(p, j / curFlag, 0),
-            this.calcBezier(p, j / curFlag, 1),
-          ])
-      }
-      lineNodes.push([
-        smoothNodes[smoothNodes.length - 1][0],
-        smoothNodes[smoothNodes.length - 1][1],
-      ])
-    }
     return { lineNodes, curFlag }
   }
   zigzagLinker(nodes, flag = 1, length = 10, height = 4) {

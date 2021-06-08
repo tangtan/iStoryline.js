@@ -18,7 +18,7 @@ async function main(fileName) {
     drawStoryline(characters[idx], storyline)
   )
 }
-main('Coco.json')
+main('JurassicParkTune.json')
 
 // function main2() {
 //   const iStoryliner = new iStoryline()

@@ -1,6 +1,8 @@
-const TIME_UNIT = 10
-const TIME_GAP_RATIO = 0.8
-const TWIST_FACTOR = 0.1
+import { TIME_UNIT, TIME_GAP_RATIO, TWIST_FACTOR } from '../utils/CONSTANTS'
+
+const UP = -1
+const DOWN = 1
+const SAME = 0
 
 export class LayoutRelaxer {
   constructor(story, constraints) {
@@ -68,10 +70,6 @@ export class LayoutRelaxer {
     return ret
   }
 }
-
-const UP = -1
-const DOWN = 1
-const SAME = 0
 
 export class SplineTwister {
   constructor(story, renderX) {
