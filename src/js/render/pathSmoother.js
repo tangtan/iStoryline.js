@@ -2,6 +2,7 @@ import { StyleConfiger } from './styleConfiger'
 import { LayoutRelaxer } from './layoutRelaxer'
 import { Table } from '../data/table'
 import { STYLE_LABELS, RENDER_MODE } from '../utils/CONSTANTS'
+
 export class PathSmoother {
   constructor(story, constraints) {
     this.styleConfiger = new StyleConfiger(story, constraints)
