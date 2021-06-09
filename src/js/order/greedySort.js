@@ -48,12 +48,20 @@ function getParams(story, constraints) {
       const [startTimeStamp, endTimeStamp] = ctr.timeSpan
       const startTimeStep = story.getTimeStep(startTimeStamp)
       const endTimeStep = story.getTimeStep(endTimeStamp)
-      if (startTimeStep && endTimeStep && endTimeStep >= startTimeStep) {
+      if (
+        startTimeStep !== null &&
+        endTimeStep !== null &&
+        endTimeStep >= startTimeStep
+      ) {
         for (let _step = startTimeStep; _step < endTimeStep; _step++) {
           const paramsInStep = params[_step]
           const vertexs = paramsInStep[0]
-          const vertexPair = new VertexPair(srcCharName, endCharName, vertexs)
-          paramsInStep[1].push(vertexPair)
+          const srcVertex = findCharacterVertex(srcCharName, vertexs)
+          const endVertex = findCharacterVertex(endCharName, vertexs)
+          if (srcVertex && endVertex) {
+            const vertexPair = new VertexPair(srcVertex, endVertex)
+            paramsInStep[1].push(vertexPair)
+          }
         }
       }
     }
@@ -112,17 +120,83 @@ function runAlgorithm(params, characters) {
  */
 function constrainedCrossingReduction(V1, V2, C) {
   let ans = []
-  V2.sort((a, b) => a.getBarycenterRoot(V1) - b.getBarycenterRoot(V1))
+  // 初始化所有节点的barycenter值并排序
   V2.forEach(vertex => {
     vertex.list.sort(
       (a, b) => a.getBarycenterLeaf(V1) - b.getBarycenterLeaf(V1)
     )
+  })
+  // 获取未满足约束条件
+  let V = generateConstrainedVertexs(C)
+  let _V = V2.filter(vertex => V.indexOf(vertex) === -1)
+  let [vertex1, vertex2] = findViolatedContraint(V, C, V1)
+  while (vertex1 && vertex2) {
+    let _vertex1 = new Vertex()
+    _vertex1.list = vertex1.list.concat(vertex2.list)
+    C.forEach(vertexPair => {
+      if (
+        vertexPair.srcVertex.name === vertex2.name ||
+        vertexPair.srcVertex.name === vertex1.name
+      ) {
+        vertexPair.srcVertex = _vertex1
+      }
+      if (
+        vertexPair.endVertex.name === vertex2.name ||
+        vertexPair.endVertex.name === vertex1.name
+      ) {
+        vertexPair.endVertex = _vertex1
+      }
+    })
+    // 移除已满足约束
+    C = C.filter(
+      vertexPair => vertexPair.srcVertex.name !== vertexPair.endVertex.name
+    )
+    V = V.filter(
+      vertex => vertex.name !== vertex2.name && vertex.name !== vertex1.name
+    )
+    if (_vertex1.hasConstraints(C)) {
+      V.push(_vertex1)
+    } else {
+      _V.push(_vertex1)
+    }
+    ;[vertex1, vertex2] = findViolatedContraint(V, C, V1)
+  }
+  // Barycenter排序
+  const VComp = _V.concat(V)
+  VComp.sort((a, b) => a.getBarycenterRoot(V1) - b.getBarycenterRoot(V1))
+  VComp.forEach(vertex => {
     ans = ans.concat(vertex.list)
   })
   ans.forEach((vertex, idx) => (vertex.order = idx))
 }
 
-function findViolatedContraint(V, C) {}
+function findViolatedContraint(V, C, V1) {
+  for (let i = 0, len = C.length; i < len; i++) {
+    const pair = C[i]
+    if (
+      pair.srcVertex.getBarycenterRoot(V1) >=
+      pair.endVertex.getBarycenterRoot(V1)
+    ) {
+      return [pair.srcVertex, pair.endVertex]
+    } else {
+      pair.srcVertex = pair.endVertex
+    }
+  }
+  return [null, null]
+}
+
+function generateConstrainedVertexs(C) {
+  let V = []
+  C.forEach(pair => {
+    if (pair.srcVertex && pair.endVertex) {
+      if (pair.srcVertex.name !== pair.endVertex.name) {
+        V.push(pair.srcVertex)
+      }
+      V.push(pair.endVertex)
+    }
+  })
+  return V
+}
 
 class Vertex {
   constructor(name, sessionID, order) {
@@ -147,6 +221,25 @@ class Vertex {
     return vertex ? vertex.order : this.order
   }
 
+  hasConstraints(C) {
+    for (let i = 0, len = C.length; i < len; i++) {
+      const pair = C[i]
+      if (
+        pair.srcVertex.name === this.name ||
+        pair.endVertex.name === this.name
+      ) {
+        return true
+      }
+    }
+    return false
+  }
+
+  clone() {
+    const _vertex = new Vertex(this.name, this.sessionID, this.order)
+    _vertex.list = this.list
+    return _vertex
+  }
+
   get degree() {
     return this.list.length
   }
@@ -154,9 +247,9 @@ class Vertex {
 
 // src vertex must be ahead of end vertex
 class VertexPair {
-  constructor(srcCharName, endCharName, V) {
-    this.srcVertex = findCharacterVertex(srcCharName, V)
-    this.endVertex = findCharacterVertex(endCharName, V)
+  constructor(srcVertex, endVertex) {
+    this.srcVertex = srcVertex
+    this.endVertex = endVertex
   }
 }
 
@@ -165,6 +258,17 @@ function findCharacterVertex(char, V) {
     for (let j = 0; j < V[i].list.length; j++) {
       if (V[i].list[j].name === char) {
         return V[i].list[j]
+      }
+    }
+  }
+  return null
+}
+
+function findRootCharacterVertex(char, V) {
+  for (let i = 0; i < V.length; i++) {
+    for (let j = 0; j < V[i].list.length; j++) {
+      if (V[i].list[j].name === char) {
+        return V[i]
       }
     }
   }
