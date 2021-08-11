@@ -62,29 +62,6 @@
         { "Start": 6, "End": 7, "Session": 13 },
         { "Start": 7, "End": 8, "Session": 16 },
         { "Start": 8, "End": 9, "Session": 17 }
-      ],
-      "TT": [
-        { "Start": 1, "End": 2, "Session": 29 },
-        { "Start": 2, "End": 3, "Session": 29 },
-        { "Start": 3, "End": 4, "Session": 29 },
-        { "Start": 4, "End": 5, "Session": 29 },
-        { "Start": 5, "End": 6, "Session": 29 },
-        { "Start": 6, "End": 7, "Session": 29 },
-        { "Start": 7, "End": 8, "Session": 29 },
-        { "Start": 8, "End": 9, "Session": 29 },
-        { "Start": 9, "End": 10, "Session": 29 }
-      ],
-      "TT3": [
-        { "Start": 1, "End": 2, "Session": 30 },
-        { "Start": 2, "End": 3, "Session": 30 },
-        { "Start": 3, "End": 4, "Session": 30 },
-        { "Start": 4, "End": 5, "Session": 30 },
-        { "Start": 7, "End": 8, "Session": 30 },
-        { "Start": 8, "End": 9, "Session": 30 },
-        { "Start": 9, "End": 10, "Session": 30 },
-        { "Start": 10, "End": 11, "Session": 30 },
-        { "Start": 11, "End": 12, "Session": 30 },
-        { "Start": 12, "End": 22, "Session": 30 }
       ]
     }
   }

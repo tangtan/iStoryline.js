@@ -77,14 +77,14 @@ function getParams(story, constraints) {
  */
 function runAlgorithm(params, characters) {
   for (let orderTime = 0; orderTime < ORDER_TIMES; orderTime++) {
-    // forward sorting
+    // Forward sorting
     for (let i = 0; i < params.length - 1; i++) {
       const V1 = params[i][0]
       const V2 = params[i + 1][0]
       const C = params[i + 1][1]
       constrainedCrossingReduction(V1, V2, C)
     }
-    // backward sorting
+    // Backward sorting
     for (let i = params.length - 1; i > 0; i--) {
       const V1 = params[i][0]
       const V2 = params[i - 1][0]
@@ -92,7 +92,7 @@ function runAlgorithm(params, characters) {
       constrainedCrossingReduction(V1, V2, C)
     }
   }
-  // update permutation
+  // Update permutation
   const ans = []
   characters.forEach(charName => {
     const charOrders = []
@@ -118,17 +118,33 @@ function runAlgorithm(params, characters) {
  * @param {VertexPair[]} C constrained orders of V2
  * @return {Vertex[]} permutation of V2
  */
-function constrainedCrossingReduction(V1, V2, C) {
+function constrainedCrossingReduction(V1, V2, ctrs) {
   let ans = []
-  // 初始化所有节点的barycenter值并排序
+  // Init orders
   V2.forEach(vertex => {
     vertex.list.sort(
       (a, b) => a.getBarycenterLeaf(V1) - b.getBarycenterLeaf(V1)
     )
   })
-  // 获取未满足约束条件
+  // Sort V2 to satisfy inner-group constraints
+  for (let i = 0, len = ctrs.length; i < len; i++) {
+    const srcVert = ctrs[i].srcVertex
+    const endVert = ctrs[i].endVertex
+    const [srcVertRoot, srcVertIdx] = findRootCharacterVertex(srcVert.name, V2)
+    const [endVertRoot, endVertIdx] = findRootCharacterVertex(endVert.name, V2)
+    if (srcVertRoot && endVertRoot && srcVertRoot.name === endVertRoot.name) {
+      if (srcVertIdx > endVertIdx) {
+        ;[srcVertRoot.list[srcVertIdx], srcVertRoot.list[endVertIdx]] = [
+          srcVertRoot.list[endVertIdx],
+          srcVertRoot.list[srcVertIdx],
+        ]
+      }
+    }
+  }
+  // Sort V2 to satisfy inter-group constraints
+  let C = filterInnerGroupConstraints(ctrs, V2)
   let V = generateConstrainedVertexs(C)
-  let _V = V2.filter(vertex => V.indexOf(vertex) === -1)
+  let _V = generateUnconstrainedVertexs(V2, V)
   let [vertex1, vertex2] = findViolatedContraint(V, C, V1)
   while (vertex1 && vertex2) {
     let _vertex1 = new Vertex()
@@ -147,7 +163,7 @@ function constrainedCrossingReduction(V1, V2, C) {
         vertexPair.endVertex = _vertex1
       }
     })
-    // 移除已满足约束
+    // Remove satisfied constraints
     C = C.filter(
       vertexPair => vertexPair.srcVertex.name !== vertexPair.endVertex.name
     )
@@ -161,13 +177,18 @@ function constrainedCrossingReduction(V1, V2, C) {
     }
     ;[vertex1, vertex2] = findViolatedContraint(V, C, V1)
   }
-  // Barycenter排序
+  // Sort by barycenter values
   const VComp = _V.concat(V)
   VComp.sort((a, b) => a.getBarycenterRoot(V1) - b.getBarycenterRoot(V1))
   VComp.forEach(vertex => {
     ans = ans.concat(vertex.list)
   })
-  ans.forEach((vertex, idx) => (vertex.order = idx))
+  // Update V2 orders
+  ans.forEach((vert, idx) => {
+    vert.order = idx
+    const vertInV2 = findCharacterVertex(vert.name, V2)
+    if (vertInV2) vertInV2.order = idx
+  })
 }
 
 function findViolatedContraint(V, C, V1) {
@@ -185,17 +206,51 @@ function findViolatedContraint(V, C, V1) {
   return [null, null]
 }
 
+function filterInnerGroupConstraints(C, V2) {
+  let interGroupCtrs = []
+  for (let i = 0, len = C.length; i < len; i++) {
+    const pair = C[i]
+    const [srcVertRoot, srcVertIdx] = findRootCharacterVertex(
+      pair.srcVertex.name,
+      V2
+    )
+    const [endVertRoot, endVertIdx] = findRootCharacterVertex(
+      pair.endVertex.name,
+      V2
+    )
+    if (srcVertRoot && endVertRoot) {
+      if (srcVertRoot.name !== endVertRoot.name) {
+        const newPair = new VertexPair(srcVertRoot, endVertRoot)
+        interGroupCtrs.push(newPair)
+      }
+    }
+  }
+  return interGroupCtrs
+}
+
 function generateConstrainedVertexs(C) {
   let V = []
+  let charsInV = []
   C.forEach(pair => {
     if (pair.srcVertex && pair.endVertex) {
       if (pair.srcVertex.name !== pair.endVertex.name) {
-        V.push(pair.srcVertex)
+        if (charsInV.indexOf(pair.srcVertex.name) === -1) {
+          V.push(pair.srcVertex)
+          charsInV.push(pair.srcVertex.name)
+        }
       }
-      V.push(pair.endVertex)
+      if (charsInV.indexOf(pair.endVertex.name) === -1) {
+        V.push(pair.endVertex)
+        charsInV.push(pair.endVertex.name)
+      }
     }
   })
   return V
+}
+
+function generateUnconstrainedVertexs(V2, V) {
+  const constrainedCharacters = V.map(_ => _.name)
+  return V2.filter(vertex => constrainedCharacters.indexOf(vertex.name) === -1)
 }
 
 class Vertex {
@@ -245,7 +300,7 @@ class Vertex {
   }
 }
 
-// src vertex must be ahead of end vertex
+// Src vertex must be ahead of end vertex
 class VertexPair {
   constructor(srcVertex, endVertex) {
     this.srcVertex = srcVertex
@@ -268,15 +323,9 @@ function findRootCharacterVertex(char, V) {
   for (let i = 0; i < V.length; i++) {
     for (let j = 0; j < V[i].list.length; j++) {
       if (V[i].list[j].name === char) {
-        return V[i]
+        return [V[i], j]
       }
     }
   }
-  return null
-}
-
-function sum(arr) {
-  return arr.reduce(function(prev, curr) {
-    return prev + curr
-  })
+  return [null, -1]
 }
