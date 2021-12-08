@@ -19,20 +19,20 @@ For more information, please check [our paper](http://www.tantang.org/publicatio
 
 Use the package manager [npm](https://docs.npmjs.com/cli/install) or [yarn](https://yarnpkg.com/lang/en/docs/cli/add/) to install iStoryline.
 
-```Json
-npm install https://github.com/tangtan/iStoryline.js.git
+```Shell
+npm install i-storyline-js
 ```
 
 or
 
-```Json
-yarn add https://github.com/tangtan/iStoryline.js.git
+```Shell
+yarn add i-storyline-js
 ```
 
 ## Basic Usage
 
 ```JavaScript
-import iStoryline from "iStoryline.js"
+import iStoryline from "i-storyline-js"
 let iStoryliner = new iStoryline();
 
 // generate storyline visualizations from the story script
