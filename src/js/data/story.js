@@ -25,6 +25,7 @@ export class Story {
     this._characters = []
     this._locations = []
     this._timeStamps = []
+    this._timeStamps2X = []
     this._positions = []
     this._paths = []
   }
