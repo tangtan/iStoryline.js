@@ -9,12 +9,21 @@ export function scale(story, constraints) {
   const layout = story.getTable('layout')
   const positions = story.positions
   if (ctrs.length < 1) return position
+  // Only consider the newest scale constraint
   const { x0, y0, width, height, reserveRatio } = ctrs[ctrs.length - 1].param
   const { minX, maxX, minY, maxY } = getBoundary(story)
   let pos = []
   let ratio = (maxY - minY) / (maxX - minX)
   // ratio = ratio < thres ? idealRatio : ratio;
   for (let i = 0, n = story.getTableRows(); i < n; i++) {
+    // Scale timeline
+    let timelineX = story._timeStamps2X[i]
+    story._timeStamps2X[i] = (timelineX - minX) / (maxX - minX) * width + x0
+    if (i === n - 1) {
+      timelineX = story._timeStamps2X[n]
+      story._timeStamps2X[n] = (timelineX - minX) / (maxX - minX) * width + x0
+    }
+    // Scale nodes
     pos[i] = []
     for (let j = 0, m = story.getTableCols(); j < m; j++) {
       pos[i][j] = []
