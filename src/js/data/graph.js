@@ -1,6 +1,4 @@
-//x的放缩和render模块有关
-//当前没有设置鼠标触发阈值，找最近点
-//目前istoryline结构中locationid不明，以locationTree中下标代替
+import { STYLE_LABELS } from "../utils/CONSTANTS";
 /**
  * @types
  * Story Space
@@ -33,6 +31,7 @@
 export class Graph {
   constructor(story) {
     this._story = story
+    this._style = []
     this._nodes = []
     this._storylinePaths = []
     this._session = this.getTable('session')
@@ -41,6 +40,7 @@ export class Graph {
     const characterTable = this.getTable('character')
     const positionTable = this.getTable('position')
     const pathTable = this.getTable('path')
+    const styleTable = this.getTable('style')
     const rows = this.getTableRows()
     const cols = this.getTableCols()
     for (let row = 0; row < rows; row++) {
@@ -49,12 +49,24 @@ export class Graph {
       for (let col = 0; col < cols; col++) {
         let characterStatus = characterTable.value(row, col)
         if (characterStatus > 0) {
+          // storyline nodes
           let positionId = positionTable.value(row, col)
           let segment = this._story._positions[positionId]
           segments.push(segment)
+          // storyline paths
           let pathId = pathTable.value(row, col)
           let path = this._story._paths[pathId]
           segmentPaths.push(path)
+          // storyline style
+          let styleId = styleTable.value(row, col)
+          let styleLabel = STYLE_LABELS[styleId]
+          if (styleLabel !== 'Normal') {
+            this._style.push({
+              name: story.characters[row],
+              segmentID: segments.length - 1,
+              type: styleLabel
+            })
+          }
         }
       }
       if (segments.length > 0) {
@@ -76,6 +88,10 @@ export class Graph {
 
   get paths() {
     return this._storylinePaths
+  }
+
+  get style() {
+    return this._style
   }
 
   get timeline() {
