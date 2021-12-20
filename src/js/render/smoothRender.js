@@ -1,7 +1,7 @@
-import { StyleConfiger } from 'i-storyline-js/src/js/render/styleConfiger'
-import { LayoutRelaxer } from 'i-storyline-js/src/js/render/layoutRelaxer'
-import { Table } from 'i-storyline-js/src/js/data/table'
-import { STYLE_LABELS, BEZIER_SAMPLE_NODES } from 'i-storyline-js/src/js/utils/CONSTANTS'
+import { StyleConfiger } from './styleConfiger'
+import { LayoutRelaxer } from './layoutRelaxer'
+import { Table } from '../data/table'
+import { STYLE_LABELS, BEZIER_SAMPLE_NODES } from '../utils/CONSTANTS'
 
 export function smoothRender(story, constraints) {
   const pathSmoother = new PathSmoother(story, constraints)

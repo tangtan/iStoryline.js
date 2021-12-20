@@ -9,6 +9,7 @@ export class LayoutRelaxer {
     const { origX, renderX } = this.layoutRelax(story, constraints)
     this._origX = origX
     this._renderX = renderX
+    story._timeStamps2X = []
     for (let idx = 0, len = story.timeline.length; idx < len; idx++) {
       if (idx < renderX[0].length) {
         story._timeStamps2X.push(renderX[0][idx][0])

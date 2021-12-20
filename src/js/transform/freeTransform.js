@@ -1,5 +1,11 @@
 import { Table } from '../data/table'
 
+function freeTransform(story, constraints) {
+  const pathTable = genPath(story, constraints)
+  story.setTable('path', pathTable)
+  return pathTable
+}
+
 export function scale(story, constraints) {
   const ctrs = constraints.filter(ctr => {
     return ctr.style === 'Scale'
@@ -12,17 +18,11 @@ export function scale(story, constraints) {
   // Only consider the newest scale constraint
   const { x0, y0, width, height, reserveRatio } = ctrs[ctrs.length - 1].param
   const { minX, maxX, minY, maxY } = getBoundary(story)
+  console.log(minX, maxX);
   let pos = []
   let ratio = (maxY - minY) / (maxX - minX)
   // ratio = ratio < thres ? idealRatio : ratio;
   for (let i = 0, n = story.getTableRows(); i < n; i++) {
-    // Scale timeline
-    let timelineX = story._timeStamps2X[i]
-    story._timeStamps2X[i] = (timelineX - minX) / (maxX - minX) * width + x0
-    if (i === n - 1) {
-      timelineX = story._timeStamps2X[n]
-      story._timeStamps2X[n] = (timelineX - minX) / (maxX - minX) * width + x0
-    }
     // Scale nodes
     pos[i] = []
     for (let j = 0, m = story.getTableCols(); j < m; j++) {
@@ -39,6 +39,11 @@ export function scale(story, constraints) {
         })
       }
     }
+  }
+  // Scale timeline
+  for (let t = 0; t < story.timeline.length; t++) {
+    let timelineX = story._timeStamps2X[t]
+    story._timeStamps2X[t] = (timelineX - minX) / (maxX - minX) * width + x0
   }
   const newPosition = genNewPosition(story, pos)
   return newPosition
@@ -84,12 +89,6 @@ export function getBoundary(story) {
     }
   }
   return { minX, maxX, minY, maxY }
-}
-
-function freeTransform(story, constraints) {
-  const pathTable = genPath(story, constraints)
-  story.setTable('path', pathTable)
-  return pathTable
 }
 
 export function genPath(story, constraints) {

@@ -33,7 +33,7 @@ export class Graph {
     this._story = story
     this._style = []
     this._nodes = []
-    this._storylinePaths = []
+    this._paths = []
     this._session = this.getTable('session')
     this._keyTimeframe = this._story._timeStamps
     this._keyTimeframe2X = this._story._timeStamps2X
@@ -73,7 +73,7 @@ export class Graph {
         this._nodes.push(segments)
       }
       if (segmentPaths.length > 0) {
-        this._storylinePaths.push(segmentPaths)
+        this._paths.push(segmentPaths)
       }
     }
   }
@@ -87,7 +87,7 @@ export class Graph {
   }
 
   get paths() {
-    return this._storylinePaths
+    return this._paths
   }
 
   get style() {
@@ -96,6 +96,10 @@ export class Graph {
 
   get timeline() {
     return this._keyTimeframe
+  }
+
+  get timelineGuide() {
+    return this._keyTimeframe2X
   }
 
   get locations() {
@@ -395,20 +399,6 @@ export class Graph {
     }
     return ret
   }
-  /**
-   * Get the time according to the given position.
-   *
-   * @param {Number} x
-   * @param {Number} y
-   *
-   * @return time
-   */
-  getStoryTime(x, y) {
-    let tmpI = this.getStorylineID(x, y)
-    let tmpJ = this.getStorySegmentID(x, y)
-    let tmpK = this.getStoryNodeID(x, y)
-    return this.timeline[Number(tmpI)][Number(tmpJ)][Number(tmpK)]
-  }
 
   /**
    * Get the timeSpan according to the given position.
@@ -418,6 +408,7 @@ export class Graph {
    * @return timeSpan
    */
   getStoryTimeSpan(x) {
+    console.log(x, this.timelineGuide);
     let i = 0
     if (x < this._keyTimeframe2X[i]) {
       return [-1, -1]
@@ -433,41 +424,6 @@ export class Graph {
       return [this._keyTimeframe[i - 1], this._keyTimeframe[i]]
     }
     return [-1, -1]
-  }
-
-  getStoryTimeSpanID(startTime, endTime) {
-    let ret = [-1, -1]
-    for (let i = 0; i < this._keyTimeframe.length - 1; i++) {
-      if (
-        startTime >= this._keyTimeframe[i] &&
-        startTime < this._keyTimeframe[i + 1]
-      ) {
-        ret[0] = i
-        break
-      }
-    }
-    for (let i = 0; i < this._keyTimeframe.length - 1; i++) {
-      if (
-        endTime > this._keyTimeframe[i] &&
-        endTime <= this._keyTimeframe[i + 1]
-      ) {
-        ret[1] = i
-        break
-      }
-    }
-    return ret
-  }
-
-  getStoryTimeID(time) {
-    let ret = -1
-    for (let i = 0; i < this._keyTimeframe.length - 1; i++) {
-      if (time > this._keyTimeframe[i] && time <= this._keyTimeframe[i + 1]) {
-        ret = i
-        break
-      }
-    }
-    if (ret === -1 && time === 0) ret = 0
-    return ret
   }
 
   /**
@@ -506,142 +462,11 @@ export class Graph {
     return -1
   }
 
-  getSessions(x0, y0, x1, y1) {
-    //半包括
-    let tmp = this._session
-    let sTime = this.getStoryTime(x0, y0)
-    let eTime = this.getStoryTime(x1, y1)
-    let ret = []
-    let sflag = 1
-    let eflag = 1
-    for (let [key, value] of tmp) {
-      sflag = 1
-      eflag = 1
-      for (let i = 0; i < value.length && (sflag || eflag); i++) {
-        if (
-          (value[i].start >= sTime && eTime >= value[i].start) ||
-          (value[i].end >= sTime && eTime >= value[i].end)
-        ) {
-          let tmpI = this.getStorylineIDByName(value[i].entity)
-          for (let k = 0; k < this._nodes[tmpI].length; k++) {
-            if (
-              this._nodes[tmpI][k][0][1] >= y0 &&
-              this._nodes[tmpI][k][0][1] <= y1
-            ) {
-              sflag = 0
-            }
-            if (
-              this._nodes[tmpI][k][1][1] >= y0 &&
-              this._nodes[tmpI][k][1][1] <= y1
-            ) {
-              eflag = 0
-            }
-          }
-        }
-      }
-      if (sflag || eflag) {
-      } else {
-        ret.push(String(key))
-      }
-    }
-    return ret
-  }
-  getPrevSessionID(id) {
-    let oriSession = this._session.get(Number(id))
-    let recNum = -1
-    let sSessionID = -1
-    let recTim = 0
-    for (let [key, value] of this._session) {
-      if (value[0].end === oriSession[0].start) {
-        let tmp = 0
-        for (let i = 0; i < value.length; i++) {
-          for (let j = 0; j < oriSession.length; j++) {
-            if (value[i].entity === oriSession[j].entity) {
-              tmp++
-              break
-            }
-          }
-        }
-        if (tmp > recNum) {
-          recNum = tmp
-          sSessionID = key
-          recTim = value[0].end
-        }
-      }
-    }
-    let lTime = this.getStoryTimeID(recTim)
-    return { lTime, sSessionID }
-  }
-  getNextSessionID(id) {
-    let oriSession = this._session.get(Number(id))
-    let recNum = -1
-    let eSessionID = -1
-    let recTim = 0
-    for (let [key, value] of this._session) {
-      if (value[0].start === oriSession[0].end) {
-        let tmp = 0
-        for (let i = 0; i < value.length; i++) {
-          for (let j = 0; j < oriSession.length; j++) {
-            if (value[i].entity === oriSession[j].entity) {
-              tmp++
-              break
-            }
-          }
-        }
-        if (tmp > recNum) {
-          recNum = tmp
-          eSessionID = key
-          recTim = value[0].start
-        }
-      }
-    }
-    let rTime = this.getStoryTimeID(recTim)
-    return { rTime, eSessionID }
-  }
-
-  getBesideSessions(x, y, name) {
-    let tmpI = this.getStorylineIDByName(name)
-    let time = -1
-    let flag = 1
-    for (let j = 0; j < this._nodes[tmpI].length && flag; j++) {
-      for (let k = 1; k < this._nodes[tmpI][j].length; k++) {
-        if (
-          x >= this._nodes[tmpI][j][k - 1][0] &&
-          x <= this._nodes[tmpI][j][k][0]
-        ) {
-          time = this.timeline[tmpI][j][k]
-          flag = 0
-          break
-        }
-      }
-    }
-    let sSessionID = -1
-    let eSessionID = -1
-    for (let [key, value] of this._session) {
-      if (value[0].end <= time) {
-        for (let i = 0; i < value.length; i++) {
-          if (value[i].entity === name) {
-            sSessionID = key
-            break
-          }
-        }
-      }
-      if (value[0].start >= time) {
-        for (let i = 0; i < value.length; i++) {
-          if (value[i].entity === name) {
-            eSessionID = key
-            break
-          }
-        }
-      }
-    }
-    return { time, sSessionID, eSessionID }
-  }
   /**
    * Get the characters in a _session according to the given position.
    *
    * @param {Number} x
-   * @param {Number} yf
+   * @param {Number} y
    *
    * @return characters
    */
