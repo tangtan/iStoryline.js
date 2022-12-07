@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "canvas": "^2.10.2",
     "d3-fetch": "^1.1.2",
     "d3-scale": "^3.2.0",
     "lodash": "^4.17.19",

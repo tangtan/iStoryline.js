@@ -39,10 +39,10 @@ export default class iStoryline {
    * @param {String} fileUrl
    * - "./data/JurassicPark.xml"
    */
-  async loadFile(fileUrl, fileType = 'xml') {
-    await this._story.loadFile(fileUrl, fileType)
-    return this._layout()
-  }
+  // async loadFile(fileUrl, fileType = 'xml') {
+  //   await this._story.loadFile(fileUrl, fileType)
+  //   return this._layout()
+  // }
 
   /**
    * Generate storyline visualizations from the input json.
