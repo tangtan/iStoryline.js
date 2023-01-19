@@ -31,6 +31,48 @@ function constructSubStoryJson(storyJson, startFrame, endFrame) {
   }
 }
 
+function countCrossings(table) {
+  let count = 0
+  for (let frame = 1; frame < table.cols; frame++) {
+    const left = frame - 1
+    const right = frame
+    for (let i = 0; i < table.rows; i++) {
+      for (let j = i + 1; j < table.rows; j++) {
+        if (
+          table.value(i, left) *
+            table.value(j, left) *
+            table.value(i, right) *
+            table.value(j, right) >
+          0
+        ) {
+          if (
+            (table.value(i, left) - table.value(j, left)) *
+              (table.value(i, right) - table.value(j, right)) <
+            0
+          ) {
+            count++
+          }
+        }
+      }
+    }
+  }
+  return count
+}
+
+function countWiggles(table) {
+  let wiggles = 0
+  for (let char = 0; char < table.rows; char++) {
+    for (let frame = 0; frame < table.cols - 1; frame++) {
+      if (table.value(char, frame) * table.value(char, frame + 1) > 0) {
+        if (table.value(char, frame) !== table.value(char, frame + 1)) {
+          wiggles++
+        }
+      }
+    }
+  }
+  return wiggles
+}
+
 function writeJsonFile(jsonData) {
   // convert JSON object to a string
   const data = JSON.stringify(jsonData)
@@ -44,16 +86,20 @@ function writeJsonFile(jsonData) {
   })
 }
 
-constructSubStoryJson(storyJson, 0, 20)
+const subStoryJson = constructSubStoryJson(storyJson, 0, 60)
 
 // init canvas
 const canvas = createCanvas(1000, 1000)
 const ctx = canvas.getContext('2d')
 
 // obtain storylines
-// const iStorylineInstance = new iStoryline.default()
-// let graph = iStorylineInstance.load(storyJson)
-// console.log(graph.timeline)
+const iStorylineInstance = new iStoryline.default()
+const graph = iStorylineInstance.load(subStoryJson)
+const orderTable = graph.getTable('sort')
+const crossings = countCrossings(orderTable)
+const alignTable = graph.getTable('align')
+const wiggles = countWiggles(alignTable)
+console.log(graph.timeline, crossings, wiggles)
 
 // draw
 function drawSegement(points) {

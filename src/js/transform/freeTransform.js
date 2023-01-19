@@ -18,7 +18,6 @@ export function scale(story, constraints) {
   // Only consider the newest scale constraint
   const { x0, y0, width, height, reserveRatio } = ctrs[ctrs.length - 1].param
   const { minX, maxX, minY, maxY } = getBoundary(story)
-  console.log(minX, maxX);
   let pos = []
   let ratio = (maxY - minY) / (maxX - minX)
   // ratio = ratio < thres ? idealRatio : ratio;
@@ -43,7 +42,7 @@ export function scale(story, constraints) {
   // Scale timeline
   for (let t = 0; t < story.timeline.length; t++) {
     let timelineX = story._timeStamps2X[t]
-    story._timeStamps2X[t] = (timelineX - minX) / (maxX - minX) * width + x0
+    story._timeStamps2X[t] = ((timelineX - minX) / (maxX - minX)) * width + x0
   }
   const newPosition = genNewPosition(story, pos)
   return newPosition

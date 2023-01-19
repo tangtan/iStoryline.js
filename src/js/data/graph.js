@@ -1,4 +1,4 @@
-import { STYLE_LABELS } from "../utils/CONSTANTS";
+import { STYLE_LABELS } from '../utils/CONSTANTS'
 /**
  * @types
  * Story Space
@@ -64,7 +64,7 @@ export class Graph {
             this._style.push({
               name: story.characters[row],
               segmentID: segments.length - 1,
-              type: styleLabel
+              type: styleLabel,
             })
           }
         }
@@ -408,7 +408,6 @@ export class Graph {
    * @return timeSpan
    */
   getStoryTimeSpan(x) {
-    console.log(x, this.timelineGuide);
     let i = 0
     if (x < this._keyTimeframe2X[i]) {
       return [-1, -1]

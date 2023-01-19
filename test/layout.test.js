@@ -174,14 +174,15 @@ function compareWiggles(table1, table2, done) {
 }
 
 function countWiggles(table) {
-  let count = 0
+  let wiggles = 0
   for (let char = 0; char < table.rows; char++) {
     for (let frame = 0; frame < table.cols - 1; frame++) {
       if (table.value(char, frame) * table.value(char, frame + 1) > 0) {
         if (table.value(char, frame) !== table.value(char, frame + 1)) {
-          count++
+          wiggles++
         }
       }
     }
   }
+  return wiggles
 }
