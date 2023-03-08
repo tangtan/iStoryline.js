@@ -1,5 +1,7 @@
-const iStoryline = require('../build/js/index')
 const storyJson = require('../data/sim/Simulation-50-20-20.json') // storyJson
+const iStoryline = require('../build/js/index')
+const { buildTree } = require('./convertToTree.js')
+const { findMDL } = require('./selectTreecut.js')
 
 // constructing sub json data
 function constructSubStoryJson(storyJson, startFrame, endFrame) {
@@ -79,21 +81,47 @@ function calculateDistBtwnAdjTimeframes(orderTable, alignTable) {
   return res
 }
 
-async function main() {
-  const iStorylineInstance = new iStoryline.default()
-  let fullGraph = iStorylineInstance.load(storyJson)
-  const timeline = fullGraph.timeline
+// Function to filter out valid timeframes
+function filterValidTimeFrames(storyJson, iStorylineInstance, timeline) {
+  let clusterOrder = []
+  let vaildTFs = timeline
+  const currTF = { start: 0, spilt: 1, end: 2 }
+  const n = timeline.length - 2
+  for (let idx = 0; idx < n; idx++) {
+    const currTFData = constructSubStoryJson(
+      storyJson,
+      timeline[currTF.start],
+      timeline[currTF.end]
+    )
+    const currTable = iStorylineInstance.load(currTFData).getTable('sort')
+    const crossing = countCrossings(currTable)
+    if (crossing === 0) {
+      vaildTFs = vaildTFs.filter(tf => tf !== timeline[currTF.spilt])
+      clusterOrder.push(timeline[currTF.spilt])
+      currTF.spilt = currTF.end
+      currTF.end = currTF.end + 1
+    } else {
+      currTF.start = currTF.spilt
+      currTF.spilt = currTF.end
+      currTF.end = currTF.end + 1
+    }
+  }
+  return { vaildTFs, clusterOrder }
+}
 
-  let distList = []
-  let hClusterLayout = []
-  let currTimeline = timeline
-
-  // creating first layout & full distance list
-  for (let idx = 0; idx < timeline.length - 2; idx++) {
+// Function to create first layout and full distance list
+function createFirstLayoutAndFullDistanceList(
+  storyJson,
+  iStorylineInstance,
+  vaildTFs
+) {
+  const distList = []
+  let firstLayout = []
+  for (let idx = 0; idx < vaildTFs.length - 2; idx++) {
     const d = {
-      start: timeline[idx],
-      split: timeline[idx + 1],
-      end: timeline[idx + 2],
+      start: vaildTFs[idx],
+      split: vaildTFs[idx + 1],
+      end: vaildTFs[idx + 2],
     }
     d.data = constructSubStoryJson(storyJson, d.start, d.end)
 
@@ -105,10 +133,28 @@ async function main() {
 
     distList.push(d)
   }
-  hClusterLayout.push({ layout: 0, tfs: currTimeline })
+  firstLayout = [...vaildTFs]
+  return { distList, firstLayout }
+}
+
+async function main() {
+  const iStorylineInstance = new iStoryline.default()
+  let fullGraph = iStorylineInstance.load(storyJson)
+  const timeline = fullGraph.timeline
+
+  let { vaildTFs, clusterOrder } = filterValidTimeFrames(
+    storyJson,
+    iStorylineInstance,
+    timeline
+  )
+
+  let { distList, firstLayout } = createFirstLayoutAndFullDistanceList(
+    storyJson,
+    iStorylineInstance,
+    vaildTFs
+  )
 
   let minDist
-  let layoutLevel = 1
   while (distList.length > 1) {
     // finding the shortest distance between tfs
     let minDistIndex = 0
@@ -122,9 +168,8 @@ async function main() {
     })
 
     // after the shortest distance is found, create new layout
-    currTimeline = currTimeline.filter(tf => tf != minDist.split)
-    hClusterLayout.push({ layout: layoutLevel, tfs: currTimeline })
-    layoutLevel += 1
+    firstLayout = firstLayout.filter(tf => tf != minDist.split)
+    clusterOrder.push(minDist.split)
 
     // recalculate the distance between the new timeframe and the its left and right timeframes
     const updateDistance = (
@@ -160,14 +205,15 @@ async function main() {
     // remove the original distance object
     distList = distList.filter((_, index) => index != minDistIndex)
   }
+  clusterOrder.push(distList[0].split)
 
-  hClusterLayout.push({
-    layout: layoutLevel,
-    tfs: [timeline[0], timeline[timeline.length - 1]],
-  })
+  const tree = buildTree(timeline, clusterOrder)
 
-  console.log('final order', hClusterLayout)
-  return hClusterLayout
+  // find treecut
+  const treecut = findMDL(timeline, tree.root)
+
+  console.log('treecut :>> ', treecut)
+  return tree
 }
 
 main()
