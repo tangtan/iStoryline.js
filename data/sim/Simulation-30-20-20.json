@@ -1,0 +1,1069 @@
+{
+  "Story": {
+    "Location": {
+      "LOC0": [0],
+      "LOC11": [11],
+      "LOC10": [10],
+      "LOC7": [7],
+      "LOC12": [12],
+      "LOC4": [4],
+      "LOC8": [8],
+      "LOC17": [17],
+      "LOC5": [5],
+      "LOC3": [3],
+      "LOC13": [13],
+      "LOC20": [20],
+      "LOC6": [6],
+      "LOC9": [9],
+      "LOC15": [15],
+      "LOC18": [18],
+      "LOC19": [19],
+      "LOC2": [2],
+      "LOC14": [14],
+      "LOC1": [1],
+      "LOC16": [16]
+    },
+    "Characters": {
+      "����1": [
+        {
+          "Start": 60,
+          "End": 70,
+          "Session": 11
+        },
+        {
+          "Start": 70,
+          "End": 80,
+          "Session": 10
+        },
+        {
+          "Start": 80,
+          "End": 90,
+          "Session": 7
+        },
+        {
+          "Start": 90,
+          "End": 100,
+          "Session": 12
+        },
+        {
+          "Start": 100,
+          "End": 110,
+          "Session": 4
+        }
+      ],
+      "����2": [
+        {
+          "Start": 110,
+          "End": 120,
+          "Session": 8
+        },
+        {
+          "Start": 120,
+          "End": 130,
+          "Session": 17
+        },
+        {
+          "Start": 130,
+          "End": 140,
+          "Session": 5
+        },
+        {
+          "Start": 140,
+          "End": 150,
+          "Session": 7
+        },
+        {
+          "Start": 150,
+          "End": 160,
+          "Session": 7
+        },
+        {
+          "Start": 160,
+          "End": 170,
+          "Session": 3
+        },
+        {
+          "Start": 170,
+          "End": 180,
+          "Session": 13
+        },
+        {
+          "Start": 180,
+          "End": 190,
+          "Session": 3
+        },
+        {
+          "Start": 190,
+          "End": 200,
+          "Session": 20
+        }
+      ],
+      "����3": [
+        {
+          "Start": 90,
+          "End": 100,
+          "Session": 20
+        },
+        {
+          "Start": 100,
+          "End": 110,
+          "Session": 20
+        },
+        {
+          "Start": 110,
+          "End": 120,
+          "Session": 17
+        },
+        {
+          "Start": 120,
+          "End": 130,
+          "Session": 11
+        },
+        {
+          "Start": 130,
+          "End": 140,
+          "Session": 6
+        },
+        {
+          "Start": 140,
+          "End": 150,
+          "Session": 5
+        },
+        {
+          "Start": 150,
+          "End": 160,
+          "Session": 9
+        },
+        {
+          "Start": 160,
+          "End": 170,
+          "Session": 9
+        }
+      ],
+      "����4": [
+        {
+          "Start": 80,
+          "End": 90,
+          "Session": 10
+        },
+        {
+          "Start": 90,
+          "End": 100,
+          "Session": 13
+        },
+        {
+          "Start": 100,
+          "End": 110,
+          "Session": 10
+        },
+        {
+          "Start": 110,
+          "End": 120,
+          "Session": 10
+        },
+        {
+          "Start": 120,
+          "End": 130,
+          "Session": 7
+        },
+        {
+          "Start": 130,
+          "End": 140,
+          "Session": 15
+        },
+        {
+          "Start": 140,
+          "End": 150,
+          "Session": 9
+        },
+        {
+          "Start": 150,
+          "End": 160,
+          "Session": 9
+        },
+        {
+          "Start": 160,
+          "End": 170,
+          "Session": 18
+        },
+        {
+          "Start": 170,
+          "End": 180,
+          "Session": 20
+        }
+      ],
+      "����5": [
+        {
+          "Start": 100,
+          "End": 110,
+          "Session": 19
+        },
+        {
+          "Start": 110,
+          "End": 120,
+          "Session": 9
+        },
+        {
+          "Start": 120,
+          "End": 130,
+          "Session": 10
+        },
+        {
+          "Start": 130,
+          "End": 140,
+          "Session": 12
+        }
+      ],
+      "����6": [
+        {
+          "Start": 70,
+          "End": 80,
+          "Session": 6
+        },
+        {
+          "Start": 80,
+          "End": 90,
+          "Session": 4
+        },
+        {
+          "Start": 90,
+          "End": 100,
+          "Session": 9
+        }
+      ],
+      "����7": [
+        {
+          "Start": 30,
+          "End": 40,
+          "Session": 18
+        },
+        {
+          "Start": 40,
+          "End": 50,
+          "Session": 2
+        },
+        {
+          "Start": 50,
+          "End": 60,
+          "Session": 8
+        },
+        {
+          "Start": 60,
+          "End": 70,
+          "Session": 7
+        },
+        {
+          "Start": 70,
+          "End": 80,
+          "Session": 18
+        },
+        {
+          "Start": 80,
+          "End": 90,
+          "Session": 14
+        }
+      ],
+      "����8": [
+        {
+          "Start": 30,
+          "End": 40,
+          "Session": 4
+        },
+        {
+          "Start": 40,
+          "End": 50,
+          "Session": 3
+        },
+        {
+          "Start": 50,
+          "End": 60,
+          "Session": 4
+        },
+        {
+          "Start": 60,
+          "End": 70,
+          "Session": 5
+        },
+        {
+          "Start": 70,
+          "End": 80,
+          "Session": 13
+        },
+        {
+          "Start": 80,
+          "End": 90,
+          "Session": 13
+        },
+        {
+          "Start": 90,
+          "End": 100,
+          "Session": 15
+        },
+        {
+          "Start": 100,
+          "End": 110,
+          "Session": 17
+        },
+        {
+          "Start": 110,
+          "End": 120,
+          "Session": 16
+        },
+        {
+          "Start": 120,
+          "End": 130,
+          "Session": 9
+        },
+        {
+          "Start": 130,
+          "End": 140,
+          "Session": 6
+        }
+      ],
+      "����9": [
+        {
+          "Start": 130,
+          "End": 140,
+          "Session": 5
+        },
+        {
+          "Start": 140,
+          "End": 150,
+          "Session": 5
+        }
+      ],
+      "����10": [
+        {
+          "Start": 70,
+          "End": 80,
+          "Session": 13
+        },
+        {
+          "Start": 80,
+          "End": 90,
+          "Session": 13
+        }
+      ],
+      "����11": [
+        {
+          "Start": 120,
+          "End": 130,
+          "Session": 19
+        },
+        {
+          "Start": 130,
+          "End": 140,
+          "Session": 15
+        },
+        {
+          "Start": 140,
+          "End": 150,
+          "Session": 18
+        },
+        {
+          "Start": 150,
+          "End": 160,
+          "Session": 16
+        },
+        {
+          "Start": 160,
+          "End": 170,
+          "Session": 5
+        },
+        {
+          "Start": 170,
+          "End": 180,
+          "Session": 11
+        },
+        {
+          "Start": 180,
+          "End": 190,
+          "Session": 6
+        }
+      ],
+      "����12": [
+        {
+          "Start": 30,
+          "End": 40,
+          "Session": 20
+        },
+        {
+          "Start": 40,
+          "End": 50,
+          "Session": 20
+        },
+        {
+          "Start": 50,
+          "End": 60,
+          "Session": 20
+        },
+        {
+          "Start": 60,
+          "End": 70,
+          "Session": 2
+        },
+        {
+          "Start": 70,
+          "End": 80,
+          "Session": 2
+        },
+        {
+          "Start": 80,
+          "End": 90,
+          "Session": 17
+        },
+        {
+          "Start": 90,
+          "End": 100,
+          "Session": 15
+        },
+        {
+          "Start": 100,
+          "End": 110,
+          "Session": 16
+        },
+        {
+          "Start": 110,
+          "End": 120,
+          "Session": 15
+        },
+        {
+          "Start": 120,
+          "End": 130,
+          "Session": 15
+        },
+        {
+          "Start": 130,
+          "End": 140,
+          "Session": 15
+        },
+        {
+          "Start": 140,
+          "End": 150,
+          "Session": 15
+        },
+        {
+          "Start": 150,
+          "End": 160,
+          "Session": 13
+        },
+        {
+          "Start": 160,
+          "End": 170,
+          "Session": 14
+        },
+        {
+          "Start": 170,
+          "End": 180,
+          "Session": 13
+        },
+        {
+          "Start": 180,
+          "End": 190,
+          "Session": 12
+        }
+      ],
+      "����13": [
+        {
+          "Start": 110,
+          "End": 120,
+          "Session": 6
+        },
+        {
+          "Start": 120,
+          "End": 130,
+          "Session": 7
+        }
+      ],
+      "����14": [
+        {
+          "Start": 20,
+          "End": 30,
+          "Session": 10
+        },
+        {
+          "Start": 30,
+          "End": 40,
+          "Session": 14
+        },
+        {
+          "Start": 40,
+          "End": 50,
+          "Session": 17
+        },
+        {
+          "Start": 50,
+          "End": 60,
+          "Session": 17
+        },
+        {
+          "Start": 60,
+          "End": 70,
+          "Session": 18
+        },
+        {
+          "Start": 70,
+          "End": 80,
+          "Session": 18
+        },
+        {
+          "Start": 80,
+          "End": 90,
+          "Session": 17
+        },
+        {
+          "Start": 90,
+          "End": 100,
+          "Session": 3
+        },
+        {
+          "Start": 100,
+          "End": 110,
+          "Session": 14
+        },
+        {
+          "Start": 110,
+          "End": 120,
+          "Session": 16
+        },
+        {
+          "Start": 120,
+          "End": 130,
+          "Session": 16
+        },
+        {
+          "Start": 130,
+          "End": 140,
+          "Session": 16
+        },
+        {
+          "Start": 140,
+          "End": 150,
+          "Session": 16
+        },
+        {
+          "Start": 150,
+          "End": 160,
+          "Session": 14
+        },
+        {
+          "Start": 160,
+          "End": 170,
+          "Session": 19
+        },
+        {
+          "Start": 170,
+          "End": 180,
+          "Session": 17
+        },
+        {
+          "Start": 180,
+          "End": 190,
+          "Session": 10
+        },
+        {
+          "Start": 190,
+          "End": 200,
+          "Session": 11
+        }
+      ],
+      "����15": [
+        {
+          "Start": 180,
+          "End": 190,
+          "Session": 15
+        },
+        {
+          "Start": 190,
+          "End": 200,
+          "Session": 15
+        }
+      ],
+      "����16": [
+        {
+          "Start": 0,
+          "End": 10,
+          "Session": 11
+        },
+        {
+          "Start": 10,
+          "End": 20,
+          "Session": 12
+        }
+      ],
+      "����17": [
+        {
+          "Start": 100,
+          "End": 110,
+          "Session": 13
+        },
+        {
+          "Start": 110,
+          "End": 120,
+          "Session": 14
+        },
+        {
+          "Start": 120,
+          "End": 130,
+          "Session": 12
+        },
+        {
+          "Start": 130,
+          "End": 140,
+          "Session": 12
+        },
+        {
+          "Start": 140,
+          "End": 150,
+          "Session": 12
+        }
+      ],
+      "����18": [
+        {
+          "Start": 60,
+          "End": 70,
+          "Session": 15
+        },
+        {
+          "Start": 70,
+          "End": 80,
+          "Session": 15
+        },
+        {
+          "Start": 80,
+          "End": 90,
+          "Session": 5
+        },
+        {
+          "Start": 90,
+          "End": 100,
+          "Session": 5
+        },
+        {
+          "Start": 110,
+          "End": 120,
+          "Session": 7
+        }
+      ],
+      "����19": [
+        {
+          "Start": 120,
+          "End": 130,
+          "Session": 15
+        },
+        {
+          "Start": 130,
+          "End": 140,
+          "Session": 5
+        }
+      ],
+      "����20": [
+        {
+          "Start": 130,
+          "End": 140,
+          "Session": 15
+        },
+        {
+          "Start": 140,
+          "End": 150,
+          "Session": 15
+        },
+        {
+          "Start": 150,
+          "End": 160,
+          "Session": 13
+        },
+        {
+          "Start": 160,
+          "End": 170,
+          "Session": 13
+        },
+        {
+          "Start": 170,
+          "End": 180,
+          "Session": 13
+        },
+        {
+          "Start": 180,
+          "End": 190,
+          "Session": 12
+        }
+      ],
+      "����21": [
+        {
+          "Start": 130,
+          "End": 140,
+          "Session": 14
+        },
+        {
+          "Start": 140,
+          "End": 150,
+          "Session": 12
+        }
+      ],
+      "����22": [
+        {
+          "Start": 160,
+          "End": 170,
+          "Session": 2
+        },
+        {
+          "Start": 180,
+          "End": 190,
+          "Session": 4
+        },
+        {
+          "Start": 190,
+          "End": 200,
+          "Session": 4
+        }
+      ],
+      "����23": [
+        {
+          "Start": 80,
+          "End": 90,
+          "Session": 2
+        },
+        {
+          "Start": 90,
+          "End": 100,
+          "Session": 2
+        },
+        {
+          "Start": 100,
+          "End": 110,
+          "Session": 13
+        },
+        {
+          "Start": 110,
+          "End": 120,
+          "Session": 11
+        },
+        {
+          "Start": 120,
+          "End": 130,
+          "Session": 17
+        },
+        {
+          "Start": 140,
+          "End": 150,
+          "Session": 16
+        }
+      ],
+      "����24": [
+        {
+          "Start": 110,
+          "End": 120,
+          "Session": 15
+        },
+        {
+          "Start": 120,
+          "End": 130,
+          "Session": 13
+        },
+        {
+          "Start": 130,
+          "End": 140,
+          "Session": 13
+        },
+        {
+          "Start": 140,
+          "End": 150,
+          "Session": 15
+        },
+        {
+          "Start": 150,
+          "End": 160,
+          "Session": 15
+        },
+        {
+          "Start": 160,
+          "End": 170,
+          "Session": 15
+        },
+        {
+          "Start": 170,
+          "End": 180,
+          "Session": 20
+        },
+        {
+          "Start": 180,
+          "End": 190,
+          "Session": 20
+        },
+        {
+          "Start": 190,
+          "End": 200,
+          "Session": 20
+        }
+      ],
+      "����25": [
+        {
+          "Start": 20,
+          "End": 30,
+          "Session": 20
+        },
+        {
+          "Start": 30,
+          "End": 40,
+          "Session": 20
+        },
+        {
+          "Start": 40,
+          "End": 50,
+          "Session": 17
+        },
+        {
+          "Start": 50,
+          "End": 60,
+          "Session": 13
+        },
+        {
+          "Start": 60,
+          "End": 70,
+          "Session": 6
+        }
+      ],
+      "����26": [
+        {
+          "Start": 70,
+          "End": 80,
+          "Session": 19
+        },
+        {
+          "Start": 80,
+          "End": 90,
+          "Session": 19
+        },
+        {
+          "Start": 90,
+          "End": 100,
+          "Session": 19
+        },
+        {
+          "Start": 100,
+          "End": 110,
+          "Session": 16
+        },
+        {
+          "Start": 110,
+          "End": 120,
+          "Session": 19
+        }
+      ],
+      "����27": [
+        {
+          "Start": 40,
+          "End": 50,
+          "Session": 15
+        },
+        {
+          "Start": 50,
+          "End": 60,
+          "Session": 15
+        },
+        {
+          "Start": 60,
+          "End": 70,
+          "Session": 12
+        },
+        {
+          "Start": 70,
+          "End": 80,
+          "Session": 12
+        },
+        {
+          "Start": 80,
+          "End": 90,
+          "Session": 9
+        },
+        {
+          "Start": 90,
+          "End": 100,
+          "Session": 11
+        },
+        {
+          "Start": 100,
+          "End": 110,
+          "Session": 11
+        },
+        {
+          "Start": 110,
+          "End": 120,
+          "Session": 11
+        },
+        {
+          "Start": 120,
+          "End": 130,
+          "Session": 13
+        }
+      ],
+      "����28": [
+        {
+          "Start": 80,
+          "End": 90,
+          "Session": 3
+        },
+        {
+          "Start": 90,
+          "End": 100,
+          "Session": 14
+        },
+        {
+          "Start": 100,
+          "End": 110,
+          "Session": 14
+        },
+        {
+          "Start": 110,
+          "End": 120,
+          "Session": 12
+        },
+        {
+          "Start": 120,
+          "End": 130,
+          "Session": 15
+        },
+        {
+          "Start": 130,
+          "End": 140,
+          "Session": 13
+        },
+        {
+          "Start": 140,
+          "End": 150,
+          "Session": 14
+        },
+        {
+          "Start": 150,
+          "End": 160,
+          "Session": 17
+        },
+        {
+          "Start": 160,
+          "End": 170,
+          "Session": 17
+        }
+      ],
+      "����29": [
+        {
+          "Start": 110,
+          "End": 120,
+          "Session": 3
+        },
+        {
+          "Start": 120,
+          "End": 130,
+          "Session": 5
+        },
+        {
+          "Start": 130,
+          "End": 140,
+          "Session": 4
+        },
+        {
+          "Start": 140,
+          "End": 150,
+          "Session": 7
+        },
+        {
+          "Start": 150,
+          "End": 160,
+          "Session": 6
+        },
+        {
+          "Start": 160,
+          "End": 170,
+          "Session": 14
+        }
+      ],
+      "����30": [
+        {
+          "Start": 30,
+          "End": 40,
+          "Session": 11
+        },
+        {
+          "Start": 40,
+          "End": 50,
+          "Session": 8
+        },
+        {
+          "Start": 50,
+          "End": 60,
+          "Session": 6
+        },
+        {
+          "Start": 60,
+          "End": 70,
+          "Session": 5
+        },
+        {
+          "Start": 70,
+          "End": 80,
+          "Session": 2
+        },
+        {
+          "Start": 80,
+          "End": 90,
+          "Session": 19
+        },
+        {
+          "Start": 90,
+          "End": 100,
+          "Session": 16
+        },
+        {
+          "Start": 100,
+          "End": 110,
+          "Session": 5
+        },
+        {
+          "Start": 110,
+          "End": 120,
+          "Session": 4
+        },
+        {
+          "Start": 120,
+          "End": 130,
+          "Session": 2
+        },
+        {
+          "Start": 130,
+          "End": 140,
+          "Session": 3
+        },
+        {
+          "Start": 140,
+          "End": 150,
+          "Session": 4
+        },
+        {
+          "Start": 150,
+          "End": 160,
+          "Session": 13
+        },
+        {
+          "Start": 160,
+          "End": 170,
+          "Session": 14
+        },
+        {
+          "Start": 170,
+          "End": 180,
+          "Session": 7
+        },
+        {
+          "Start": 180,
+          "End": 190,
+          "Session": 7
+        },
+        {
+          "Start": 190,
+          "End": 200,
+          "Session": 10
+        }
+      ]
+    }
+  }
+}

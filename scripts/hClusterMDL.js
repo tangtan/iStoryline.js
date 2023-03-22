@@ -1,6 +1,6 @@
 const storyJson = require('../data/sim/Simulation-50-20-20.json') // storyJson
 const iStoryline = require('../build/js/index')
-const { buildTree } = require('./convertToTree.js')
+const { buildTree } = require('./convertToTreeMDL.js')
 const { findMDL } = require('./selectTreecut.js')
 
 // constructing sub json data
@@ -58,29 +58,6 @@ function countCrossings(table) {
     }
   }
   return count
-}
-
-function countWiggles(table) {
-  let wiggles = 0
-  for (let char = 0; char < table.rows; char++) {
-    for (let frame = 0; frame < table.cols - 1; frame++) {
-      if (table.value(char, frame) * table.value(char, frame + 1) > 0) {
-        if (table.value(char, frame) !== table.value(char, frame + 1)) {
-          wiggles++
-        }
-      }
-    }
-  }
-  return wiggles
-}
-
-function calculateDistBtwnAdjTimeframes(orderTable, alignTable) {
-  // console.log('orderTable: ', orderTable)
-  // console.log('alignTable: ', alignTable)
-  const crossings = countCrossings(orderTable)
-  const wiggles = countWiggles(alignTable)
-  const res = 0.6 * crossings + 0.4 * wiggles
-  return res
 }
 
 const P_hat = (start, end, timeline) => {
@@ -157,16 +134,8 @@ function createFirstLayoutAndFullDistanceList(
     }
     d.data = constructSubStoryJson(storyJson, d.start, d.end)
 
-    const currGraph = iStorylineInstance.load(d.data)
-
     d.value = calculateVirtualParentMDL(d.start, d.split, d.end, vaildTFs)
-
-    // d.value = calculateDistBtwnAdjTimeframes(
-    //   currGraph.getTable('sort'),
-    //   currGraph.getTable('align')
-    // )
-
-    console.log('d.value = ', d.value)
+    console.log(d.split, d.value)
 
     distList.push(d)
   }
@@ -193,68 +162,61 @@ async function main() {
   console.log('begin firstLayout: ', firstLayout)
   console.log('begin clusterOrder: ', clusterOrder)
 
+  let ifMergeTogether = new Array(clusterOrder.length).fill(0)
+  console.log('begin ifMergeTogether: ', ifMergeTogether)
   let minDist
+  let prevMinDist = null
   while (distList.length > 1) {
     // finding the shortest distance between tfs
     let minDistIndex = 0
-    minDist = distList.reduce((prev, cur, index) => {
-      if (cur.value < prev.value) {
-        minDistIndex = index
-        // console.log('minValue = ', cur.value)
-        // console.log('minDistIndex = ', minDistIndex)
-        return cur
-      } else {
-        // if (cur.value == prev.value) {
-        //   console.log('==')
-        // }
-        return prev
+    let mergeTogether = 0
+    minDist = distList[0]
+    // console.log('prevMin: ', prevMinDist)
+    for (var i = 0; i < distList.length; i++) {
+      let dist = distList[i]
+      if (dist.value < minDist.value) {
+        minDistIndex = i
+        minDist = dist
       }
-    })
+    }
+    // if minDist and prevMinDist are equal and adjacent, merge them together
+    if (
+      prevMinDist &&
+      minDist.value == prevMinDist.value &&
+      minDist.start == prevMinDist.split
+    ) {
+      mergeTogether = 1
+    }
+    prevMinDist = minDist
+    // console.log('minDist: ', minDist.split, minDist.value)
 
     // after the shortest distance is found, create new layout
     firstLayout = firstLayout.filter(tf => tf != minDist.split)
-    clusterOrder.push(minDist.split)
     // console.log('firstLayout: ', firstLayout)
+    clusterOrder.push(minDist.split)
     // console.log('clusterOrder: ', clusterOrder)
-
-    // recalculate the distance between the new timeframe and the its left and right timeframes
-    const updateDistance = (
-      distList,
-      minDistIndex,
-      storyJson,
-      iStorylineInstance
-    ) => {
-      const updateDistanceValue = (d, start, end) => {
-        const currData = constructSubStoryJson(storyJson, start, end)
-        const currGraph = iStorylineInstance.load(currData)
-        d.value = calculateDistBtwnAdjTimeframes(
-          currGraph.getTable('sort'),
-          currGraph.getTable('align')
-        )
-      }
-
-      if (minDistIndex !== 0) {
-        let leftDist = distList[minDistIndex - 1]
-        leftDist.split = minDist.start
-        leftDist.end = minDist.end
-        updateDistanceValue(leftDist, leftDist.start, leftDist.end)
-      }
-
-      if (minDistIndex !== distList.length - 1) {
-        let rightDist = distList[minDistIndex + 1]
-        rightDist.start = minDist.start
-        rightDist.split = minDist.end
-        updateDistanceValue(rightDist, rightDist.start, rightDist.end)
-      }
-    }
+    ifMergeTogether.push(mergeTogether)
+    // console.log("ifMergeTogether: ", ifMergeTogether)
 
     // remove the original distance object
     distList = distList.filter((_, index) => index != minDistIndex)
   }
+
   clusterOrder.push(distList[0].split)
+  if (
+    prevMinDist &&
+    distList[0].value == prevMinDist.value &&
+    distList[0].start == prevMinDist.split
+  ) {
+    ifMergeTogether.push(1)
+  } else {
+    ifMergeTogether.push(0)
+  }
 
   console.log('end clusterOrder: ', clusterOrder)
-  const tree = buildTree(timeline, clusterOrder)
+  console.log('end ifMergeTogether: ', ifMergeTogether)
+
+  const tree = buildTree(timeline, clusterOrder, ifMergeTogether)
   console.log('tree :>> ', tree.toString())
   for (let node of tree.preOrderTraversal()) {
     node.weight = getWeight(node.value[0], node.value[1])

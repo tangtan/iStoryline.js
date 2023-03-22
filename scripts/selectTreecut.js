@@ -18,7 +18,10 @@ const P_hat = (n, timeline) => {
 
 // calculate data description length
 function calculateDat(timeline, nodes) {
-  return -nodes.reduce((sum, n) => sum + Math.log2(P_hat(n, timeline)), 0)
+  return -nodes.reduce(
+    (sum, n) => sum + n.weight * Math.log2(P_hat(n, timeline)),
+    0
+  )
 }
 
 // calculate data description length for the node itself
@@ -27,15 +30,26 @@ function calculateRootDat(timeline, nodes) {
   const rootChildrenNum = rootNode.children.length
   // assume evenly distribution
   const rootP = P_hat(rootNode, timeline)
-  return -rootChildrenNum * Math.log2(rootP / rootChildrenNum)
+
+  const weight = rootNode.weight
+  // const weight = rootNode.children.reduce((sum, n) => sum + n.weight, 0)
+  return -weight * rootChildrenNum * Math.log2(rootP / rootChildrenNum)
 }
 
 // calculate description length
 function calculateDescriptionLength(timeline, nodes) {
+  // const ParLength = calculatePar(timeline, nodes)
+  // const DatLength = calculateDat(timeline, nodes)
+  // console.log('ParLength :>> ', ParLength)
+  // console.log('DatLength :>> ', DatLength)
   return calculatePar(timeline, nodes) + calculateDat(timeline, nodes)
 }
 
 function calculateRootDescriptionLength(timeline, nodes) {
+  // const rootParLength = calculatePar(timeline, nodes)
+  // const rootDatLength = calculateRootDat(timeline, nodes)
+  // console.log('rootParLength :>> ', rootParLength)
+  // console.log('rootDatLength :>> ', rootDatLength)
   return calculatePar(timeline, nodes) + calculateRootDat(timeline, nodes)
 }
 
