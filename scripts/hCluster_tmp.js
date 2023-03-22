@@ -2,6 +2,7 @@ const storyJson = require('../data/sim/Simulation-50-20-20.json') // storyJson
 const iStoryline = require('../build/js/index')
 const { buildTree } = require('./convertToTree.js')
 const { findMDL } = require('./selectTreecut.js')
+// const fs = require('fs')
 
 // constructing sub json data
 function constructSubStoryJson(storyJson, startFrame, endFrame) {
@@ -75,42 +76,10 @@ function countWiggles(table) {
 }
 
 function calculateDistBtwnAdjTimeframes(orderTable, alignTable) {
-  // console.log('orderTable: ', orderTable)
-  // console.log('alignTable: ', alignTable)
   const crossings = countCrossings(orderTable)
   const wiggles = countWiggles(alignTable)
   const res = 0.6 * crossings + 0.4 * wiggles
   return res
-}
-
-const P_hat = (start, end, timeline) => {
-  const nDuration = end - start
-  const totalDuration = timeline[timeline.length - 1] - timeline[0]
-  return nDuration / totalDuration
-}
-
-function getWeight(start, end) {
-  let weight = 0
-  const charactersJson = storyJson['Story']['Characters']
-  for (const charName in charactersJson) {
-    const charItemList = charactersJson[charName]
-    const sFrame = charItemList[0].Start
-    const length = charItemList.length
-    const eFrame = charItemList[length - 1].End
-    if (eFrame > start && sFrame < end) {
-      weight += 1
-    }
-  }
-  return weight
-}
-
-function calculateVirtualParentMDL(start, split, end, timeline) {
-  const P1 = P_hat(start, split, timeline)
-  const P2 = P_hat(split, end, timeline)
-  const weight = getWeight(start, end)
-  const Dat = -weight * 2 * Math.log2((P1 + P2) / 2)
-  // console.log(P1, P2, weight, Dat)
-  return Dat
 }
 
 // Function to filter out valid timeframes
@@ -158,15 +127,10 @@ function createFirstLayoutAndFullDistanceList(
     d.data = constructSubStoryJson(storyJson, d.start, d.end)
 
     const currGraph = iStorylineInstance.load(d.data)
-
-    d.value = calculateVirtualParentMDL(d.start, d.split, d.end, vaildTFs)
-
-    // d.value = calculateDistBtwnAdjTimeframes(
-    //   currGraph.getTable('sort'),
-    //   currGraph.getTable('align')
-    // )
-
-    console.log('d.value = ', d.value)
+    d.value = calculateDistBtwnAdjTimeframes(
+      currGraph.getTable('sort'),
+      currGraph.getTable('align')
+    )
 
     distList.push(d)
   }
@@ -190,32 +154,39 @@ async function main() {
     iStorylineInstance,
     vaildTFs
   )
-  console.log('begin firstLayout: ', firstLayout)
-  console.log('begin clusterOrder: ', clusterOrder)
 
   let minDist
+  let minDistList = []
   while (distList.length > 1) {
     // finding the shortest distance between tfs
-    let minDistIndex = 0
+    // let minDistIndex = 0
+    let minDistIndex = [0]
+    minDistList = [distList[0]]
+
     minDist = distList.reduce((prev, cur, index) => {
       if (cur.value < prev.value) {
-        minDistIndex = index
-        // console.log('minValue = ', cur.value)
-        // console.log('minDistIndex = ', minDistIndex)
+        // minDistIndex = index
+        minDistIndex = [index]
+        minDistList = [cur]
+        return cur
+      } else if (cur.value === prev.value) {
+        minDistIndex.push(index)
+        minDistList.push(cur)
         return cur
       } else {
-        // if (cur.value == prev.value) {
-        //   console.log('==')
-        // }
         return prev
       }
     })
 
+    console.log('minDist = ', minDist)
+    console.log('minDistList = ', minDistList)
+    console.log('minDistIndex = ', minDistIndex)
     // after the shortest distance is found, create new layout
-    firstLayout = firstLayout.filter(tf => tf != minDist.split)
-    clusterOrder.push(minDist.split)
-    // console.log('firstLayout: ', firstLayout)
-    // console.log('clusterOrder: ', clusterOrder)
+    for (minDist in minDistList) {
+      firstLayout = firstLayout.filter(tf => tf != minDist.split)
+      clusterOrder.push(minDist.split)
+    }
+    // console.log('clusterOrder = ', clusterOrder)
 
     // recalculate the distance between the new timeframe and the its left and right timeframes
     const updateDistance = (
@@ -233,32 +204,46 @@ async function main() {
         )
       }
 
-      if (minDistIndex !== 0) {
-        let leftDist = distList[minDistIndex - 1]
-        leftDist.split = minDist.start
-        leftDist.end = minDist.end
-        updateDistanceValue(leftDist, leftDist.start, leftDist.end)
-      }
+      if (minDistIndex.length !== 0) {
+        console.log('here0!')
+        for (Index in minDistIndex) {
+          let i = minDistIndex.indexof(Index)
+          console.log('i = ', i)
+          let minDistCur = minDistList[i]
+          if (Index !== 0) {
+            let leftDist = distList[Index - 1]
+            // leftDist.split = minDist.start
+            // leftDist.end = minDist.end
+            leftDist.split = minDistCur.start
+            leftDist.end = minDistCur.end
+            updateDistanceValue(leftDist, leftDist.start, leftDist.end)
+          }
 
-      if (minDistIndex !== distList.length - 1) {
-        let rightDist = distList[minDistIndex + 1]
-        rightDist.start = minDist.start
-        rightDist.split = minDist.end
-        updateDistanceValue(rightDist, rightDist.start, rightDist.end)
+          if (Index !== distList.length - 1) {
+            let rightDist = distList[Index + 1]
+            // rightDist.start = minDist.start
+            // rightDist.split = minDist.end
+            rightDist.start = minDistCur.start
+            rightDist.split = minDistCur.end
+            updateDistanceValue(rightDist, rightDist.start, rightDist.end)
+          }
+        }
       }
     }
 
     // remove the original distance object
-    distList = distList.filter((_, index) => index != minDistIndex)
+    // distList = distList.filter((_, index) => index != minDistIndex)
+    distList = distList.filter((_, index) => !minDistIndex.includes(index))
+    console.log('distList = ', distList)
+    console.log('\n')
   }
+  console.log('here!')
   clusterOrder.push(distList[0].split)
 
-  console.log('end clusterOrder: ', clusterOrder)
+  console.log('here2!')
   const tree = buildTree(timeline, clusterOrder)
+  console.log('here3!')
   console.log('tree :>> ', tree.toString())
-  for (let node of tree.preOrderTraversal()) {
-    node.weight = getWeight(node.value[0], node.value[1])
-  }
 
   // find treecut
   const treecut = findMDL(timeline, tree.root)
