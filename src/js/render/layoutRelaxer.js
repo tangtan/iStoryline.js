@@ -12,9 +12,21 @@ export class LayoutRelaxer {
     story._timeStamps2X = []
     for (let idx = 0, len = story.timeline.length; idx < len; idx++) {
       if (idx < renderX[0].length) {
-        story._timeStamps2X.push(renderX[0][idx][0])
+        for (let jdx = 0, jLen = story.characters.length; jdx < jLen; jdx++) {
+          const tmpX = renderX[jdx][idx][0]
+          if (tmpX > -1) {
+            story._timeStamps2X.push(tmpX)
+            break
+          }
+        }
       } else {
-        story._timeStamps2X.push(renderX[0][idx - 1][1])
+        for (let jdx = 0, jLen = story.characters.length; jdx < jLen; jdx++) {
+          const tmpX = renderX[jdx][idx - 1][1]
+          if (tmpX > -1) {
+            story._timeStamps2X.push(tmpX)
+            break
+          }
+        }
       }
     }
   }

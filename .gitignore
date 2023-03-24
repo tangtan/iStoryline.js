@@ -8,6 +8,7 @@
 /build
 /dist
 /.vscode
+/scripts/*.png
 
 # dependencies
 /node_modules
