@@ -19,7 +19,9 @@ const P_hat = (n, timeline) => {
 // calculate data description length
 function calculateDat(timeline, nodes) {
   return -nodes.reduce(
-    (sum, n) => sum + n.weight * Math.log2(P_hat(n, timeline)),
+    // (sum, n) => sum + n.weight * Math.log2(P_hat(n, timeline)), 0
+    (sum, n) =>
+      sum + n.weight * P_hat(n, timeline) * Math.log2(P_hat(n, timeline)),
     0
   )
 }
@@ -33,7 +35,8 @@ function calculateRootDat(timeline, nodes) {
 
   const weight = rootNode.weight
   // const weight = rootNode.children.reduce((sum, n) => sum + n.weight, 0)
-  return -weight * rootChildrenNum * Math.log2(rootP / rootChildrenNum)
+  // return -weight * rootChildrenNum * Math.log2(rootP / rootChildrenNum)
+  return -weight * rootP * rootChildrenNum * Math.log2(rootP / rootChildrenNum)
 }
 
 // calculate description length
@@ -70,13 +73,19 @@ const findMDL = (timeline, tree) => {
   const rootModelLength = calculateRootDescriptionLength(timeline, [tree])
   // const rootModelLength = calculateDescriptionLength(timeline, [tree])
   const optimalModelLength = calculateDescriptionLength(timeline, optimalModels)
-  console.log('rootModelLength :>> ', rootModelLength)
-  console.log('optimalModelLength :>> ', optimalModelLength)
+  // console.log('rootModelLength :>> ', rootModelLength)
+  // console.log('optimalModelLength :>> ', optimalModelLength)
   if (rootModelLength < optimalModelLength) {
-    console.log('return root :>> ')
+    if (tree.parent === null) {
+      console.log('Final MDL: ', rootModelLength)
+    }
+    // console.log('return root :>> ')
     return [tree]
   } else {
-    console.log('return optimalModels')
+    if (tree.parent === null) {
+      console.log('Final MDL: ', optimalModelLength)
+    }
+    // console.log('return optimalModels')
     return optimalModels
   }
 }

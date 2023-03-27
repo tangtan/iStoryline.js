@@ -1,4 +1,7 @@
+const { result } = require('lodash')
+
 function splitArrayIntoPairs(data) {
+  // console.log('data: ', data)
   var nodes = []
   for (var i = 0; i < data.length - 1; i++) {
     nodes.push({ value: [data[i], data[i + 1]] })
@@ -6,30 +9,75 @@ function splitArrayIntoPairs(data) {
   return nodes
 }
 
-function buildTreeNodes(data, clusterOrder) {
+function buildTreeNodes(data, clusterOrder, ifMergeTogether, mergeResults) {
   const nodes = splitArrayIntoPairs(data)
+  // console.log('splitArrayIntoPairs done, nodes: ', nodes)
+  // console.log('clusterOrder: ', clusterOrder)
+  // console.log('ifMergeTogether: ', ifMergeTogether)
 
+  // console.log('nodes.length = ', nodes.length)
   while (nodes.length > 1) {
+    // console.log('nodes.length = ', nodes.length)
+    // console.log('nodes before: ', nodes)
     var clusterNum = clusterOrder[0]
+    // console.log('clusterNum = ', clusterNum)
+
+    let mergeNum = 1
+    if (ifMergeTogether[1] === 1) {
+      var i = 1
+      while (ifMergeTogether[i++] === 1) {
+        mergeNum++
+      }
+    }
+
     for (var i = 0; i < nodes.length; i++) {
       var currNode = nodes[i]
       if (currNode.value[1] === clusterNum) {
         const newNode = {
-          value: [currNode.value[0], nodes[i + 1].value[1]],
-          children: [currNode, nodes[i + 1]],
+          value: [currNode.value[0], nodes[i + mergeNum].value[1]],
+          children: [currNode],
+        }
+        for (var j = 1; j <= mergeNum; j++) {
+          newNode.children.push(nodes[i + j])
         }
         nodes[i] = newNode
-        nodes.splice(i + 1, 1)
-        clusterOrder.shift()
+        nodes.splice(i + 1, mergeNum)
+        while (mergeNum--) {
+          clusterOrder.shift()
+          ifMergeTogether.shift()
+        }
+      }
+    }
+    // console.log('nodes num: ', nodes.length)
+    // console.log('clusterNum: ', clusterNum)
+    // console.log('nodes after merge: ')
+    // for (let node of nodes) {
+    //   console.log(node.value)
+    //   // if (node.children) {
+    //   //   for (let child of node.children) {
+    //   //     console.log('--', child.value)
+    //   //   }
+    //   // }
+    // }
+    for (let result of mergeResults) {
+      if (result.ClusterNum == clusterNum) {
+        result.numOfClusters = nodes.length
+        result.partition = JSON.parse(JSON.stringify(nodes))
       }
     }
   }
   return nodes[0]
 }
 
-function buildTree(timeline, clusterOrder) {
-  const data = buildTreeNodes(timeline, clusterOrder)
-
+function buildTree(timeline, clusterOrder, ifMergeTogether, mergeResults) {
+  // console.log('Enter buildTree')
+  const data = buildTreeNodes(
+    timeline,
+    clusterOrder,
+    ifMergeTogether,
+    mergeResults
+  )
+  // console.log('buildTreeNodes done')
   const tree = new Tree(data.value, data.value)
 
   if (data.children) {

@@ -86,8 +86,8 @@ def npy2json(npy_path, json_path):
 
 if __name__ == '__main__':
     # 路径
-    num_person = 50      # number of person appeared in the parks
-    num_loc = 20         # number of locations
-    num_t = 20           # number of sampled time points
+    num_person = 20      # number of person appeared in the parks
+    num_loc = 100         # number of locations
+    num_t = 1000           # number of sampled time points
     json_path = f'../data/sim/Simulation-{num_person}-{num_loc}-{num_t}.json'
     simulate_date(json_path, num_person, num_loc, num_t)
