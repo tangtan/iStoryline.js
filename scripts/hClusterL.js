@@ -1,4 +1,4 @@
-const storyJson = require('../data/case/case1.json') // storyJson
+const storyJson = require('../data/sim/Simulation-20-20-20.json') // storyJson
 const iStoryline = require('../build/js/index')
 
 // constructing sub json data
@@ -72,6 +72,13 @@ function countWiggles(table) {
   return wiggles
 }
 
+function calculateDistBtwnAdjTimeframes(orderTable, alignTable) {
+  const crossings = countCrossings(orderTable)
+  const wiggles = countWiggles(alignTable)
+  const res = 0.6 * crossings + 0.4 * wiggles
+  return res
+}
+
 const P_hat = (start, end, timeline) => {
   const nDuration = end - start
   const totalDuration = timeline[timeline.length - 1] - timeline[0]
@@ -96,7 +103,6 @@ function getWeight(start, end) {
   // return weight / totalweight
 }
 
-// calculate data description length
 function calculateDat(start, end, timeline) {
   const P = P_hat(start, end, timeline)
   const weight = getWeight(start, end)
@@ -105,36 +111,6 @@ function calculateDat(start, end, timeline) {
   return Dat
 }
 
-function calculateDat_nodes(timeline, nodes) {
-  return -nodes.reduce(
-    (sum, n) =>
-      sum + n.weight * Math.log2(P_hat(n.value[0], n.value[1], timeline)),
-    0
-    // (sum, n) => sum + n.weight * P_hat(n.value[0], n.value[1], timeline) * Math.log2(P_hat(n.value[0], n.value[1], timeline)), 0
-  )
-}
-
-// calculate data description length for the node itself
-function calculateRootDat(timeline, nodes) {
-  const rootNode = nodes[0]
-  const rootChildrenNum = rootNode.children.length
-  // assume evenly distribution
-  const rootP = P_hat(rootNode.value[0], rootNode.value[1], timeline)
-  const weight = rootNode.weight
-  return -weight * rootChildrenNum * Math.log2(rootP / rootChildrenNum)
-  // return -weight * rootP * rootChildrenNum * Math.log2(rootP / rootChildrenNum)
-}
-
-function calculateVirtualParentDat(start, split, end, timeline) {
-  const P1 = P_hat(start, split, timeline)
-  const P2 = P_hat(split, end, timeline)
-  const weight = getWeight(start, end)
-  const Dat = -weight * 2 * Math.log2((P1 + P2) / 2)
-  // const Dat = -weight * (P1 + P2) * 2 * Math.log2((P1 + P2) / 2)
-  return Dat
-}
-
-// calculate parameter description length
 function calculatePar(timeline, clusterNum) {
   const S = timeline.length - 1
   const K = clusterNum
@@ -186,14 +162,29 @@ function createFirstLayoutAndFullDistanceList(
       end: vaildTFs[idx + 2],
     }
     d.data = constructSubStoryJson(storyJson, d.start, d.end)
-    d.value = calculateVirtualParentDat(d.start, d.split, d.end, vaildTFs)
+    iStorylineInstance = new iStoryline.default()
+    const currGraph = iStorylineInstance.load(d.data)
+
+    d.value = calculateDistBtwnAdjTimeframes(
+      currGraph.getTable('sort'),
+      currGraph.getTable('align')
+    )
+
     distList.push(d)
   }
   firstLayout = [...vaildTFs]
   return { distList, firstLayout }
 }
 
-//convert to tree
+class mergeResult {
+  constructor(dist, ClusterNum, numOfClusters = 0, partition = []) {
+    this.dist = dist
+    this.ClusterNum = ClusterNum
+    this.numOfClusters = numOfClusters
+    this.partition = partition
+  }
+}
+
 function splitArrayIntoPairs(data) {
   var nodes = []
   for (var i = 0; i < data.length - 1; i++) {
@@ -202,7 +193,7 @@ function splitArrayIntoPairs(data) {
   return nodes
 }
 
-function buildTreeNodes(data, clusterOrder, ifMergeTogether) {
+function buildTreeNodes(data, clusterOrder, ifMergeTogether, mergeResults) {
   const nodes = splitArrayIntoPairs(data)
 
   while (nodes.length > 1) {
@@ -233,12 +224,23 @@ function buildTreeNodes(data, clusterOrder, ifMergeTogether) {
         }
       }
     }
+    for (let result of mergeResults) {
+      if (result.ClusterNum == clusterNum) {
+        result.numOfClusters = nodes.length
+        result.partition = JSON.parse(JSON.stringify(nodes))
+      }
+    }
   }
   return nodes[0]
 }
 
-function buildTree(timeline, clusterOrder, ifMergeTogether) {
-  const data = buildTreeNodes(timeline, clusterOrder, ifMergeTogether)
+function buildTree(timeline, clusterOrder, ifMergeTogether, mergeResults) {
+  const data = buildTreeNodes(
+    timeline,
+    clusterOrder,
+    ifMergeTogether,
+    mergeResults
+  )
   const tree = new Tree(data.value, data.value)
 
   if (data.children) {
@@ -338,53 +340,79 @@ class Tree {
   }
 }
 
-const a = 1
-// calculate description length
-function calculateDescriptionLength(timeline, nodes) {
-  return (
-    calculatePar(timeline, nodes.length) +
-    a * calculateDat_nodes(timeline, nodes)
-  )
+// select treecut by L_method
+// find 2 linear models to fit the curve, with min rmse
+function L_method(mergeResults) {
+  let k = 1
+  let minError = Number.MAX_VALUE
+  const points = mergeResults
+    .reverse()
+    .map(obj => ({ x: obj.numOfClusters, y: obj.dist }))
+  const eq = linearRegression(points)
+  for (let i = 2; i < points.length - 1; i++) {
+    let l_points = points.slice(0, i)
+    let r_points = points.slice(i, points.length)
+    let l_eq = linearRegression(l_points)
+    let r_eq = linearRegression(r_points)
+    let l_error = rmse(l_points, l_eq)
+    let r_error = rmse(r_points, r_eq)
+    let error_tmp =
+      (l_error * i) / points.length +
+      (r_error * (points.length - i)) / points.length
+    if (error_tmp < minError) {
+      minError = error_tmp
+      k = i
+    }
+  }
+
+  let error_all = rmse(points, eq)
+  if (error_all < minError) {
+    minError = error_all
+    k = points.length - 1
+  }
+
+  let L_cut
+  for (let mergeResult of mergeResults) {
+    if (mergeResult.numOfClusters === k) {
+      L_cut = mergeResult.partition
+    }
+  }
+  return L_cut
 }
 
-function calculateRootDescriptionLength(timeline, nodes) {
-  return (
-    calculatePar(timeline, nodes.length) + a * calculateRootDat(timeline, nodes)
-  )
+function rmse(points, eq) {
+  // root-mean-squared error
+  const n = points.length
+  let sumError = 0
+  for (let i = 0; i < n; i++) {
+    const pred_y = eq.slope * points[i].x + eq.intercept
+    const error = pred_y - points[i].y
+    sumError += error * error
+  }
+  const rmse = Math.sqrt(sumError / n)
+  return rmse
 }
 
-// select treecut by calculation MDL
-const findMDL = (timeline, tree) => {
-  // Check if the current node is a leaf node
-  if (tree.children.length === 0) {
-    return [tree]
+function linearRegression(points) {
+  var xSum = 0
+  var ySum = 0
+  var xySum = 0
+  var xxSum = 0
+  var count = points.length
+
+  for (var i = 0; i < count; i++) {
+    var x = points[i].x
+    var y = points[i].y
+    xSum += x
+    ySum += y
+    xySum += x * y
+    xxSum += x * x
   }
 
-  // Recursively find the optimal model for each child subtree
-  let optimalModels = []
-  for (let i = 0; i < tree.children.length; i++) {
-    const childModels = findMDL(timeline, tree.children[i])
-    optimalModels = optimalModels.concat(childModels)
-  }
+  var slope = (count * xySum - xSum * ySum) / (count * xxSum - xSum * xSum)
+  var intercept = ySum / count - (slope * xSum) / count
 
-  // Check if collapsing the lower-level optimal models reduces the description length
-  const rootModelLength = calculateRootDescriptionLength(timeline, [tree])
-  const optimalModelLength = calculateDescriptionLength(timeline, optimalModels)
-  // console.log('rootModelLength :>> ', rootModelLength)
-  // console.log('optimalModelLength :>> ', optimalModelLength)
-  if (rootModelLength < optimalModelLength) {
-    // if (tree.parent === null) {
-    //   console.log('Final MDL: ', rootModelLength)
-    // }
-    // console.log('return root :>> ')
-    return [tree]
-  } else {
-    // if (tree.parent === null) {
-    //   console.log('Final MDL: ', optimalModelLength)
-    // }
-    // console.log('return optimalModels')
-    return optimalModels
-  }
+  return { slope, intercept }
 }
 
 async function main() {
@@ -406,9 +434,14 @@ async function main() {
     vaildTFs
   )
 
+  let mergeResults = []
   let ifMergeTogether = new Array(clusterOrder.length).fill(0)
   let minDist
   let prevMinDist = null
+
+  for (let clusterNum of clusterOrder) {
+    mergeResults.push(new mergeResult(0, clusterNum))
+  }
   while (distList.length > 1) {
     // finding the shortest distance between tfs
     let minDistIndex = 0
@@ -436,10 +469,45 @@ async function main() {
     clusterOrder.push(minDist.split)
     ifMergeTogether.push(mergeTogether)
 
+    mergeResults.push(new mergeResult(minDist.value, minDist.split))
+
+    // recalculate the distance between the new timeframe and the its left and right timeframes
+    const updateDistance = (
+      distList,
+      minDistIndex,
+      storyJson,
+      iStorylineInstance
+    ) => {
+      // console.log('in updateDistance')
+      const updateDistanceValue = (d, start, end) => {
+        const currData = constructSubStoryJson(storyJson, start, end)
+        iStorylineInstance = new iStoryline.default()
+        const currGraph = iStorylineInstance.load(currData)
+        d.value = calculateDistBtwnAdjTimeframes(
+          currGraph.getTable('sort'),
+          currGraph.getTable('align')
+        )
+      }
+
+      if (minDistIndex !== 0) {
+        let leftDist = distList[minDistIndex - 1]
+        leftDist.split = minDist.start
+        leftDist.end = minDist.end
+        updateDistanceValue(leftDist, leftDist.start, leftDist.end)
+      }
+
+      if (minDistIndex !== distList.length - 1) {
+        let rightDist = distList[minDistIndex + 1]
+        rightDist.start = minDist.start
+        rightDist.split = minDist.end
+        updateDistanceValue(rightDist, rightDist.start, rightDist.end)
+      }
+    }
+    updateDistance(distList, minDistIndex, storyJson, iStorylineInstance)
+
     // remove the original distance object
     distList = distList.filter((_, index) => index != minDistIndex)
   }
-
   clusterOrder.push(distList[0].split)
   if (
     prevMinDist &&
@@ -451,18 +519,19 @@ async function main() {
     ifMergeTogether.push(0)
   }
 
-  const tree = buildTree(timeline, clusterOrder, ifMergeTogether)
+  mergeResults.push(new mergeResult(distList[0].value, distList[0].split))
+
+  const tree = buildTree(timeline, clusterOrder, ifMergeTogether, mergeResults)
   for (let node of tree.preOrderTraversal()) {
     node.weight = getWeight(node.value[0], node.value[1])
   }
 
   // find treecut
-  const treecut = findMDL(timeline, tree.root)
+  const treecut = L_method(mergeResults)
 
   var end = Date.now()
   console.log('time: ', end - start)
 
-  // calculate crossings, wiggles and DL
   let totalcrossings = 0
   let totalwiggles = 0
   let Dat = 0
