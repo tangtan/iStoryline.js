@@ -1,20 +1,14 @@
 // import { logStoryInfo } from '../../src/js/utils/logger'
-import { drawStoryline, drawSquares } from '../../src/js/utils/drawer'
+import { drawStoryline, drawSquaresAndBands } from '../../src/js/utils/drawer'
 import iStoryline from '../../src/js'
 
 async function main(fileUrl, partition, svgPadding = 10) {
-  // const iStorylineInstance = new iStoryline()
-  // const fileUrl = `../../data/${fileName.split('.')[1]}/${fileName}`
-  // let graph = await iStorylineInstance.loadFile(fileUrl)
-  // Scale to window size
   const containerDom = document.getElementById('mySvg')
-  const windowW = containerDom.clientWidth - 2 * svgPadding
-  const windowH = containerDom.clientHeight - 2 * svgPadding
-  const graphPadding = 50
+  const graphPadding = 100
   const minX = svgPadding
-  const maxX = windowW + svgPadding
+  const maxX = containerDom.clientWidth - svgPadding
   const minY = svgPadding
-  const maxY = windowH + svgPadding
+  const maxY = containerDom.clientHeight - svgPadding
   const graphMinX = minX + svgPadding
   const graphMaxX = maxX - svgPadding
   const graphMinY = minY + svgPadding
@@ -33,7 +27,8 @@ async function main(fileUrl, partition, svgPadding = 10) {
         graphMinY,
         graphMaxY
       )
-      drawSquares(graphs, minY, maxY)
+      console.log(graphs)
+      drawSquaresAndBands(graphs, minY, maxY, graphPadding)
       const graph = graphs[0]
       const storylines = graph.storylines
       const characters = graph.characters
@@ -66,7 +61,7 @@ function joinSubGraphs(
     const subStoryData = constructSubStoryJson(storyJson, sTime, eTime)
     let subGraph = iStorylineGenerator.load(subStoryData)
     const graphW =
-      ((width - (partition.length - 1) * padding) * (eTime - sTime)) /
+      ((width - (partition.length - 2) * padding) * (eTime - sTime)) /
       (maxTime - minTime)
     const graphH = maxY - minY
     subGraph = iStorylineGenerator.scale(minX, minY, graphW, graphH)
@@ -115,10 +110,13 @@ function joinSubGraphs(
     })
     graph.minX = _graphMinX
     graph.maxX = _graphMaxX
-    console.log(_graphMaxX, _graphMinX)
+    // console.log(_graphMaxX, _graphMinX)
   })
   // join subgraphs into the first one
   for (let i = graphs.length - 1; i >= 1; i--) {
+    let graphUps = 0
+    let graphDowns = 0
+    let graphEquals = 0
     for (const [idx, currChar] of graphs[i].characters.entries()) {
       if (graphs[i - 1].characters.includes(currChar)) {
         const _idx = graphs[i - 1].characters.indexOf(currChar)
@@ -140,6 +138,16 @@ function joinSubGraphs(
           if (currPoint[0] - lastPoint[0] === padding && isJoint) {
             graphs[i - 1].storylines[_idx].push([lastPoint, currPoint])
           }
+          // counting trends
+          if (currPoint[0] - lastPoint[0] === padding) {
+            if (lastPoint[1] > currPoint[1]) {
+              graphDowns++
+            } else if (lastPoint[1] < currPoint[1]) {
+              graphUps++
+            } else {
+              graphEquals++
+            }
+          }
         }
         graphs[i - 1].storylines[_idx].push(...graphs[i].storylines[idx])
       } else {
@@ -148,6 +156,9 @@ function joinSubGraphs(
         graphs[i - 1].storylines.push(graphs[i].storylines[idx])
       }
     }
+    graphs[i - 1].lineUps = graphUps
+    graphs[i - 1].lineDowns = graphDowns
+    graphs[i - 1].lineEquals = graphEquals
   }
   return graphs
 }
@@ -192,5 +203,5 @@ function constructSubStoryJson(storyJson, startFrame, endFrame) {
   }
 }
 
-// main('../../data/case/case1.json', [50, 680, 1330])
-main('../../data/sim/Simulation-20-20-20.json', [0, 100, 200])
+main('../../data/case/case1.json', [50, 680, 1330])
+// main('../../data/sim/Simulation-20-20-20.json', [0, 60, 140, 200])
