@@ -1,7 +1,8 @@
 const fs = require('fs')
 const { createCanvas } = require('canvas')
 const iStoryline = require('../build/js/index')
-const storyJson = require('../data/sim/Simulation-50-20-20.json') // storyJson
+// const storyJson = require('../data/sim/Simulation-60-20-20.json') // storyJson
+const storyJson = require('../data/json/case2_200_byday.json')
 
 function constructSubStoryJson(storyJson, startFrame, endFrame) {
   const _charactersJson = {}
@@ -93,13 +94,15 @@ function saveStorylineImage(graph, imgName = 'test', imgW = 5000, imgH = 5000) {
   const canvas = createCanvas(imgW, imgH)
   const ctx = canvas.getContext('2d')
   const drawSegement = points => {
+    if (!points) return
     if (points.length < 2) return
     ctx.beginPath()
     ctx.moveTo(points[0][0], points[0][1])
     for (let i = 1; i < points.length; i++) {
       ctx.lineTo(points[i][0], points[i][1])
     }
-    ctx.strokeStyle = 'green'
+    ctx.strokeStyle = '#5b7590'
+    ctx.strokeWidth = 5
     ctx.stroke()
   }
 
@@ -112,12 +115,24 @@ function saveStorylineImage(graph, imgName = 'test', imgW = 5000, imgH = 5000) {
   imgOut.on('finish', () => console.log('The PNG file was created.'))
 }
 
+function getStorylineMaxX(graph) {
+  let maxX = 0
+  graph.storylines.forEach(storyline => {
+    storyline.forEach(segment => {
+      segment.forEach(pt => {
+        if (pt[0] >= maxX) maxX = pt[0]
+      })
+    })
+  })
+  return maxX
+}
+
 function drawJointSubGraphs(
   storyJson,
   partition,
   isJoint = true,
   width = 3000,
-  padding = 100,
+  padding = 50,
   minY = 10,
   maxY = 800
 ) {
@@ -145,15 +160,24 @@ function drawJointSubGraphs(
     let lastGraphMinX = graphs[i - 1].timelineGuide[0]
     let lastGraphMaxX =
       graphs[i - 1].timelineGuide[graphs[i - 1].timelineGuide.length - 1]
+    if (!lastGraphMaxX) lastGraphMaxX = getStorylineMaxX(graphs[i - 1])
     translateX += lastGraphMaxX - lastGraphMinX + padding
+    // console.log(translateX, lastGraphMaxX)
     graphs[i].storylines.forEach(storyline => {
-      storyline.forEach(segment => {
-        segment.forEach(pt => {
-          pt[0] += translateX
+      if (storyline && storyline.length > 0) {
+        storyline.forEach(segment => {
+          if (segment && segment.length > 0) {
+            segment.forEach(pt => {
+              if (pt && pt.length === 2) {
+                pt[0] += translateX
+              }
+            })
+          }
         })
-      })
+      }
     })
   }
+  // writeJsonFile(graphs[0]) // debugger
   // join subgraphs into the first one
   for (let i = graphs.length - 1; i >= 1; i--) {
     for (const [idx, currChar] of graphs[i].characters.entries()) {
@@ -161,15 +185,22 @@ function drawJointSubGraphs(
         const _idx = graphs[i - 1].characters.indexOf(currChar)
         let lastStoryline = graphs[i - 1].storylines[_idx]
         let lastSegment = lastStoryline[lastStoryline.length - 1]
-        let lastPoint = lastSegment[lastSegment.length - 1]
         let currStoryline = graphs[i].storylines[idx]
         let currSegment = currStoryline[0]
-        let currPoint = currSegment[0]
-        // console.log('last:', lastPoint)
-        // console.log('curr:', currPoint)
-        // add connecting lines
-        if (currPoint[0] - lastPoint[0] === padding && isJoint) {
-          graphs[i - 1].storylines[_idx].push([lastPoint, currPoint])
+        if (
+          lastSegment &&
+          currSegment &&
+          lastSegment.length > 0 &&
+          currSegment.length > 0
+        ) {
+          let lastPoint = lastSegment[lastSegment.length - 1]
+          let currPoint = currSegment[0]
+          // console.log('last:', lastPoint)
+          // console.log('curr:', currPoint)
+          // add connecting lines
+          if (currPoint[0] - lastPoint[0] === padding && isJoint) {
+            graphs[i - 1].storylines[_idx].push([lastPoint, currPoint])
+          }
         }
         graphs[i - 1].storylines[_idx].push(...graphs[i].storylines[idx])
       } else {
@@ -179,13 +210,21 @@ function drawJointSubGraphs(
       }
     }
   }
-  saveStorylineImage(graphs[0], 'subs')
+  saveStorylineImage(graphs[0], 'subs', width, maxY + minY)
 }
 
 // Main
-const iStorylineInstance = new iStoryline.default()
-let graph0 = iStorylineInstance.load(storyJson)
-graph0 = iStorylineInstance.scale(0, 10, 3000, 800) // 对照
-saveStorylineImage(graph0, 'full')
+// const iStorylineInstance = new iStoryline.default()
+// let graph0 = iStorylineInstance.load(storyJson)
+// // writeJsonFile(graph0)
+// graph0 = iStorylineInstance.scale(0, 10, 3000, 800) // 对照
+// saveStorylineImage(graph0, 'full', 3000, 810)
 
-drawJointSubGraphs(storyJson, [0, 60, 80, 100, 120, 200], false)
+drawJointSubGraphs(storyJson, [0, 100, 260])
+
+// Case1
+// const iStorylineInstance = new iStoryline.default()
+// const subStoryJson = constructSubStoryJson(storyJson, 680, 1330)
+// let graph1 = iStorylineInstance.load(subStoryJson)
+// graph1 = iStorylineInstance.scale(0, 10, 3000, 800)
+// saveStorylineImage(graph1, 'sub2')
