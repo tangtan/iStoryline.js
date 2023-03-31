@@ -1,21 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <title>iStoryline</title>
-    <style>
-      body {
-        margin: 0;
-        overflow: hidden;
-      }
-      .mySvg {
-        width: 98vw;
-        height: 98vh;
-      }
-    </style>
+    <meta charset="utf-8" />
+    <title>StoryPartition</title>
+    <link rel="stylesheet" type="text/css" href="app/static/index.css" />
   </head>
 
   <body>
-    <svg id="mySvg" class="mySvg"></svg>
+    <nav class="navbar">
+      <a href="#">StoryPartition</a>
+      <div class="column-container">
+        <div class="dropdown">
+          <div class="dropdown-title">People</div>
+          <div class="wrapper">
+            <input
+              id="people-volume"
+              type="range"
+              min="20"
+              max="100"
+              step="40"
+              value="20"
+            />
+            <div id="people-volume-value" class="volume-value"></div>
+          </div>
+        </div>
+        <div class="dropdown">
+          <div class="dropdown-title">Time Frames</div>
+          <div class="wrapper">
+            <input
+              id="timeframes-volume"
+              type="range"
+              min="20"
+              max="40"
+              step="20"
+              value="20"
+            />
+            <div id="timeframes-volume-value" class="volume-value"></div>
+          </div>
+        </div>
+        <div class="dropdown">
+          <div class="dropdown-title">Locations</div>
+          <div class="wrapper">
+            <input
+              id="locations-volume"
+              type="range"
+              min="20"
+              max="40"
+              step="20"
+              value="20"
+            />
+            <div id="locations-volume-value" class="volume-value"></div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="separator"></div>
+    <svg id="mySvg"></svg>
   </body>
 </html>

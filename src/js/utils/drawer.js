@@ -73,3 +73,22 @@ function generateBezierPath(points) {
   pathStr += ` L ${points[pointsNum - 1][0]} ${points[pointsNum - 1][1]}`
   return pathStr
 }
+
+export function drawSquares(graphs, minY, maxY) {
+  const svg = Snap('#mySvg')
+  graphs.forEach(graph => {
+    let minX = graph.minX
+    let maxX = graph.maxX
+
+    const squareWidth = maxX - minX
+    const squareHeight = maxY - minY
+
+    svg.rect(minX, minY, squareWidth, squareHeight).attr({
+      fill: 'white',
+      stroke: 'blue',
+      strokeWidth: 2,
+      rx: 10,
+      ry: 10,
+    })
+  })
+}

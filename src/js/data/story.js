@@ -56,19 +56,19 @@ export class Story {
   //  * @param {string} fileType
   //  * @returns
   //  */
-  // async loadFile(fileUrl) {
-  //   const fileSeps = fileUrl.split('.')
-  //   const fileType = fileSeps[fileSeps.length - 1]
-  //   if (fileType === 'xml') {
-  //     const xml = await d3Fetch.xml(fileUrl)
-  //     parseXMLFile(xml, this)
-  //   } else if (fileType === 'json') {
-  //     const json = await d3Fetch.json(fileUrl)
-  //     parseJSONFile(json, this)
-  //   } else {
-  //     console.error('Wrong fileType!')
-  //   }
-  // }
+  async loadFile(fileUrl) {
+    const fileSeps = fileUrl.split('.')
+    const fileType = fileSeps[fileSeps.length - 1]
+    if (fileType === 'xml') {
+      const xml = await d3Fetch.xml(fileUrl)
+      parseXMLFile(xml, this)
+    } else if (fileType === 'json') {
+      const json = await d3Fetch.json(fileUrl)
+      parseJSONFile(json, this)
+    } else {
+      console.error('Wrong fileType!')
+    }
+  }
 
   /**
    * load json object

@@ -1,8 +1,8 @@
 const fs = require('fs')
 const { createCanvas } = require('canvas')
 const iStoryline = require('../build/js/index')
-// const storyJson = require('../data/sim/Simulation-60-20-20.json') // storyJson
-const storyJson = require('../data/json/case2_200_byday.json')
+// const storyJson = require('../data/sim/Simulation-20-40-40.json') // storyJson
+const storyJson = require('../data/json/case1_new.json')
 
 function constructSubStoryJson(storyJson, startFrame, endFrame) {
   const _charactersJson = {}
@@ -177,7 +177,6 @@ function drawJointSubGraphs(
       }
     })
   }
-  // writeJsonFile(graphs[0]) // debugger
   // join subgraphs into the first one
   for (let i = graphs.length - 1; i >= 1; i--) {
     for (const [idx, currChar] of graphs[i].characters.entries()) {
@@ -210,6 +209,7 @@ function drawJointSubGraphs(
       }
     }
   }
+  writeJsonFile({ graphs: graphs }) // debugger
   saveStorylineImage(graphs[0], 'subs', width, maxY + minY)
 }
 
@@ -220,7 +220,7 @@ function drawJointSubGraphs(
 // graph0 = iStorylineInstance.scale(0, 10, 3000, 800) // 对照
 // saveStorylineImage(graph0, 'full', 3000, 810)
 
-drawJointSubGraphs(storyJson, [0, 100, 260])
+drawJointSubGraphs(storyJson, [50, 680, 1330], false, 1200, 50, 10, 640)
 
 // Case1
 // const iStorylineInstance = new iStoryline.default()
