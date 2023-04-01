@@ -6,20 +6,20 @@ export function drawSegmentPath(pathStr, defaultWidth = 2, hoverWidth = 4) {
   pathSvg.hover(
     () => {
       pathSvg.attr({
-        stroke: 'blue',
+        stroke: '#283f54',
         'stroke-width': hoverWidth,
       })
     },
     () => {
       pathSvg.attr({
-        stroke: 'black',
+        stroke: '#3e6285',
         'stroke-width': defaultWidth,
       })
     }
   )
   pathSvg.attr({
     fill: 'none',
-    stroke: 'black',
+    stroke: '#283f54',
     'stroke-width': defaultWidth,
   })
   return pathSvg
@@ -146,7 +146,15 @@ export function drawSquaresAndBands(graphs, minY, maxY, padding) {
     // draw rectangle
     svg.rect(minX, minY, squareWidth, squareHeight).attr({
       fill: 'white',
-      stroke: 'blue',
+      stroke: '#3e6285',
+      opacity: 0.4,
+      strokeWidth: 4,
+      rx: 10,
+      ry: 10,
+    })
+    svg.rect(minX, minY, squareWidth, squareHeight).attr({
+      fill: 'white',
+      stroke: '#3e6285',
       strokeWidth: 2,
       rx: 10,
       ry: 10,

@@ -2,7 +2,7 @@
 import { drawStoryline, drawSquaresAndBands } from '../../src/js/utils/drawer'
 import iStoryline from '../../src/js'
 
-async function main(fileUrl, partition, svgPadding = 10) {
+async function main(fileUrl, partition, svgPadding = 50) {
   const containerDom = document.getElementById('mySvg')
   const graphPadding = 100
   const minX = svgPadding
@@ -203,5 +203,7 @@ function constructSubStoryJson(storyJson, startFrame, endFrame) {
   }
 }
 
-main('../../data/case/case1.json', [50, 680, 1330])
+// main('../../data/case/case1.json', [50, 1330])
+// main('../../data/case/case2_50_byday.json', [0, 260])
 // main('../../data/sim/Simulation-20-20-20.json', [0, 60, 140, 200])
+main('../../data/sim/Simulation-50-20-20.json', [0, 80, 160, 200])
